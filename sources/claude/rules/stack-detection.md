@@ -2,7 +2,7 @@
 
 > **Purpose:** Prevent reviewer/auditor agents from fabricating stack dependencies based on the "Default Stack" in `~/.claude/CLAUDE.md`. The global default is not evidence — the project's actual files are. This file is linked from Golden Rule #8 and is the canonical reference for all stack-scoping decisions.
 >
-> **Reference implementer:** `performance-review/SKILL.md:13-26` (and `check-backend-deploy.sh:16,33`) already use this pattern correctly — consult them for working examples.
+> **Reference implementer:** `performance-review/SKILL.md:13-26` already uses this pattern correctly — consult it for a working example.
 
 ## Core Rule
 
@@ -85,4 +85,3 @@ When skipping a section due to stack absence, surface it explicitly: "N/A — pr
 - `~/.claude/CLAUDE.md` Golden Rule #8 "Stack-Verification" — the binding rule
 - `~/.claude/rules/security.md` "Rate Limiting" — scoped version
 - `claude-config/skills/performance-review/SKILL.md:13-26` — reference implementation
-- `claude-config/hooks/check-backend-deploy.sh:16,33` — hook using same signatures

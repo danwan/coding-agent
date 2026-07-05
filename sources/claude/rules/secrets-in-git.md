@@ -1,6 +1,6 @@
 # Secrets in Git/GitHub Artifacts (Never)
 
-> Pattern catalog, FP-whitelist, hook reference, override escape-hatch: `~/.claude/rules/secrets-in-git-patterns.md` (path-scoped to `.env*` etc.)
+> Pattern catalog, FP-whitelist: `~/.claude/rules/secrets-in-git-patterns.md` (path-scoped to `.env*` etc.)
 > Rotation runbook: `~/.claude/runbooks/secrets-in-git-runbook.md`
 
 ## NEVER include secret values in:
@@ -26,7 +26,7 @@ The chat itself is not "persisted" in the GitHub-leak sense: it lives in the use
 
 ## Redaction Conventions (use these in commit/PR/issue bodies)
 
-When you need to *reference* a secret in a body, use one of these placeholders. The hook explicitly allows them:
+When you need to *reference* a secret in a body, use one of these placeholders:
 
 - `<set via vercel env add APP_PROXY_SECRET production>` — for Vercel-stored values
 - `<set via convex env set APP_PROXY_SECRET>` — for Convex-stored values
@@ -40,6 +40,6 @@ Never paste even a partial real secret — half a JWT is still recoverable.
 
 If a secret reaches GitHub: rotate immediately at source, update all envs (Vercel/Modal/Convex), revoke the old value, document the incident, then optionally redact in GitHub. Full 5-step runbook: `~/.claude/runbooks/secrets-in-git-runbook.md`.
 
-## When the hook blocks you
+## No automated scanner — self-enforce
 
-`~/.claude/hooks/pre-publish-secret-scan.sh` enforces this at Bash-PreToolUse. If it blocks: surface the block verbatim to the user. Do NOT silently bypass. Pattern details + escape-hatch: see `secrets-in-git-patterns.md` (loads when editing `.env*` files).
+This is a hard rule, not a hook-enforced one: there is no automated scanner in this setup. Before every commit/push, self-check the diff/body against the NEVER-list above. Pattern details: see `secrets-in-git-patterns.md` (loads when editing `.env*` files).
