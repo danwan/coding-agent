@@ -1,0 +1,17 @@
+{
+  "userSettings": {
+    "globalPermissionGrants": {
+      "allow": [
+        "command(git branch)",
+        "command(git log)",
+        "command(git status)",
+        "command(find)",
+        "command(git show)",
+        "command(git diff)",
+        "command(git ls-files)",
+        "command(grep)"
+      ]
+    },
+    "themeMode": "THEME_MODE_DARK"
+  }
+}

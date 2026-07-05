@@ -1,0 +1,27 @@
+# Sensitive data
+claude-config/.secrets/
+*.secret
+*.key
+.env*
+
+# OS
+.DS_Store
+
+# Claude Code session data
+.claude/*
+!.claude/CLAUDE.md
+!.claude/skills/
+zz-plans/
+
+# Local agent memory/cache data
+.memsearch/
+
+# Build artifacts in skill eval scaffolds and autoresearch experiment outputs
+**/node_modules/
+**/.next/
+**/.convex/
+**/.turbo/
+claude-config/skills/*/autoresearch-*/
+
+# Local agents store (managed by skills CLI, not versioned)
+.agents/

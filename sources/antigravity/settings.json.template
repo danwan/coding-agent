@@ -1,0 +1,16 @@
+{
+  "model": "Gemini 3.5 Flash (High)",
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+  "toolPermission": "always-proceed",
+  "trustedWorkspaces": [
+    "{{HOME}}/Code/googleCLI",
+    "{{HOME}}/Code",
+    "{{HOME}}/Code/updater",
+    "{{HOME}}/Code/svb-finanzen",
+    "{{HOME}}/Code/svb-scripts",
+    "{{HOME}}/Code/coding-agent-setup"
+  ]
+}

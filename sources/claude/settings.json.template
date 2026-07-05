@@ -1,0 +1,152 @@
+{
+  "cleanupPeriodDays": 30,
+  "env": {
+    "TMPPREFIX": "/tmp/claude/zsh",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "attribution": {
+    "pr": "Created with Claude Code"
+  },
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Edit",
+      "Write",
+      "Read(~/**)",
+      "Read(~/.claude/**)",
+      "Read(//tmp/**)",
+      "mcp__claude_ai_Notion",
+      "mcp__claude_ai_n8n",
+      "mcp__claude_ai_Gmail",
+      "mcp__claude_ai_Google_Calendar",
+      "WebSearch",
+      "WebFetch",
+      "Skill",
+      "mcp__claude_ai_Exa",
+      "mcp__claude_ai_Sentry"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(rm -r *)",
+      "Bash(sudo *)",
+      "Bash(chmod 777 *)"
+    ],
+    "ask": [],
+    "defaultMode": "auto"
+  },
+  "skillOverrides": {},
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+  "enabledPlugins": {
+    "commit-commands@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "memsearch@memsearch-plugins": true,
+    "coderabbit@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "memsearch-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "zilliztech/memsearch"
+      },
+      "autoUpdate": true
+    }
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "network": {
+      "allowedDomains": [
+        "github.com",
+        "*.github.com",
+        "vercel.com",
+        "*.vercel.com",
+        "modal.com",
+        "*.modal.com",
+        "convex.dev",
+        "*.convex.dev",
+        "convex.cloud",
+        "*.convex.cloud",
+        "convex.site",
+        "*.convex.site",
+        "npmjs.org",
+        "*.npmjs.org",
+        "pypi.org",
+        "*.pypi.org",
+        "files.pythonhosted.org",
+        "context7.com",
+        "*.context7.com",
+        "exa.ai",
+        "*.exa.ai",
+        "shadcn.io",
+        "*.shadcn.io",
+        "shadcn.com",
+        "*.shadcn.com",
+        "anthropic.com",
+        "*.anthropic.com",
+        "platform.claude.com",
+        "*.platform.claude.com",
+        "*.githubusercontent.com",
+        "*.googleapis.com",
+        "api.notion.com",
+        "easyverein.com",
+        "*.easyverein.com",
+        "youtube.com",
+        "*.youtube.com",
+        "n8n.cloud",
+        "*.n8n.cloud",
+        "*.gstatic.com",
+        "*.cloudflare.com",
+        "cdn.jsdelivr.net",
+        "unpkg.com",
+        "registry.yarnpkg.com",
+        "*.skills.sh",
+        "openai.com",
+        "*.openai.com",
+        "chatgpt.com",
+        "*.chatgpt.com"
+      ],
+      "allowLocalBinding": true
+    },
+    "filesystem": {
+      "allowWrite": [
+        "~/code/**",
+        "~/.cache/uv/**",
+        "~/.local/share/uv/**",
+        "~/.claude/plugins/**",
+        "~/.claude/logs/**",
+        "~/.codex/**",
+        "~/.npm/**",
+        "~/.cache/pnpm/**",
+        "~/.local/share/pnpm/**",
+        "~/.local/share/fnm/**",
+        "~/.config/gh/**",
+        "~/.config/gcloud/**",
+        "~/.memsearch/**",
+        "~/.config/qmd/**",
+        "~/.cache/qmd/**",
+        "//tmp/**",
+        "//private/tmp/**"
+      ]
+    },
+    "enableWeakerNetworkIsolation": true
+  },
+  "effortLevel": "high",
+  "plansDirectory": "./zz-plans",
+  "prefersReducedMotion": true,
+  "autoMemoryEnabled": true,
+  "autoDreamEnabled": true,
+  "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
+  "theme": "dark",
+  "editorMode": "vim",
+  "agentPushNotifEnabled": true,
+  "tui": "fullscreen"
+}
