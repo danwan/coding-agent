@@ -1,0 +1,30 @@
+{
+  "skill_name": "notion-safe-writes",
+  "notes": "Live Notion evals. Each eval has its own with-skill and baseline fixture page (runs mutate them). Fixtures live under sandbox page 3770bbe8c24b815c809dd8792268779d.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "emoji-escapes-on-update",
+      "prompt": "Update my Notion page 'GitHub & Security Notes' (URL: https://app.notion.com/p/{FIXTURE}). Change the intro callout/quote so it says that 2FA is now enforced for all contributors. Then add a new section at the end: a heading '🔑 API Key Rotation' with a sentence under it saying API keys are rotated every 90 days.",
+      "tests_quirk": "#1 literal \\u-escapes on update operations; #2 fetch-before-edit",
+      "fixtures": {"with_skill": "3770bbe8c24b8179b8e4dac50afbfcdb", "baseline": "3770bbe8c24b81b2828add7e6e660c3b"},
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "table-row-native-format",
+      "prompt": "On my Notion page 'MCP Tools' (URL: https://app.notion.com/p/{FIXTURE}), add a new tool to the table: sentry-mcp with status 'connected'. Also update the heading so the count is correct.",
+      "tests_quirk": "#6 table rows become native <tr>/<td>; #3 silent multi-edit skip",
+      "fixtures": {"with_skill": "3770bbe8c24b81aeb39de4f628ecceb6", "baseline": "3770bbe8c24b8167ba85e6ed7592999a"},
+      "assertions": []
+    },
+    {
+      "id": 3,
+      "name": "child-page-preservation",
+      "prompt": "Restructure the body of my Notion page 'Project Hub' (URL: https://app.notion.com/p/{FIXTURE}) into something cleaner: a short intro paragraph, then two sections — one '## Overview' and one '## Links'. Keep the existing information.",
+      "tests_quirk": "#4 replace_content deletes child pages unless re-included",
+      "fixtures": {"with_skill": "3770bbe8c24b8119948df17f4709bcad", "baseline": "3770bbe8c24b81d7b6c6e9cb64cf42f4"},
+      "assertions": []
+    }
+  ]
+}

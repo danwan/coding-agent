@@ -1,0 +1,343 @@
+approval_policy = "never"
+approvals_reviewer = "user"
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+personality = "pragmatic"
+plan_mode_reasoning_effort = "xhigh"
+project_doc_fallback_filenames = []
+project_doc_max_bytes = 65536
+sandbox_mode = "workspace-write"
+
+notify = ["{{HOME}}/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
+
+[features]
+hooks = true
+plugins = true
+terminal_resize_reflow = true
+external_migration = true
+apps = false
+goals = true
+prevent_idle_sleep = true
+mentions_v2 = true
+js_repl = false
+
+[marketplaces.claude-plugins-official]
+source_type = "local"
+source = "{{HOME}}/.codex/plugins/marketplaces/claude-plugins-official"
+
+[marketplaces.memsearch-plugins]
+source_type = "local"
+source = "{{HOME}}/.codex/plugins/marketplaces/memsearch-plugins"
+
+[marketplaces.openai-bundled]
+last_updated = "2026-06-03T22:01:23Z"
+source_type = "local"
+source = "{{HOME}}/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[marketplaces.openai-primary-runtime]
+last_updated = "2026-05-15T11:03:05Z"
+source_type = "local"
+source = "{{HOME}}/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"
+
+[mcp_servers.context7.http_headers]
+CONTEXT7_API_KEY = "{{CONTEXT7_API_KEY}}"
+
+[mcp_servers.notion]
+url = "https://mcp.notion.com/mcp"
+
+[mcp_servers.node_repl]
+args = []
+command = "/Applications/Codex.app/Contents/Resources/node_repl"
+startup_timeout_sec = 120
+
+[mcp_servers.node_repl.env]
+NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
+NODE_REPL_NODE_MODULE_DIRS = ""
+NODE_REPL_NODE_PATH = "/Applications/Codex.app/Contents/Resources/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "{{HOME}}/.codex"
+CODEX_HOME = "{{HOME}}/.codex"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "4b6bfaf4ed2ce9b5cd68e60a61642eb4927a36306ba8c8993f6058607b3530fb"
+BROWSER_USE_AVAILABLE_BACKENDS = "iab"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
+BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
+CODEX_CLI_PATH = "/Applications/Codex.app/Contents/Resources/codex"
+
+[notice]
+"hide_gpt-5.1-codex-max_migration_prompt" = true
+"fast_default_opt_out" = true
+
+[notice.model_migrations]
+"gpt-5.3-codex" = "gpt-5.4"
+
+[notice.external_config_migration_prompts]
+home_last_prompted_at = 1781067136
+
+[notice.external_config_migration_prompts.project_last_prompted_at]
+"{{HOME}}/Code/svb-dokumente" = 1778853743
+"{{HOME}}/Code/go2rtc" = 1779396777
+"{{HOME}}/Library/CloudStorage/GoogleDrive-danny.wannagat@gmail.com/Meine Ablage/!Cowork/Finanzen" = 1779572939
+
+[plugins."coderabbit@claude-plugins-official"]
+enabled = true
+
+[plugins."commit-commands@claude-plugins-official"]
+enabled = true
+
+[plugins."frontend-design@claude-plugins-official"]
+enabled = true
+
+[plugins."memsearch@memsearch-plugins"]
+enabled = true
+
+[plugins."pr-review-toolkit@claude-plugins-official"]
+enabled = true
+
+[plugins."pyright-lsp@claude-plugins-official"]
+enabled = true
+
+[plugins."skill-creator@claude-plugins-official"]
+enabled = true
+
+[plugins."superpowers@claude-plugins-official"]
+enabled = true
+
+[plugins."typescript-lsp@claude-plugins-official"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = false
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = false
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = false
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[projects."{{HOME}}/Code"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/LAutomation"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/coding-agent-setup"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/elektr-schiesskladde"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/elektr_schiesskladde"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/l-automation"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/shared-canvas"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/shared-canvas-analysis"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/svb"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/svb-manager"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/svb1864site"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/updater"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/voicebot"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/xxtest"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Documents/Codex/2026-05-04/pr-f-mal-bitte-gibt-es"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Documents/Codex/2026-05-04/wenn-ich-das-in-der-ansicht"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Documents/Codex/2026-05-05/wo-kommen-die-einzelnen-mcp-konfigurationen"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Library/CloudStorage/GoogleDrive-danny.wannagat@gmail.com/Meine Ablage/!Cowork/SVB"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/my-python-project/jit-comparison-new"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Documents/Codex/2026-05-09/in-codex-app-auf-dem-mac"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Documents/Codex/2026-05-09/es-gibt-auch-so-tools-mit"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Documents/Codex/2026-05-11/hast-du-eigentlich-zugriff-auf-appify"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Documents/Codex/2026-05-11/features-codex-hooks-is-deprecated-use"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Documents/Codex/2026-05-11/https-zilliztech-github-io-memsearch-platforms"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/google-adk"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/n8n"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/svb-finanzen"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/notioncourse"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/.codex/worktrees/cf23/elektr-schiesskladde"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/googleCLI"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/.codex/worktrees/5543/l-automation"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Documents/Codex/2026-05-13/was-bedeutet-der-orangene-text-hier"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/svb-elektrschiess"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/svb-dokumente"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/!Vault"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/go2rtc"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Library/CloudStorage/GoogleDrive-danny.wannagat@gmail.com/Meine Ablage/!Cowork/Finanzen"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/svb-scripts"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/Code/google-henkel1"]
+trust_level = "trusted"
+
+[projects."{{HOME}}/code/updater"]
+trust_level = "trusted"
+
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+TMPPREFIX = "/tmp/codex/zsh"
+CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"
+
+[tui]
+status_line = ["model-with-reasoning", "current-dir", "git-branch", "used-tokens", "five-hour-limit", "weekly-limit"]
+
+[tui.model_availability_nux]
+"gpt-5.5" = 4
+
+[sandbox_workspace_write]
+network_access = true
+
+[[skills.config]]
+path = "{{HOME}}/.agents/skills/pnpm/SKILL.md"
+enabled = false
+
+[hooks.state]
+
+[hooks.state."{{HOME}}/.codex/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:3ee4eb973bcadf4e6fd5c011014bdf8d0b0d394b60a62009b67c22580d28d279"
+
+[hooks.state."{{HOME}}/.codex/hooks.json:pre_tool_use:0:1"]
+enabled = true
+trusted_hash = "sha256:51b71bec2ab494d47488c655713d2b036e492786db99995c184da42dbd60bc9a"
+
+[hooks.state."{{HOME}}/.codex/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:aa976225b54e652a7065a764ec8582a00cddcde1cb6619d53d5b4d92fcabb53e"
+
+[hooks.state."{{HOME}}/.codex/hooks.json:session_start:0:1"]
+trusted_hash = "sha256:fa7da7d0eec0cff3fd795d579d646904bbbec3bd84f98c44f78c13ff5e12a731"
+
+[hooks.state."{{HOME}}/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:1ebb025f50997dc62578973a0927eb9388033690b1038664257c17931cb1c86c"
+
+[hooks.state."{{HOME}}/.codex/hooks.json:stop:0:1"]
+trusted_hash = "sha256:7d83e00d6d382983018b24ce91e9205b3a0131dafb4c47e06b072d8f3132f81a"
+
+[hooks.state."{{HOME}}/.codex/hooks.json:stop:0:2"]
+trusted_hash = "sha256:f3f18c4b3024bb70c5446bda6904c8824d95eb4970c798aa0b8ab16a76b21015"
+
+[hooks.state."{{HOME}}/.codex/hooks.json:user_prompt_submit:0:0"]
+enabled = true
+trusted_hash = "sha256:4d0a85e7d0a535fd69c2a3b072fd344149d050418ec1013d055d2c63f9515f4b"
+
+[hooks.state."memsearch@memsearch-plugins:hooks/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:0a7162d47401ab1d64377c3158ca312c3882750a730193c480e00e3da970612e"
+
+[hooks.state."memsearch@memsearch-plugins:hooks/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:ce53a51d5778d17afb7be6e7e3e3440e957d88e8452956aa0d853e334924a2ab"
+
+[hooks.state."superpowers@claude-plugins-official:hooks/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:62acbaff2b2f55f41971e21a164990aaa53c96919baa0a5eae2eb5db73b9e6e6"
+
+[hooks.state."memsearch@memsearch-plugins:hooks/hooks.json:stop:0:0"]
+trusted_hash = "sha256:59d86a6ae1809f3895b72379d5cc3387270ff86364939548539304c51dceef0a"
+
+[desktop]
+ambient-suggestions-enabled = true
+appearanceTheme = "dark"
+appearanceLightCodeThemeId = "codex"
+appearanceDarkCodeThemeId = "ayu"
+followUpQueueMode = "queue"
+preventSleepWhileRunning = true
+keepRemoteControlAwakeWhilePluggedIn = true
+git-create-pull-request-as-draft = false
+git-show-sidebar-pr-icons = true
+git-pr-instructions = "Create Pull Request always as Ready to Review not as Draft."
+conversationDetailMode = "STEPS_COMMANDS"
+
+[desktop.appearanceLightChromeTheme]
+accent = "#0169cc"
+contrast = 40
+ink = "#0d0d0d"
+opaqueWindows = true
+surface = "#ffffff"
+
+[desktop.appearanceLightChromeTheme.fonts]
+code = '"Geist Mono", ui-monospace, "SFMono-Regular"'
+ui = "Geist, Inter"
+
+[desktop.appearanceLightChromeTheme.semanticColors]
+diffAdded = "#00a240"
+diffRemoved = "#e02e2a"
+skill = "#751ed9"
+
+[desktop.appearanceDarkChromeTheme]
+accent = "#e6b450"
+contrast = 60
+ink = "#bfbdb6"
+opaqueWindows = false
+surface = "#0b0e14"
+
+[desktop.appearanceDarkChromeTheme.fonts]
+
+[desktop.appearanceDarkChromeTheme.semanticColors]
+diffAdded = "#7fd962"
+diffRemoved = "#ea6c73"
+skill = "#cda1fa"
