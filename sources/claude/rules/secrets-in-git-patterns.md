@@ -9,14 +9,14 @@ paths:
   - "**/*.key"
 ---
 
-# Secrets in Git — Pattern Catalog & Hook Reference
+# Secrets in Git — Pattern Catalog
 
 > Preventive conventions (NEVER-list, redaction, allowlist) live in `~/.claude/rules/secrets-in-git.md`.
-> Background, audit-log queries, rotation runbook: `~/.claude/runbooks/secrets-in-git-runbook.md`
+> Background, rotation runbook: `~/.claude/runbooks/secrets-in-git-runbook.md`
 
 ## Pattern Set
 
-Each pattern below is a HARD signal. The hook MUST block on any single match. Patterns are intentionally over-eager — false positives are cheaper than leaks. The hook applies the False-Positive whitelist (next section) BEFORE matching.
+Each pattern below is a HARD signal to self-check for before publishing. Patterns are intentionally over-eager — treating a false positive as a secret is cheaper than a leak. Apply the False-Positive whitelist (next section) before deciding a match is real.
 
 | Pattern | Regex | Examples |
 |---|---|---|
@@ -32,30 +32,18 @@ Each pattern below is a HARD signal. The hook MUST block on any single match. Pa
 | Bcrypt/Argon2 hash | `\$2[aby]?\$[0-9]{2}\$[A-Za-z0-9./]{50,}` and `\$argon2(id\|i\|d)?\$` | password hashes |
 | Private key block | `-----BEGIN [A-Z ]*PRIVATE KEY-----` literal | RSA/EC/OpenSSH/PGP |
 
-## False-Positive Whitelist (applied before pattern match)
+## False-Positive Whitelist (apply before pattern match)
 
-The hook strips/ignores these BEFORE running the pattern set, so legitimate text never blocks:
+Treat these as non-matches — ignore them before checking the pattern set, so legitimate text is never mistaken for a secret:
 
 - **Trailer lines:** `Co-authored-by:`, `Signed-off-by:`, `Reviewed-by:`, `Acked-by:`, `Tested-by:`, `Reported-by:` — entire line dropped.
 - **Commit-SHA references:** `commit <sha>`, `revert <sha>`, `cherry-pick <sha>`, `merge <sha>`, `see <sha>`, `parent <sha>`, `tree <sha>` — token replaced with placeholder.
 - **Commit-range refs:** `abc1234..def5678` — replaced with placeholder.
 - **Explicit redaction placeholders:** `<REDACTED:...>`, `<set via vercel env add ...>`, `<set via convex env set ...>`, `<set via chat session>`, `<rotated secret — see chat session>`, `<chat session>` — stripped before scan.
 
-## False-Positive Override (escape hatch)
+## False-Positive Judgment Call
 
-If the hook flags a value that is genuinely not a secret:
-
-1. The agent MUST surface the block to the user verbatim.
-2. The agent MUST NOT silently bypass the hook.
-3. Only after the user explicitly says "this is not a secret, proceed" → the agent re-runs the same command with the override prefix:
-   ```bash
-   CLAUDE_SKIP_SECRET_SCAN=1 git commit -m "..."
-   ```
-4. The hook honors `CLAUDE_SKIP_SECRET_SCAN=1` in the command and approves with a logged warning.
-
-## Hook Reference
-
-`~/.claude/hooks/pre-publish-secret-scan.sh` enforces this rule at the Bash-PreToolUse layer. Publish-only: normal read/search/test commands are not scanned. The hook is a **guard, not a rewriter** — it blocks and surfaces; the agent (or user) decides how to redact. Audit log: `~/.claude/logs/pre-publish-secret-scan.log` (cookbook queries in runbook).
+If a value matches a pattern but is genuinely not a secret (e.g. a commit SHA, a test fixture), say so explicitly and proceed — there is no scanner to override, just your own judgment. When in doubt, ask the user.
 
 ## Out of scope (intentional)
 

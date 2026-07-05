@@ -1,8 +1,8 @@
 # Authored Skills
 
 Local-authored skills maintained in this repo. Each lives under
-`sources/skills/<name>/SKILL.md` and is symlinked into `~/.agents/skills/`
-(the canonical hub) by `apply.sh`. From there it is linked into every
+`sources/skills/<name>/SKILL.md` and is placed into `~/.agents/skills/`
+(the canonical hub) by the setup prompt. From there it is linked into every
 installed tool's skill dir (`~/.claude/skills`, `~/.codex/skills`,
 `~/.cursor/skills`, `~/.gemini/antigravity-cli/skills`). OpenCode reads
 `~/.agents/skills/*/SKILL.md` directly — no per-tool dir needed.
@@ -32,10 +32,8 @@ Remote skills (installed via `npx skills add`) are tracked separately in
 
 ## Lifecycle
 
-- **New authored skill**: create `sources/skills/<name>/SKILL.md`, run
-  `./scripts/apply.sh`, commit. The skill is immediately available to all
-  tools.
-- **Edit an authored skill**: edit the file in this repo (live paths are
-  symlinks into it). Commit + push = backup.
-- **Drift check**: `./scripts/apply.sh --check` verifies all per-tool
-  symlinks exist and point to the canonical hub.
+- **New authored skill**: create `sources/skills/<name>/SKILL.md`, have the
+  setup prompt place it under `~/.agents/skills/`, commit. The skill is
+  immediately available to all tools.
+- **Edit an authored skill**: edit the file in this repo (live paths are the
+  same files). Commit + push = backup.

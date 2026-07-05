@@ -6,8 +6,6 @@
 # appended content from Antigravity, grok, fnm, zoxide, fzf), so the
 # alias block is mirrored here by hand. When you add/change an alias,
 # update BOTH this file and the live ~/.zshrc so they stay in sync.
-# Run `./scripts/apply.sh --check` afterwards — it does not manage this
-# file, but keeps the rest of the drift report honest.
 #
 # Convention: one-letter / two-letter aliases for the coding agents,
 # grouped by tool. `o`-family = OpenCode, `c`-family = Claude Code,

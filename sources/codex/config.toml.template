@@ -11,7 +11,7 @@ sandbox_mode = "workspace-write"
 notify = ["{{HOME}}/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
 
 [features]
-hooks = true
+hooks = false
 plugins = true
 terminal_resize_reflow = true
 external_migration = true
@@ -258,46 +258,6 @@ network_access = true
 [[skills.config]]
 path = "{{HOME}}/.agents/skills/pnpm/SKILL.md"
 enabled = false
-
-[hooks.state]
-
-[hooks.state."{{HOME}}/.codex/hooks.json:pre_tool_use:0:0"]
-trusted_hash = "sha256:3ee4eb973bcadf4e6fd5c011014bdf8d0b0d394b60a62009b67c22580d28d279"
-
-[hooks.state."{{HOME}}/.codex/hooks.json:pre_tool_use:0:1"]
-enabled = true
-trusted_hash = "sha256:51b71bec2ab494d47488c655713d2b036e492786db99995c184da42dbd60bc9a"
-
-[hooks.state."{{HOME}}/.codex/hooks.json:session_start:0:0"]
-trusted_hash = "sha256:aa976225b54e652a7065a764ec8582a00cddcde1cb6619d53d5b4d92fcabb53e"
-
-[hooks.state."{{HOME}}/.codex/hooks.json:session_start:0:1"]
-trusted_hash = "sha256:fa7da7d0eec0cff3fd795d579d646904bbbec3bd84f98c44f78c13ff5e12a731"
-
-[hooks.state."{{HOME}}/.codex/hooks.json:stop:0:0"]
-trusted_hash = "sha256:1ebb025f50997dc62578973a0927eb9388033690b1038664257c17931cb1c86c"
-
-[hooks.state."{{HOME}}/.codex/hooks.json:stop:0:1"]
-trusted_hash = "sha256:7d83e00d6d382983018b24ce91e9205b3a0131dafb4c47e06b072d8f3132f81a"
-
-[hooks.state."{{HOME}}/.codex/hooks.json:stop:0:2"]
-trusted_hash = "sha256:f3f18c4b3024bb70c5446bda6904c8824d95eb4970c798aa0b8ab16a76b21015"
-
-[hooks.state."{{HOME}}/.codex/hooks.json:user_prompt_submit:0:0"]
-enabled = true
-trusted_hash = "sha256:4d0a85e7d0a535fd69c2a3b072fd344149d050418ec1013d055d2c63f9515f4b"
-
-[hooks.state."memsearch@memsearch-plugins:hooks/hooks.json:session_start:0:0"]
-trusted_hash = "sha256:0a7162d47401ab1d64377c3158ca312c3882750a730193c480e00e3da970612e"
-
-[hooks.state."memsearch@memsearch-plugins:hooks/hooks.json:user_prompt_submit:0:0"]
-trusted_hash = "sha256:ce53a51d5778d17afb7be6e7e3e3440e957d88e8452956aa0d853e334924a2ab"
-
-[hooks.state."superpowers@claude-plugins-official:hooks/hooks.json:session_start:0:0"]
-trusted_hash = "sha256:62acbaff2b2f55f41971e21a164990aaa53c96919baa0a5eae2eb5db73b9e6e6"
-
-[hooks.state."memsearch@memsearch-plugins:hooks/hooks.json:stop:0:0"]
-trusted_hash = "sha256:59d86a6ae1809f3895b72379d5cc3387270ff86364939548539304c51dceef0a"
 
 [desktop]
 ambient-suggestions-enabled = true

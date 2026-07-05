@@ -28,6 +28,17 @@ marketplaces: anthropics/claude-plugins-official, DietrichGebert/ponytail, zilli
 branch-cleanup · challenge · code-search · git-sync · grill-me · security-review · pr-workflow
 verify: `/` shows each; skills load
 
+## Skills — own, optional (stored, not default)  [optional]
+- config-edit — why: path syntax reference for Claude Code settings/permissions/hooks
+- convex-vercel-setup — why: standardize/audit Vercel+Convex+Modal deploy config (project-local preferred)
+- convexcheck — why: report-only audit of a project's Convex+Vercel+Modal deploy footguns (project-local preferred)
+- deploy — why: safe Modal/Convex deploy delegating to project deploy-script gates (project-local preferred)
+- notion-safe-writes — why: guardrails against known Notion MCP write bugs before create/edit calls
+- performance-review — why: automated Next.js+Convex+Modal performance checks (project-local preferred)
+- pin-auth — why: scaffold PIN-based auth (Convex or lightweight HMAC variant) into a Next.js app
+- review-routing — why: routing lookup to resolve which review/security tool is the default in a given case
+verify: `/` shows each once placed; skills load
+
 ## Skills — remote meta (skills.sh)  [default]
 - mcp-builder — anthropics/skills — verify: skills list shows it
 - find-skills — vercel-labs/skills — verify: skills list shows it

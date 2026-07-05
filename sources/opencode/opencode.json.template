@@ -21,20 +21,9 @@
     }
   },
   "plugin": [
-    "@zilliz/memsearch-opencode",
-    "./plugin/safety-hooks.js"
+    "@zilliz/memsearch-opencode"
   ],
   "lsp": true,
-  "formatter": {
-    "ruff": {
-      "command": ["{{HOME}}/.claude/hooks/format-python.sh", "$FILE"],
-      "extensions": [".py"]
-    },
-    "prettier-ts": {
-      "command": ["{{HOME}}/.claude/hooks/format-typescript.sh", "$FILE"],
-      "extensions": [".ts", ".tsx"]
-    }
-  },
   "permission": {
     "*": "allow",
     "bash": {
