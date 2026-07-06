@@ -23,6 +23,7 @@ verify (all): the binary's `--version` (or `--help`) succeeds.
 | `jq` | jqlang.github.io/jq (`jq`) | — |
 | `tree` | `tree` in every package manager | — |
 | `tmux` | `tmux` in every package manager | — |
+| `micro` | micro editor — github.com/zyedidia/micro | package/binary **`micro`** (brew/apt/snap/scoop/winget id `zyedidia.micro`). ⚠️ collides with **go-micro** (micro.dev, github.com/micro/micro) — a different CLI also named `micro`; install the editor, not the microservices toolkit |
 | `uv` | Astral — github.com/astral-sh/uv (`uv`) | astral.sh installer or brew/pipx/winget `uv` |
 | `fnm` | Fast Node Manager — github.com/Schniz/fnm | package/binary `fnm` (winget id `Schniz.fnm`) |
 | `bun` | Bun — bun.sh (`bun`) | bun.sh installer or brew `oven-sh/bun/bun` |
