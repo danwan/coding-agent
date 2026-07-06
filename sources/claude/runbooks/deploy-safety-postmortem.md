@@ -24,11 +24,16 @@ svb-manager's deploy script fell back to the shell env and silently deployed to 
 
 As of 2026-04-19, the following vars were exported globally in `~/.zshrc`:
 
-| Variable | Value (prefix only) | Originally for | Risk |
-|----------|---------------------|----------------|------|
-| `CONVEX_PROD_DEPLOY_KEY` | `prod:adorable-chipmunk-536` | lanalyzer | **HIGH** — causes wrong-instance deploy in any project whose script does `${CONVEX_PROD_DEPLOY_KEY}` |
-| `CONVEX_DEV_DEPLOY_KEY` | `dev:acrobatic-guineapig-733` | lanalyzer | MEDIUM — same pattern for dev |
-| `VERCEL_TOKEN` | `uKKaoASUrihUEpaT8X8SDDek` | cross-project | LOW-MEDIUM — any project's Vercel CLI call works without explicit configuration |
+| Variable | Value | Originally for | Risk |
+|----------|-------|----------------|------|
+| `CONVEX_PROD_DEPLOY_KEY` | `<REDACTED:convex-deployment>` | lanalyzer | **HIGH** — causes wrong-instance deploy in any project whose script does `${CONVEX_PROD_DEPLOY_KEY}` |
+| `CONVEX_DEV_DEPLOY_KEY` | `<REDACTED:convex-deployment>` | lanalyzer | MEDIUM — same pattern for dev |
+| `VERCEL_TOKEN` | `<REDACTED:vercel-token — rotate>` | cross-project | LOW-MEDIUM — any project's Vercel CLI call works without explicit configuration |
+
+> **Redaction note:** the concrete values that used to sit in this table have been
+> removed — this is a public repo. The `VERCEL_TOKEN` value was a full-length token
+> and must be treated as compromised → **rotate it in Vercel**. The Convex entries
+> were deployment-name prefixes (the secret is the part after `|`, never stored here).
 
 **Recommended action (manual — do not automate):** Remove these from `~/.zshrc`. See the manual steps section below.
 

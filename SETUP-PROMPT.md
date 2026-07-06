@@ -50,9 +50,11 @@ loads it (the targets you found in Step 1):
 - `sources/claude/runbooks/` → your consult-on-demand references.
 - `sources/claude/agents/` → your subagent definitions.
 - own skills from `sources/skills/` → the shared `~/.agents/skills/` hub, linked
-  into your skills dir (Claude reads them natively).
+  into your skills dir (Claude reads them natively). Place the `[default]`
+  own-skills; add the `[optional]` ones only if selected in Step 3 — see
+  `PROVISION.md`'s "Skills — own" sections for which is which.
 - If "personal" was chosen: `sources/claude/settings.json.template`,
-  `sources/claude/statusline*.sh`, and the dotfiles under `sources/shell/`,
+  `sources/claude/statusline.sh`, and the dotfiles under `sources/shell/`,
   `sources/wezterm/`.
 
 **If you are NOT Claude Code**, also read your harness note first and translate

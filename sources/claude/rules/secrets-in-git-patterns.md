@@ -24,7 +24,7 @@ Each pattern below is a HARD signal to self-check for before publishing. Pattern
 | Base64-like ≥ 40 chars (mixed) | `[A-Za-z0-9+/_-]{40,}={0,2}` w/ digit + letter | API tokens, `randomBytes().toString('base64')` |
 | JWT triplet | `eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+` | session, OAuth ID tokens |
 | Sensitive var=value | `[A-Z][A-Z0-9_]*(SECRET\|TOKEN\|KEY\|PASSWORD\|PASSWD\|HASH\|PIN\|APIKEY\|API_KEY)=[^\s"']{8,}` | `APP_PROXY_SECRET=…`, `APP_PIN=…`, `CONVEX_DEPLOY_KEY=…`, `VERCEL_TOKEN=…`, `*_HASH=…` |
-| Convex deploy key | `(prod\|dev):[a-z-]+-[0-9]+\|[A-Za-z0-9+/=_-]+` | `prod:adorable-chipmunk-536\|…` |
+| Convex deploy key | `(prod\|dev):[a-z-]+-[0-9]+\|[A-Za-z0-9+/=_-]+` | `prod:example-deploy-000\|…` |
 | GitHub PAT | `gh[pousr]_[A-Za-z0-9]{20,}` | `ghp_…`, `ghs_…` |
 | AWS Access Key | `AKIA[0-9A-Z]{16}` | `AKIA…` |
 | Stripe key | `(sk\|pk\|rk)_(live\|test)_[A-Za-z0-9]{20,}` | `sk_live_…` |
