@@ -6,8 +6,29 @@ knowledge — no install commands here. Secret NAMES + op:// refs only, never
 values. Tags: [default] on every machine · [optional] ask · [module:x] grouped.
 
 ## CLI tools  [default]
-git · gh · ripgrep (rg) · fd · ast-grep (sg) · jq · tree · tmux · uv · fnm · bun · op · qmd (npm @tobilu/qmd, never GitHub source) · skills (npx skills)
-verify: each `--version` succeeds
+The **binary name alone is not enough** to resolve a tool across macOS / Linux /
+Windows — several collide or are packaged under a different name. Each row gives
+the invoked binary, the canonical source (so you install the RIGHT thing), and a
+resolve note. Pick the package for THIS OS's package manager; the homepage/repo
+is the tie-breaker when a name is ambiguous.
+verify (all): the binary's `--version` (or `--help`) succeeds.
+
+| Invoke | Canonical source | Resolve note (cross-OS) |
+| --- | --- | --- |
+| `git` | git-scm.com | ships or via package manager |
+| `gh` | GitHub CLI — cli.github.com (`gh`) | — |
+| `rg` | ripgrep — github.com/BurntSushi/ripgrep | package is **`ripgrep`**, binary is `rg` |
+| `fd` | fd — github.com/sharkdp/fd | Debian/Ubuntu package is **`fd-find`** and installs the binary as **`fdfind`** (the name `fd` is taken) → symlink/alias to `fd`. brew/Arch/scoop/winget: `fd` |
+| `sg` | ast-grep — ast-grep.github.io | install as **`ast-grep`** (npm `@ast-grep/cli`, cargo `ast-grep`, brew `ast-grep`). ⚠️ the `sg` binary **collides with util-linux `sg`** on Linux — prefer invoking `ast-grep`, add the `sg` alias only if free |
+| `jq` | jqlang.github.io/jq (`jq`) | — |
+| `tree` | `tree` in every package manager | — |
+| `tmux` | `tmux` in every package manager | — |
+| `uv` | Astral — github.com/astral-sh/uv (`uv`) | astral.sh installer or brew/pipx/winget `uv` |
+| `fnm` | Fast Node Manager — github.com/Schniz/fnm | package/binary `fnm` (winget id `Schniz.fnm`) |
+| `bun` | Bun — bun.sh (`bun`) | bun.sh installer or brew `oven-sh/bun/bun` |
+| `op` | 1Password CLI — developer.1password.com/docs/cli | package is **`1password-cli`** (brew cask `1password-cli`; Linux via 1Password's own apt/rpm repo), binary is `op` — not in default distro repos |
+| `qmd` | npm **`@tobilu/qmd`** | install from npm ONLY — **never** a GitHub source of the same name |
+| `skills` | skills.sh — run via **`npx skills`** | no global binary needed |
 
 ## MCP servers
 - context7  [default] — https://mcp.context7.com/mcp — why: current library docs — secret: CONTEXT7_API_KEY (op://Private/CONTEXT7_API_KEY/credential) — verify: server lists tools
@@ -53,9 +74,13 @@ verify: `/` shows each once placed; skills load
   vercel-labs/agent-skills · vercel/next.js · waynesutton/convexskills · (Modal: uv is in baseline)
 
 ## Authored config (placed from this repo)  [default]
-- CLAUDE.md → the agent's global instruction file
-- rules/ → where this agent reads global rules
-- runbooks/ → referenced on demand (not auto-loaded)
+Stored ONCE, in Claude Code's format, under `sources/claude/` (single source of
+truth). A non-Claude agent translates these into its own format at provision time
+(see `sources/harness-notes/<harness>.md` for the format mapping).
+- `sources/claude/CLAUDE.md` → the agent's global instruction file
+- `sources/claude/rules/` → where this agent reads global rules (copy ALL)
+- `sources/claude/runbooks/` → referenced on demand (not auto-loaded)
+- `sources/claude/agents/` → subagent definitions
 (No hooks — by design.)
 
 ## Personal  [optional toggle]

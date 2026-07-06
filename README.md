@@ -1,7 +1,10 @@
 # coding-agent
 
-An intent-based, Claude-focused coding-agent setup. Public. Provisioned by
-pasting a prompt into an agent — no install scripts, no hooks.
+An intent-based coding-agent setup. Public. Provisioned by pasting a prompt into
+an agent — no install scripts, no hooks. Authored content is stored **once**, in
+Claude Code's format; the prompt is **harness-agnostic**, so Claude Code, Codex,
+OpenCode, Antigravity or Cursor can each run it and translate the same source
+into its own format.
 
 `PROVISION.md` declares *what* should be on a machine, *from where*, and
 *why*, plus a one-line *verify* per item. It has no install commands on
@@ -13,9 +16,12 @@ knowledge of tools and mechanisms at the time you run it.
 | Path | Purpose |
 | --- | --- |
 | `PROVISION.md` | Intent: what to install, from where, why, how to verify |
-| `SETUP-PROMPT.md` | Paste-and-go master prompt (contains the raw URL to `PROVISION.md`) |
-| `sources/` | Authored config + dotfiles the agent places on the machine |
-| `docs/` | Design specs and plans behind this setup |
+| `SETUP-PROMPT.md` | Paste-and-go master prompt — detects the harness/OS, then installs + translates |
+| `sources/claude/` | **Single source of truth**: authored CLAUDE.md, rules, runbooks, agents, settings |
+| `sources/skills/` | Own skills (source of truth) |
+| `sources/harness-notes/` | Per-harness translation notes — only what a non-Claude agent can't derive |
+| `sources/shell/`, `sources/wezterm/` | Personal dotfiles (optional toggle) |
+| `docs/` | Design specs, plans, and per-harness research (reference) |
 
 ## Use it
 

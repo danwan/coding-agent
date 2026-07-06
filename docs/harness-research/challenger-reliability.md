@@ -1,5 +1,10 @@
 # Challenger Agent Reliability
 
+> **Archived reference — historical, version-specific.** Eval data for the
+> `challenger` agent (`sources/claude/agents/challenger.md`), measured on a
+> since-moved test harness. NOT part of the provisioning path. Kept for the
+> single-run vs majority-vote guidance; re-measure if you rely on the numbers.
+
 > Empirical findings from the Challenger evaluation system. Use this to decide when a single Challenger run is enough and when to use majority-vote.
 
 ## Measured Performance

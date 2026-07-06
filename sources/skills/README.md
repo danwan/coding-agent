@@ -7,8 +7,8 @@ installed tool's skill dir (`~/.claude/skills`, `~/.codex/skills`,
 `~/.cursor/skills`, `~/.gemini/antigravity-cli/skills`). OpenCode reads
 `~/.agents/skills/*/SKILL.md` directly — no per-tool dir needed.
 
-Remote skills (installed via `npx skills add`) are tracked separately in
-`manifest/skill-lock.json` and are NOT listed here.
+Remote skills (installed via `npx skills add`) are declared as intent in
+`PROVISION.md` (the "Skills — remote meta" section), not here.
 
 ## Inventory (15 skills)
 

@@ -1,5 +1,12 @@
 # Instruction Loading: Empirical Findings (2026-05-07, CC 2.1.132)
 
+> **Archived reference — historical, version-specific.** Empirical Claude Code
+> behaviour captured on CC 2.1.132. NOT part of the provisioning path and NOT
+> authoritative for current tool versions — re-verify before relying on
+> specifics. Kept because the mechanism-level findings (why `@import` rules are
+> load-bearing, how path-scoped rules and skills load) still inform how the
+> canonical rules/skills in `sources/claude/` are authored.
+
 > 21 controlled tests across 4 phases. NOT auto-loaded. Consult when designing
 > new rules/skills/hooks or debugging "why didn't my rule fire?". This runbook
 > codifies behavior empirically observed on Claude Code 2.1.132 — re-verify

@@ -1,5 +1,12 @@
 # OpenCode configuration — translation reference
 
+> **Archived reference — historical, version-specific** (OpenCode 1.17.12).
+> The durable, version-independent essentials now live in
+> `sources/harness-notes/opencode.md`, which the setup prompt actually reads.
+> This file is kept only for the detailed feature-mapping and the reasoning
+> behind each accepted divergence. Re-verify against OpenCode's current schema
+> (`https://opencode.ai/config.json`) before relying on specifics.
+
 This directory holds the authored OpenCode config that mirrors Danny's Claude
 Code setup as closely as OpenCode's config schema allows. The repo is the
 source of truth; live config at `~/.config/opencode/` is placed by the setup
