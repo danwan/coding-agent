@@ -1,5 +1,12 @@
 # New `coding-agent` Public Repo — FINAL Implementation Plan (rev. 5)
 
+> **Historical record — completed plan.** The repo now exists. Note two later
+> corrections not reflected below: the per-tool `sources/{codex,opencode,cursor,antigravity}/`
+> copies this plan carried over (step ~43) were **removed** — authored content is
+> stored once under `sources/claude/` and non-Claude harnesses translate it at
+> provision time (`sources/harness-notes/`). Current behaviour lives in
+> `PROVISION.md` + `SETUP-PROMPT.md`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: superpowers:subagent-driven-development or superpowers:executing-plans. Steps use checkbox (`- [ ]`).
 
 **Goal:** Build ONE new, clean, public, Claude-focused repo `danwan/coding-agent` from the current setup's authored content + a new `PROVISION.md` (intent) + `SETUP-PROMPT.md` (pure prompt). No scripts, no hooks, no manifest, no mirror. The old repos and all local config stay untouched; migrating the live machine is a separate later step (Task 6).

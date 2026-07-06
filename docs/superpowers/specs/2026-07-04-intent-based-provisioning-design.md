@@ -1,5 +1,14 @@
 # Intent-Based Provisioning — Design Spec
 
+> **Historical record.** This captures the original design. The shipped repo has
+> since diverged in three ways: (1) **no hooks** at all (removed by design);
+> (2) it is a **single public repo** — no separate `coding-agent-baseline` mirror
+> or `publish-baseline.sh`; (3) the prompt is **harness-agnostic** and authored
+> content is stored once under `sources/claude/` — there are no per-tool
+> `sources/{codex,opencode,cursor,antigravity}/` copies; non-Claude harnesses
+> translate at provision time via `sources/harness-notes/`. Current behaviour
+> lives in `PROVISION.md` + `SETUP-PROMPT.md`.
+
 - **Date:** 2026-07-04
 - **Status:** Approved design, pre-implementation
 - **Repo:** `coding-agent-setup` (private, source of truth) + `coding-agent-baseline` (public mirror)
