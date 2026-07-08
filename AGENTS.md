@@ -21,3 +21,5 @@
   here. Values are resolved via the 1Password CLI or asked for interactively
   — never written to a file in this repo.
 - **Git is HTTPS via `gh`.** No SSH remotes.
+- **All commits, PRs, and messages use user's account.** All commits, PRs, and messages must always be done using the user's account and name only (never attribute to Claude or any other AI identity).
+
