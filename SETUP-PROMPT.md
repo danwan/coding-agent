@@ -39,7 +39,13 @@ your version. If a mechanism changed since this doc was written, adapt.
 ## Step 3 — Ask which optional items and modules to add
 On top of the `[default]` set, ask me about: the `[optional]` entries (e.g.
 playwright, memsearch), the "personal" toggle (dotfiles + settings), and the
-modules `google` and/or `webservice`. Wait for my answer.
+modules `google` and/or `webservice`.
+
+Additionally, if you are not running as Claude Code and need to translate the configurations for another target format, ask me to select between:
+- **OpenCode**
+- **Codex**
+
+Ask about each separately, but enforce that only one of these two options can be selected. Wait for my answer.
 
 ## Step 4 — Place the authored config (translate to YOUR format)
 Fetch the canonical files from the repo and place each where THIS version of you
