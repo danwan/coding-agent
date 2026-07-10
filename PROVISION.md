@@ -23,6 +23,7 @@ verify (all): the binary's `--version` (or `--help`) succeeds.
 | `jq` | jqlang.github.io/jq (`jq`) | — |
 | `tree` | `tree` in every package manager | — |
 | `tmux` | `tmux` in every package manager | — |
+| `tailscale` | tailscale.com | VPN client and secure network overlay. Enables secure SSH access via Tailscale SSH. |
 | `micro` | micro editor — github.com/zyedidia/micro | package/binary **`micro`** (brew/apt/snap/scoop/winget id `zyedidia.micro`). ⚠️ collides with **go-micro** (micro.dev, github.com/micro/micro) — a different CLI also named `micro`; install the editor, not the microservices toolkit |
 | `uv` | Astral — github.com/astral-sh/uv (`uv`) | astral.sh installer or brew/pipx/winget `uv` |
 | `fnm` | Fast Node Manager — github.com/Schniz/fnm | package/binary `fnm` (winget id `Schniz.fnm`) |
@@ -84,8 +85,13 @@ truth). A non-Claude agent translates these into its own format at provision tim
 - `sources/claude/agents/` → subagent definitions
 (No hooks — by design.)
 
+## System & Shell Environment  [default]
+- **Shell Aliases:** Preconfigured aliases inside `.bashrc` or `.zshrc` (`l`, `la`, `ll`, `ls`, `grep`, `egrep`, `fgrep`, and `alert` notify-send) to ensure visual coherence and terminal efficiency.
+- **SSH Tmux Auto-Load:** Shell configured to automatically launch or attach to a default tmux session when connected via SSH.
+- **Tailscale SSH:** Tailscale installed and initialized with SSH enablement flag (`sudo tailscale up --ssh`) to allow secure passwordless access.
+
 ## Personal  [optional toggle]
-- shell/aliases.zsh, wezterm/wezterm.lua → dotfiles
+- shell/aliases.zsh, shell/tmux.conf, wezterm/wezterm.lua → dotfiles
 - settings.json (permissions, env, statusLine) + statusline.sh → Claude settings (permissions are personal; not applied unless chosen)
 
 ## Secrets
