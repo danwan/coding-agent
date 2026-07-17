@@ -107,17 +107,17 @@ as the anchor, and append the new row:
 ```text
 old_str:
 <tr>
-<td>research-integrity.md</td>
+<td>research-routing.md</td>
 <td>Purpose …</td>
 </tr>
 
 new_str:
 <tr>
-<td>research-integrity.md</td>
+<td>research-routing.md</td>
 <td>Purpose …</td>
 </tr>
 <tr>
-<td>research-routing.md</td>
+<td>search-discipline.md</td>
 <td>New purpose …</td>
 </tr>
 ```

@@ -35,7 +35,7 @@ each approach was chosen — plus the features that have no OpenCode equivalent
 
 | Claude Code | OpenCode | Notes |
 | --- | --- | --- |
-| Master rules (`CLAUDE.md` + `rules/*.md`) | `instructions: ["AGENTS.md","~/.agents/AGENTS.md","~/.claude/rules/*.md"]` | Glob loading confirmed in OpenCode schema. All 11 project rules + 13 golden rules load identically. |
+| Master rules (`CLAUDE.md` + `rules/*.md`) | `instructions: ["AGENTS.md","~/.agents/AGENTS.md","~/.claude/rules/*.md"]` | Glob loading confirmed in OpenCode schema. All always-on rules + the CLAUDE.md Working/Golden Rules load identically (counts per current `sources/claude/`). |
 | Subagents (challenger, codebase-audit, git-status, learner) | `sources/opencode/agents/*.md` | Bodies byte-identical to Claude (Claude is master for shared authored content). |
 | Skills | auto-loaded from `~/.claude/skills/*/SKILL.md` AND `~/.agents/skills/*/SKILL.md` | All 44 skills reachable (authored + remote + 3 memsearch-bundled). |
 | memsearch plugin | `@zilliz/memsearch-opencode` (npm) | Equivalent to Claude's `memsearch@memsearch-plugins`; bundles the same 3 skills. |

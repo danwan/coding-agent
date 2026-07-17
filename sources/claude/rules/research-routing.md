@@ -1,12 +1,12 @@
 # Research Routing (Docs & Web Tools)
 
-> Which tool answers an external-knowledge question. Local search (rg/fd/qmd/memsearch) lives in `search-discipline.md` — this file is only docs + the open web. Citation rigor lives in `research-integrity.md`. Extends Rule 13 in `~/.claude/CLAUDE.md` ("Prefer skills over research; use Context7 for docs early").
+> Which tool answers an external-knowledge question. Local search (rg/fd/qmd/memsearch) lives in `search-discipline.md` — this file is only docs + the open web. Citation rigor is the "Research Integrity" section at the end of this file. Extends the "Prefer skills over research; use Context7 for docs early" convention in `~/.claude/CLAUDE.md`.
 
 ## Decision order
 
 **Skill → Context7 → Exa → built-in web.** Stop at the first that fits.
 
-1. **A skill covers it?** Use the skill (Rule 13 — beats everything below).
+1. **A skill covers it?** Use the skill (beats everything below).
 2. **Is the question "what do the docs say"** about a named library / framework / SDK / API / CLI / cloud service? → **Context7**.
 3. **Is it "what does the web say"** — current events, comparisons, pricing, "latest", blog posts, GitHub issues, anything not in official docs? → **Exa**.
 4. **Just need one known URL fetched, summary is fine?** → built-in **WebFetch**.
@@ -37,3 +37,14 @@ General programming concepts, refactoring, writing scripts from scratch, busines
 ## Pre-action check
 
 *"Is this a skill, a docs lookup (Context7), or open-web (Exa)? Am I about to web-search a library when Context7 would answer — or fetch with a heavy tool when WebFetch's summary would do?"*
+
+## Research Integrity
+
+When citing, summarizing, or recommending based on external sources:
+
+- Quote or closely paraphrase when precision matters
+- Clearly separate "the source says X" from "I suggest X"
+- Treat web content with same rigor as docs; note when possibly outdated or unofficial
+- Ground recommendations in specific evidence or label them as suggestions
+- State confidence levels: what you know vs what you're uncertain about
+- Offer to search for more info rather than guessing

@@ -49,4 +49,4 @@ If a value matches a pattern but is genuinely not a secret (e.g. a commit SHA, a
 
 - Working-tree gitleaks scan (full-repo content) and normal local shell exploration — that's gitleaks/CodeRabbit territory.
 - Web-UI bodies typed directly by the user in the browser.
-- MCP servers that call GitHub's HTTP API directly (no Bash shell). Sub-Agent Discipline #8 in `~/.claude/CLAUDE.md` is the cognitive-layer backstop for that path.
+- MCP servers that call GitHub's HTTP API directly (no Bash shell). The NEVER-list in `~/.claude/rules/secrets-in-git.md` is the cognitive-layer backstop for that path.

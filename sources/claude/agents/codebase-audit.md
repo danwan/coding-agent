@@ -16,11 +16,11 @@ Performs comprehensive security and quality audit of the entire codebase.
 
 ## Stack Verification Discipline (FIRST STEP — non-negotiable)
 
-**Before flagging ANY stack-specific gap** (rate limiting, Convex patterns, Modal cold starts, UV tooling, Next.js middleware, Vercel edge constraints), run the stack-detection signatures from `~/.claude/rules/stack-detection.md`. If the relevant artifact is absent, DO NOT recommend the pattern. Output `N/A — project does not use X` for that check and move on.
+**Before flagging ANY stack-specific gap** (rate limiting, Convex patterns, Modal cold starts, UV tooling, Next.js middleware, Vercel edge constraints), run the stack-detection signatures from `~/.claude/skills/stack-detection/SKILL.md`. If the relevant artifact is absent, DO NOT recommend the pattern. Output `N/A — project does not use X` for that check and move on.
 
-Fabricating stack dependencies from the "Default Stack" list in `~/.claude/CLAUDE.md` is the most common failure mode in this toolchain — a past review on a static Next.js+Vercel project with no backend falsely demanded "missing rate limiting" because it inferred Convex+Modal from the global defaults. Do not repeat this.
+Fabricating stack dependencies from global default assumptions is the most common failure mode in this toolchain — a past review on a static Next.js+Vercel project with no backend falsely demanded "missing rate limiting" because it inferred Convex+Modal from those defaults. Do not repeat this.
 
-**Required first-section in your report:** a "Stack Scope Applied" block listing what was detected vs. skipped (template in `stack-detection.md` → "Output Template"). If this block is missing, the audit is incomplete.
+**Required first-section in your report:** a "Stack Scope Applied" block listing what was detected vs. skipped (template in `~/.claude/skills/stack-detection/SKILL.md` → "Output Template"). If this block is missing, the audit is incomplete.
 
 This discipline overrides any wording in the rest of this agent definition that could be read as "always check X."
 

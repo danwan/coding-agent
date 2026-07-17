@@ -4,9 +4,8 @@
 
 ## Why this rule exists
 
-Local remote-tracking refs (`origin/main`, `[gone]` markers, `ahead/behind` counts) are only as fresh as your last successful `git fetch`. A clone that hasn't fetched — or whose fetch was blocked (sandbox SSH denial, network, auth) — will report a confident but **wrong** picture: "unmerged work" that is actually merged, "behind by N" that is really behind by N+M, branches that look deletable but aren't (and vice versa). The failure is silent because every downstream `git log`/`git diff`/`git cherry` runs happily against the stale refs.
-
-This bit us once already: a `git fetch ... 2>/dev/null || true` swallowed a sandbox-blocked SSH fetch, the audit ran on a 1-commit-stale `main`, and a branch that had been squash-merged to production got classified as "keep — unmerged work."
+Remote-tracking refs are only as fresh as your last successful `git fetch`; a blocked or skipped fetch reports a confident but **wrong** picture (merged shown as unmerged, wrong ahead/behind) because every downstream `git log`/`diff`/`cherry` runs happily against stale refs.
+This bit us once: a `git fetch ... 2>/dev/null || true` swallowed a sandbox-blocked fetch, and a branch that had been squash-merged to production got classified as "keep — unmerged work."
 
 ## The rule
 

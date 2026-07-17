@@ -48,7 +48,7 @@ marketplaces: anthropics/claude-plugins-official, DietrichGebert/ponytail, zilli
 - coderabbit / frontend-design / typescript-lsp / pyright-lsp  [optional]
 
 ## Skills — own (stored in this repo; the prompt PLACES them)  [default]
-branch-cleanup · challenge · code-search · git-sync · grill-me · security-review · pr-workflow
+branch-cleanup · challenge · code-search · git-sync · grill-me · security-review · pr-workflow · stack-detection
 verify: `/` shows each; skills load
 
 ## Skills — own, optional (stored, not default)  [optional]

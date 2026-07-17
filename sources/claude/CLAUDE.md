@@ -1,71 +1,20 @@
-These rules apply to every task in this project unless explicitly overridden.
+# Global Operating Rules
+
+These rules apply globally, to every project on this machine, unless a project CLAUDE.md overrides them.
 Bias: caution over speed on non-trivial work. Use judgment on trivial tasks.
 
-## Rule 1 — Think Before Coding
-State assumptions explicitly. If uncertain, ask rather than guess.
-Present multiple interpretations when ambiguity exists.
-Push back when a simpler approach exists.
-Stop when confused. Name what's unclear.
+## Working Rules
 
-## Rule 2 — Simplicity First
-Minimum code that solves the problem. Nothing speculative.
-No features beyond what was asked. No abstractions for single-use code.
-Test: would a senior engineer say this is overcomplicated? If yes, simplify.
-
-## Rule 3 — Surgical Changes
-Touch only what you must. Clean up only your own mess.
-Don't "improve" adjacent code, comments, or formatting.
-Don't refactor what isn't broken. Match existing style.
-
-## Rule 4 — Goal-Driven Execution
-Define success criteria. Loop until verified.
-Don't follow steps. Define success and iterate.
-Strong success criteria let you loop independently.
-
-## Rule 5 — Use the model only for judgment calls
-Use me for: classification, drafting, summarization, extraction.
-Do NOT use me for: routing, retries, deterministic transforms.
-If code can answer, code answers.
-
-## Rule 6 — Token budgets are not advisory
-Per-task: 4,000 tokens. Per-session: 30,000 tokens.
-If approaching budget, summarize and start fresh.
-Surface the breach. Do not silently overrun.
-
-## Rule 7 — Surface conflicts, don't average them
-If two patterns contradict, pick one (more recent / more tested).
-Explain why. Flag the other for cleanup.
-Don't blend conflicting patterns.
-
-## Rule 8 — Read before you write
-Before adding code, read exports, immediate callers, shared utilities.
-"Looks orthogonal" is dangerous. If unsure why code is structured a way, ask.
-
-## Rule 9 — Tests verify intent, not just behavior
-Tests must encode WHY behavior matters, not just WHAT it does.
-A test that can't fail when business logic changes is wrong.
-
-## Rule 10 — Checkpoint after every significant step
-Summarize what was done, what's verified, what's left.
-Don't continue from a state you can't describe back.
-If you lose track, stop and restate.
-
-## Rule 11 — Match the codebase's conventions, even if you disagree
-Conformance > taste inside the codebase.
-If you genuinely think a convention is harmful, surface it. Don't fork silently.
-
-## Rule 12 — Fail loud
-"Completed" is wrong if anything was skipped silently.
-"Tests pass" is wrong if any were skipped.
-Default to surfacing uncertainty, not hiding it.
-
-## Rule 13 — Research
-Prefer skills if available over research.
-Prefer researched knowledge over existing knowledge when skills are unavailable.
-Research: Use Context7 to find documentation early.
-
+1. **State assumptions, then proceed.** Ask only when the choice changes scope or outcome; expanding the requested scope needs an explicit OK first.
+2. **Define success criteria before coding, loop until verified.** Bug fix → failing test first, then make it pass. Feature → name one observable check that proves it works.
+3. **Surface conflicts, don't average them.** If two patterns contradict, pick one (more recent / more tested), say why, flag the other for cleanup.
+4. **Tests verify intent, not just behavior.** A test that can't fail when the business logic changes is wrong.
+5. **If code can answer, code answers.** Deterministic transforms, bulk edits, counting → write a script instead of doing it "by hand" across files.
+6. **If you lose track, stop and restate** what's done, what's verified, what's left.
+7. **Fail loud.** "Completed" is wrong if anything was skipped silently; "tests pass" is wrong if any were skipped. Surface uncertainty instead of hiding it.
 
 ## Golden Rules (project-agnostic things that often go wrong)
+
 1. **Python → UV** (when applicable): deps in `.venv` via uv. `uv run …`.
 2. **Git → HTTPS to github.com** via the `gh` credential helper, all git via CLI. A global `url."https://github.com/".insteadOf "git@github.com:"` rewrites SSH remotes → HTTPS at runtime, so `fetch`/`pull`/`push` run **inside** the Claude Code sandbox prompt-free (`github.com` is in the sandbox network allowlist; SSH/port-22 is not). Raw SSH still works but needs the sandbox disabled — fallback only.
 3. **Network**: always `curl --max-time 10`.
@@ -73,5 +22,6 @@ Research: Use Context7 to find documentation early.
 5. **CLI non-interactive**: always `-y` (Vercel, Modal). `printf` not `echo` for env values.
 6. **File-Sync**: copying source → destination: Read BOTH first.
 7. **Backend services don't auto-deploy**: Convex + Modal are manual; deploy backend BEFORE frontend test.
-8. **Stack-verification before recommending**: run `stack-detection` skill before flagging missing components in a project.
-9. **Git freshness before reasoning**: `git fetch` and verify it succeeded before drawing any conclusion from git state (merge status, behind/ahead, `[gone]`, "already on main"). A failed/blocked fetch (network/auth) → fail loud, label findings as possibly stale; never reason on a silent stale snapshot. (A `fatal: failed to store` line with exit 0 is harmless keychain noise, not a fetch failure — see the rule file.) See `~/.claude/rules/git-freshness.md`.
+8. **Stack-verification before recommending**: run the `stack-detection` skill before flagging missing components in a project.
+9. **Git freshness before reasoning**: `git fetch` and verify it succeeded before drawing any conclusion from git state. Failed/blocked fetch → fail loud, label findings as possibly stale. (A `fatal: failed to store` line with exit 0 is harmless keychain noise, not a fetch failure.) Details: `~/.claude/rules/git-freshness.md`.
+10. **Deploy scripts follow the 10-gate checklist**: never create or modify a deploy script without `~/.claude/rules/deploy-safety.md` (its path-trigger is unreliable — read it explicitly).

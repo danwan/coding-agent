@@ -1,8 +1,13 @@
+---
+name: stack-detection
+description: Verify which stack components (Next.js, server endpoints, Convex, Modal, Vercel, DB, Python tooling) actually exist in a project before applying stack-specific rules or flagging missing components. Use before reviews, audits, and any "missing X" finding. Detection signatures are shell one-liners; absence of a signature = "N/A — project does not use X".
+---
+
 # Stack Detection (Verify Before Applying Stack-Specific Rules)
 
-> **Purpose:** Prevent reviewer/auditor agents from fabricating stack dependencies based on the "Default Stack" in `~/.claude/CLAUDE.md`. The global default is not evidence — the project's actual files are. This file is linked from Golden Rule #8 and is the canonical reference for all stack-scoping decisions.
+> **Purpose:** Prevent reviewer/auditor agents from fabricating stack dependencies from global default assumptions. The default is not evidence — the project's actual files are. This is the canonical reference for all stack-scoping decisions.
 >
-> **Reference implementer:** `performance-review/SKILL.md:13-26` already uses this pattern correctly — consult it for a working example.
+> **Reference implementer:** `~/.claude/skills/performance-review/SKILL.md` already uses this pattern correctly — consult it for a working example.
 
 ## Core Rule
 
@@ -25,7 +30,7 @@ Each signature is a single shell command that returns non-empty **only** when th
   [ -f middleware.ts ] || [ -f middleware.js ] || \
   ls app/**/route.ts pages/api/**/*.ts 2>/dev/null | head -1
 ```
-**If absent:** do not demand rate limiting, session tokens, CSRF tokens, input validation on server-side. A static site with a third-party form handler has no server-side attack surface. See also the qualifier in `security.md` → "Rate Limiting".
+**If absent:** do not demand rate limiting, session tokens, CSRF tokens, input validation on server-side. A static site with a third-party form handler has no server-side attack surface. See also the "Rate Limiting" qualifier in the `security-review` skill.
 
 ### Convex (backend + DB)
 ```bash
@@ -67,13 +72,13 @@ For each stack-specific rule you're about to apply:
   1. Run the detection signature from this file.
   2. If signature matches → apply the rule as normal.
   3. If signature does NOT match → output "N/A — project has no X" and skip.
-  4. Never infer presence from the global "Default Stack" list.
+  4. Never infer presence from global default assumptions.
 ```
 
 ## Anti-Patterns (reject in code review)
 
 - **"Add rate limiting" for a project with no server endpoints.** Static sites and pure client-rendered pages cannot be rate-limited server-side.
-- **"Add Convex/Modal-specific patterns" for a project that has neither.** Don't infer from Default Stack; apply only to detected stacks.
+- **"Add Convex/Modal-specific patterns" for a project that has neither.** Don't infer from global defaults; apply only to detected stacks.
 - **"Run `uv run pytest`" in a TypeScript-only project.** No Python → no UV.
 
 ## Output Template
@@ -82,6 +87,6 @@ When skipping a section due to stack absence, surface it explicitly: "N/A — pr
 
 ## See Also
 
-- `~/.claude/CLAUDE.md` Golden Rule #8 "Stack-Verification" — the binding rule
-- `~/.claude/rules/security.md` "Rate Limiting" — scoped version
-- `claude-config/skills/performance-review/SKILL.md:13-26` — reference implementation
+- `~/.claude/CLAUDE.md` Golden Rule "Stack-verification before recommending" — the binding rule
+- The `security-review` skill → "Rate Limiting" — scoped version
+- `~/.claude/skills/performance-review/SKILL.md` — reference implementation

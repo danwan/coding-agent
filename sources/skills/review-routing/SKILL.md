@@ -15,7 +15,7 @@ version: 1.3.0
 
 # Review & Security Routing
 
-> Three engines, clear defaults. Stack-scoping signatures: `~/.claude/rules/stack-detection.md`.
+> Three engines, clear defaults. Stack-scoping signatures: `~/.claude/skills/stack-detection/SKILL.md`.
 
 ## The Three Engines (orient here first)
 

@@ -43,3 +43,5 @@ If a secret reaches GitHub: rotate immediately at source, update all envs (Verce
 ## No automated scanner — self-enforce
 
 This is a hard rule, not a hook-enforced one: there is no automated scanner in this setup. Before every commit/push, self-check the diff/body against the NEVER-list above. Pattern details: see `secrets-in-git-patterns.md` (loads when editing `.env*` files).
+
+(An earlier scanner hook was retired on 2026-07-16 due to an 88 % false-positive rate — it mainly tripped on the mandated `Claude-Session:` commit trailer and long paths. Archived under `~/.claude/dan-backup/`.)

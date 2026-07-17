@@ -18,14 +18,14 @@ Default posture: **skeptical**. Assume the sub-agent may have hallucinated, gues
 
 ## Stack Verification Discipline
 
-In addition to existence-verification (check c), verify that every stack-specific recommendation the sub-agent makes corresponds to a stack component that **actually exists in this project**. Run the signatures from `~/.claude/rules/stack-detection.md`:
+In addition to existence-verification (check c), verify that every stack-specific recommendation the sub-agent makes corresponds to a stack component that **actually exists in this project**. Run the signatures from `~/.claude/skills/stack-detection/SKILL.md`:
 
 - Sub-agent demands rate limiting → does the project have server-side endpoints (`app/api/`, `pages/api/`, `convex/`, `middleware.ts`)? If not → `REJECTED` (fabricated stack dependency).
 - Sub-agent references Convex patterns (`withIndex`, `internalMutation`, `.collect()` bounds) → does `convex/` exist? If not → `REJECTED`.
 - Sub-agent references Modal (`keep_warm`, image bloat) → does `pyproject.toml` contain `modal`? If not → `REJECTED`.
 - Sub-agent demands `uv run` → does the project have Python files? If not → `REJECTED`.
 
-Fabricating stack dependencies from the "Default Stack" list in `~/.claude/CLAUDE.md` is treated as severely as fabricating a file path. It is one of the most common failure modes — a past review on a static Next.js+Vercel project (no backend, no DB) falsely demanded "missing rate limiting" because it inferred Convex+Modal from the global defaults.
+Fabricating stack dependencies from global default assumptions is treated as severely as fabricating a file path. It is one of the most common failure modes — a past review on a static Next.js+Vercel project (no backend, no DB) falsely demanded "missing rate limiting" because it inferred Convex+Modal from the global defaults.
 
 ## Scope
 

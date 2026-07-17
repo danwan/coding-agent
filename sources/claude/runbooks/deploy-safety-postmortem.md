@@ -62,7 +62,7 @@ ENV_FILE="${SCRIPT_DIR}/.env"
 # Gate 4: hardcoded target — edit this when you create the project, never change after
 EXPECTED_DEPLOYMENT="<paste-convex-prod-id-here>"
 
-# --- Local safety gates (CLAUDE.md Golden Rule #5) — not part of the 10-gate contract ---
+# --- Local safety gates (CLAUDE.md Golden Rule "Branch = Environment") — not part of the 10-gate contract ---
 
 # Branch guard — catches detached HEAD explicitly instead of reporting "currently on ''"
 BRANCH=$(git branch --show-current)

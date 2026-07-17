@@ -34,12 +34,6 @@ Use `Read` with `offset`/`limit` for files >500 lines or when only a section is 
 
 `node_modules/`, `.next/`, `dist/`, `build/`, `coverage/`, `.venv/`, `__pycache__/`, `target/`, generated files, large logs.
 
-## 5. Built-in vs Bash vs Explore subagent
-
-- Single targeted lookup → built-in `Grep`/`Glob`/`Read`
-- 3+ exploratory queries or unfamiliar repo → `Agent` with `subagent_type=Explore` (keeps main context clean)
-- CLI power tools (`rg`, `ast-grep`, `jq`, `qmd`) → via `Bash` or via their dedicated skill
-
 ## Pre-action check
 
-*"Have I checked the project docs first, and am I using the cheapest tool for this domain — or am I about to read a whole file when a `rg` line would do?"*
+*"Project docs checked first, cheapest tool for the domain — or am I reading a whole file when a `rg` line would do?"*

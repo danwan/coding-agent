@@ -10,7 +10,7 @@ effort: high
 
 > Profile first, optimize second. Never recommend memoization without measurement evidence.
 
-## Scope Detection (per `~/.claude/rules/stack-detection.md`)
+## Scope Detection (per `~/.claude/skills/stack-detection/SKILL.md`)
 
 Run first; skip sections whose stack artifact is absent. **Output skipped sections explicitly as "N/A — no <stack>".**
 
