@@ -55,6 +55,12 @@ loads it (the targets you found in Step 1):
   never silently drop one.
 - `sources/claude/runbooks/` → your consult-on-demand references.
 - `sources/claude/agents/` → your subagent definitions.
+- `sources/claude/hooks/` → lifecycle hooks, implemented for Claude Code
+  (scripts + `settings-hooks.json` wiring). If you are Claude Code, place the
+  scripts in `~/.claude/hooks/` and merge the wiring into your settings. If
+  you are another agent: read your own current docs — do you support hooks or
+  an equivalent event mechanism? If yes, implement equivalents of these
+  hooks; if no, skip them (see `sources/claude/hooks/README.md`).
 - own skills from `sources/skills/` → the shared `~/.agents/skills/` hub, linked
   into your skills dir (Claude reads them natively). Place the `[default]`
   own-skills; add the `[optional]` ones only if selected in Step 3 — see

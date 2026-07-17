@@ -83,7 +83,11 @@ truth). A non-Claude agent translates these into its own format at provision tim
 - `sources/claude/rules/` → where this agent reads global rules (copy ALL)
 - `sources/claude/runbooks/` → referenced on demand (not auto-loaded)
 - `sources/claude/agents/` → subagent definitions
-(No hooks — by design.)
+- `sources/claude/hooks/` → lifecycle hook scripts, implemented for **Claude
+  Code** (wiring in `hooks/settings-hooks.json`, merged into settings
+  `hooks` key). Other agents: check your own current docs for a hook/event
+  mechanism — if you support equivalents, wire these scripts in; if not,
+  skip them (see `sources/claude/hooks/README.md`).
 
 ## System & Shell Environment  [default]
 - **Shell Aliases:** Preconfigured aliases inside `.bashrc` or `.zshrc` (`l`, `la`, `ll`, `ls`, `grep`, `egrep`, `fgrep`, and `alert` notify-send) to ensure visual coherence and terminal efficiency.

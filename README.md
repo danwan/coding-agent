@@ -1,7 +1,7 @@
 # coding-agent
 
 An intent-based coding-agent setup. Public. Provisioned by pasting a prompt into
-an agent — no install scripts, no hooks. Authored content is stored **once**, in
+an agent — no install scripts. Authored content is stored **once**, in
 Claude Code's format; the prompt is **harness-agnostic**, so Claude Code, Codex,
 OpenCode, Antigravity or Cursor can each run it and translate the same source
 into its own format.
