@@ -46,6 +46,9 @@ marketplaces: anthropics/claude-plugins-official, DietrichGebert/ponytail, zilli
 - ponytail  [default] — why: simplicity guardrail — verify: /plugin lists it
 - memsearch  [optional] — why: cross-session memory recall (needs Python memsearch[onnx]) — verify: /plugin lists it
 - coderabbit / frontend-design / typescript-lsp / pyright-lsp  [optional]
+- greptile  [optional] — why: Greptile code-review MCP; needs GREPTILE_API_KEY
+  (op://APIKeys/greptile/credential, resolved by the `claude()` shell wrapper —
+  see `sources/shell/aliases.zsh`) — verify: /plugin lists it
 
 ## Skills — own (stored in this repo; the prompt PLACES them)  [default]
 branch-cleanup · challenge · code-search · git-sync · grill-me · security-review · pr-workflow · stack-detection
@@ -65,6 +68,25 @@ verify: `/` shows each once placed; skills load
 ## Skills — remote meta (skills.sh)  [default]
 - mcp-builder — anthropics/skills — verify: skills list shows it
 - find-skills — vercel-labs/skills — verify: skills list shows it
+
+## Skills — remote, globally installed (documented only — NOT stored in this repo)  [optional]
+Remote skills live only as installs via `npx skills add -g` (canonical copy in
+`~/.agents/skills/`, symlinked into each harness). Re-install from their
+registries; this repo documents the intent, never their content. Currently:
+- convex-* (best-practices, cron-jobs, file-storage, functions, http-actions,
+  migrations, realtime, schema-validator, security-audit, security-check) — waynesutton/convexskills
+- vercel-* (cli-with-tokens, composition-patterns, optimize, react-best-practices,
+  react-native-skills, react-view-transitions) · next-cache-components-* (adoption,
+  optimizer) · deploy-to-vercel · web-design-guidelines · writing-guidelines ·
+  avoid-feature-creep — vercel-labs / vercel registries
+- webapp-testing · claude-api — anthropics/skills
+- vitest · orchestration — skills.sh registry
+- memory-config / memory-recall / memory-to-skill — memsearch plugin family
+- google-agents-cli-* — installed by `uvx google-agents-cli setup` (see Module: google)
+- orca-cli — installed by the Orca app
+NOTE: this global install of stack skills is in tension with the
+"stack SKILLS are PROJECT-LOCAL" policy under Module: webservice — the live
+machine has them global; documented here as-is, resolve deliberately.
 
 ## Module: google  [ask]
 - google skills + agents-cli — `uvx google-agents-cli setup` (installs google-agents-cli-* skills globally; CLI-tied) — verify: agents-cli info
@@ -90,7 +112,7 @@ truth). A non-Claude agent translates these into its own format at provision tim
   skip them (see `sources/claude/hooks/README.md`).
 
 ## System & Shell Environment  [default]
-- **Shell Aliases:** Preconfigured aliases inside `.bashrc` or `.zshrc` (`l`, `la`, `ll`, `ls`, `grep`, `egrep`, `fgrep`, and `alert` notify-send) to ensure visual coherence and terminal efficiency.
+- **Shell Aliases & Functions:** The canonical alias/function block for `~/.zshrc` is `sources/shell/aliases.zsh` (agent aliases `c`/`cc`/`co`/`oc`, git helpers, 1Password keychain token + `claude()` Greptile-key wrapper). NOTE: `op` is the 1Password CLI, never an alias.
 - **SSH Tmux Auto-Load:** Shell configured to automatically launch or attach to a default tmux session when connected via SSH.
 - **Tailscale SSH:** Tailscale installed and initialized with SSH enablement flag (`sudo tailscale up --ssh`) to allow secure passwordless access.
 
@@ -100,4 +122,6 @@ truth). A non-Claude agent translates these into its own format at provision tim
 
 ## Secrets
 - CONTEXT7_API_KEY — op://Private/CONTEXT7_API_KEY/credential
+- GREPTILE_API_KEY — op://APIKeys/greptile/credential (resolved per-start by the `claude()` wrapper)
+- OP_SERVICE_ACCOUNT_TOKEN — macOS Keychain item `op-service-account` (basis for all `op run`/`op read`)
 - (REF_API_KEY, EXA_API_KEY are Cursor-only — not in the Claude default)
