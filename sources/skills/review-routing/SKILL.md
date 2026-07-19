@@ -104,3 +104,32 @@ Three names are shared across engines. Qualify the namespace explicitly when inv
 **`security-review`** (built-in vs user skill):
 - built-in `/security-review` — native scan of pending changes on the current branch (run first).
 - user `security-review` skill — pre-merge checklists + audit commands for auth/data/API changes (the deeper, project-specific gate).
+
+## Solo-Dev Development Process (budget order, since 2026-07-18)
+
+Quota facts: CodeRabbit PR reviews and CLI/IDE reviews have SEPARATE hourly
+quotas (Pro: 5/h each); the adaptive fair-usage throttle (~60 PR reviews/7 days
+→ 1/h) counts only PR reviews. Repo configs enforce `profile: chill` +
+`auto_pause_after_reviewed_commits: 2`. Greptile = free tier, 50 credits/mo,
+manual-only. Monitor with `@coderabbitai rate limit` on any PR (costs nothing).
+
+1. **Iterate (free):** built-in `/code-review` (low/med) + `/simplify` during
+   development; format hooks + ggshield ai-hook run passively. `/verify` or
+   tests before each commit batch.
+2. **Before push (free):** ggshield pre-push scans automatically (fails closed
+   in sandboxed shells — push unsandboxed). Auth/API/data changes → `/security-review`.
+3. **Branch done, before PR (CLI quota):** `/coderabbit:coderabbit-review` or
+   `cr --agent`; fix findings locally. Only open the PR when clean. Large/risky
+   diff: `/review-pr` specialists or `/code-review high` first.
+4. **PR open (PR quota, conserved):** CodeRabbit reviews once, auto-pauses
+   after 2 commits — further pushes cost nothing. When truly done: one
+   `@coderabbitai review` as final gate. Throttled? → `@greptileai` fallback.
+   Aikido + GitGuardian checks run automatically.
+5. **Merge;** Dependabot PRs land grouped weekly — review in one batch
+   (`branch-cleanup` skill can automerge green ones).
+6. **Periodic / pre-launch (whole repo):** `@codebase-audit` + `/ponytail-audit`,
+   then `/performance-review`. Heavy artillery (`/code-review ultra`, deepsec,
+   workflow fan-out) only on explicit decision.
+7. **Escalation:** if `@coderabbitai rate limit` shows sustained throttling
+   despite configs → cancel Marketplace sub, re-subscribe direct (enables
+   usage-based add-on; ~prorated refund from GitHub).
