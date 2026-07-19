@@ -31,6 +31,7 @@ verify (all): the binary's `--version` (or `--help`) succeeds.
 | `op` | 1Password CLI — developer.1password.com/docs/cli | package is **`1password-cli`** (brew cask `1password-cli`; Linux via 1Password's own apt/rpm repo), binary is `op` — not in default distro repos |
 | `qmd` | npm **`@tobilu/qmd`** | install from npm ONLY — **never** a GitHub source of the same name |
 | `skills` | skills.sh — run via **`npx skills`** | no global binary needed |
+| `ggshield` | GitGuardian CLI — github.com/GitGuardian/ggshield | brew/pipx `ggshield`. Post-install (per user, interactive): `ggshield auth login` (token → OS keyring; NOT readable from sandboxed shells — sandbox "no token" errors are noise), then `ggshield install --mode global -t pre-push` and `ggshield install --mode global -t claude-code`. Husky repos need their own `.husky/pre-push` with `ggshield secret scan pre-push "$@"` (local hooksPath shadows global). Why: enforces `rules/secrets-in-git.md` — see its Enforcement section. verify: unsandboxed `ggshield api-status` reports healthy |
 
 ## MCP servers
 - context7  [default] — https://mcp.context7.com/mcp — why: current library docs — secret: CONTEXT7_API_KEY (op://Private/CONTEXT7_API_KEY/credential) — verify: server lists tools

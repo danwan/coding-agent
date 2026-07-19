@@ -40,8 +40,15 @@ Never paste even a partial real secret — half a JWT is still recoverable.
 
 If a secret reaches GitHub: rotate immediately at source, update all envs (Vercel/Modal/Convex), revoke the old value, document the incident, then optionally redact in GitHub. Full 5-step runbook: `~/.claude/runbooks/secrets-in-git-runbook.md`.
 
-## No automated scanner — self-enforce
+## Enforcement: ggshield is the gate (since 2026-07-18)
 
-This is a hard rule, not a hook-enforced one: there is no automated scanner in this setup. Before every commit/push, self-check the diff/body against the NEVER-list above. Pattern details: see `secrets-in-git-patterns.md` (loads when editing `.env*` files).
+GitGuardian's `ggshield` enforces this rule automatically on two layers:
 
-(An earlier scanner hook was retired on 2026-07-16 due to an 88 % false-positive rate — it mainly tripped on the mandated `Claude-Session:` commit trailer and long paths. Archived under `~/.claude/dan-backup/`.)
+- **Global git pre-push hook** (`ggshield install --mode global -t pre-push`, via global `core.hooksPath`) — scans every push before it leaves the machine. Husky repos (shared-canvas, svb-elektrschiess) shadow the global hooksPath; they carry their own `.husky/pre-push` with `ggshield secret scan pre-push "$@"`.
+- **Claude Code hook** (`ggshield secret scan ai-hook`, PreToolUse in `~/.claude/settings.json`) — blocks secrets before they reach prompts/tool calls.
+
+Auth: `ggshield auth login` (token in macOS keyring — NOT readable from the Bash sandbox, so sandboxed `ggshield api-status` reports "no token"; that is sandbox noise, not a broken auth). Dashboard-Ignores propagate to ggshield, so triaged test fixtures stay quiet.
+
+The NEVER-list above still applies to what the agent *authors* (commit messages, PR bodies, gists — content ggshield may not scan). The redaction conventions remain mandatory. Pattern details for judgment calls: `secrets-in-git-patterns.md`.
+
+(History: a homegrown scanner hook was retired 2026-07-16 at 88 % false-positive rate; ggshield replaced it 2026-07-18 — same intent, battle-tested engine.)
