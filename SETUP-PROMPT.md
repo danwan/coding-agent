@@ -41,11 +41,8 @@ On top of the `[default]` set, ask me about: the `[optional]` entries (e.g.
 playwright, memsearch), the "personal" toggle (dotfiles + settings), and the
 modules `google` and/or `webservice`.
 
-Additionally, if you are not running as Claude Code and need to translate the configurations for another target format, ask me to select between:
-- **OpenCode**
-- **Codex**
-
-Ask about each separately, but enforce that only one of these two options can be selected. Wait for my answer.
+Use the harness detected in Step 0. Do not ask the user to choose Codex or
+OpenCode when the current agent already identifies itself unambiguously.
 
 ## Step 4 — Place the authored config (translate to YOUR format)
 Fetch the canonical files from the repo and place each where THIS version of you
@@ -77,8 +74,10 @@ Claude features to skip):
 - Antigravity → `sources/harness-notes/antigravity.md`
 - Cursor → `sources/harness-notes/cursor.md`
 
-Keep instruction **bodies verbatim**; only translate frontmatter/format and skip
-features your harness genuinely has no equivalent for (say so as SKIP).
+Preserve instruction **intent**, not blindly literal bodies: translate
+frontmatter/format and adapt agent-specific paths, tool names, hook protocols,
+security assumptions, and unsupported fields. Skip only features your harness
+genuinely has no equivalent for (say so as SKIP).
 
 ## Step 5 — Install the selected intent items
 Install each with the mechanism current for your version: CLI tools via this OS's

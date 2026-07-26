@@ -15,28 +15,26 @@ Check the current git status of this repository and report findings.
 
 Run these checks and report the results:
 
-### 1. Remote Sync
+### 1. Refresh Remote State
 ```bash
-git fetch --quiet 2>/dev/null
+git fetch --all --prune
 ```
-```bash
-git rev-list --count HEAD..@{u} 2>/dev/null
-```
-(commits behind remote)
+Verify the exit status. If fetch fails, surface the failure and stop; do not
+classify ahead/behind or merge state from stale remote-tracking refs.
 
+When an upstream exists, run:
 ```bash
-git rev-list --count @{u}..HEAD 2>/dev/null
+git rev-list --left-right --count 'HEAD...@{upstream}'
 ```
-(commits ahead of remote)
+Report the first count as ahead and the second as behind.
 
 ### 2. Local Changes
 ```bash
 git status --short
 ```
-Count lines starting with:
-- ` M` or `M ` = modified (unstaged/staged)
-- `A ` = staged new files
-- `??` = untracked files
+Report staged, unstaged, untracked, deleted, renamed, copied, and unmerged
+states accurately from both status columns. Do not count one path twice without
+explaining why.
 
 ### 3. Unmerged Remote Branches
 ```bash
@@ -68,4 +66,6 @@ X stash entries
 X open issues in TROUBLESHOOTING.md
 ```
 
-If everything is clean, report: "Repository is clean and in sync."
+Only after a successful fetch, an upstream comparison, and a clean status may
+you report: "Repository is clean and in sync." If no upstream exists, report
+"Repository is clean; no upstream configured."

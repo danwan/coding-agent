@@ -10,9 +10,8 @@ A Claude session embedded a freshly-generated APP_PROXY_SECRET into a `gh pr
 create --body` argument. Local commits were clean (placeholder used), the
 PR-description leaked. GitHub retains PR/issue edit-history, search index,
 webhook payloads (CodeRabbit, Vercel, Slack), notification mails, and audit
-logs. The secret had to be rotated. The `secrets-in-git.md` rule — self-
-enforced before every publish, there is no automated scanner in this setup —
-exists to prevent the recurrence.
+logs. The secret had to be rotated. The `secrets-in-git.md` rule plus
+GitGuardian's global pre-push and agent hooks exist to prevent recurrence.
 
 ### Why GitHub-side persistence is unrecoverable
 
@@ -49,10 +48,12 @@ GitHub. Treat it as compromised → rotate.
    edit — treat as PR-hygiene, not security. The original value is already
    burned.
 
-## No automated scanner — self-enforce
+## Automated gate plus self-enforcement
 
-There is no hook or scanner in this setup that blocks secret-bearing publishes.
-`secrets-in-git.md` and `secrets-in-git-patterns.md` are self-enforced: check
-the NEVER-list and pattern catalog against the diff/body yourself before every
-commit, tag, branch name, PR/issue/gist/release, or comment that leaves the
-local repo.
+When authentication is healthy and scanning quota is positive, GitGuardian's
+global pre-push hook scans pushes and its native agent hook scans supported
+prompt/tool events. With zero quota, disable those hooks rather than blocking
+pushes or emitting a warning on every agent action. Neither state changes the
+manual rule: continue to check the NEVER-list and pattern catalog before every
+commit message, tag, branch name, PR/issue/gist/release, or comment that leaves
+the local machine. Never bypass an enabled hook.

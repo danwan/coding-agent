@@ -18,11 +18,13 @@
 
 Once a secret hits GitHub, treat it as compromised → rotate. See runbook.
 
-## User-Facing Channel Allowlist
+## User-Facing Secret Handling
 
-Secrets MAY appear ONCE in the active Claude chat session — so the user can copy-paste into the right CLI (`vercel env add`, `convex env set`, `pass insert`, etc.). They MUST NOT appear in any persisted artifact (file on disk inside the repo, commit, PR, issue, gist, tag, branch name).
-
-The chat itself is not "persisted" in the GitHub-leak sense: it lives in the user's local Claude history and is not searchable/indexable by third parties. That is the only legitimate channel for raw secret values during a workflow.
+Do not ask the user to paste raw secret values into an agent chat. Agent chats,
+tool transcripts, histories, screenshots, and diagnostics may persist. Have the
+user enter the value directly into the destination CLI, keychain, 1Password
+prompt, or provider dashboard. The agent may handle secret names and
+`op://` references, never the resolved value.
 
 ## Redaction Conventions (use these in commit/PR/issue bodies)
 
@@ -30,8 +32,8 @@ When you need to *reference* a secret in a body, use one of these placeholders:
 
 - `<set via vercel env add APP_PROXY_SECRET production>` — for Vercel-stored values
 - `<set via convex env set APP_PROXY_SECRET>` — for Convex-stored values
-- `<set via chat session>` — when raw was shown to user once for manual copy-paste
-- `<rotated secret — see chat session>` — for incident-response bodies after rotation
+- `<set directly by user>` — when the user entered the value outside the agent
+- `<rotated secret>` — for incident-response bodies after rotation
 - `<REDACTED:KIND>` — generic catch-all (e.g. `<REDACTED:JWT>`, `<REDACTED:HEX32>`)
 
 Never paste even a partial real secret — half a JWT is still recoverable.
@@ -40,14 +42,22 @@ Never paste even a partial real secret — half a JWT is still recoverable.
 
 If a secret reaches GitHub: rotate immediately at source, update all envs (Vercel/Modal/Convex), revoke the old value, document the incident, then optionally redact in GitHub. Full 5-step runbook: `~/.claude/runbooks/secrets-in-git-runbook.md`.
 
-## Enforcement: ggshield is the gate (since 2026-07-18)
+## Enforcement: ggshield is the gate when quota is available
 
-GitGuardian's `ggshield` enforces this rule automatically on two layers:
+After authentication, confirm `ggshield quota` is greater than zero. Only then
+enable these two layers:
 
 - **Global git pre-push hook** (`ggshield install --mode global -t pre-push`, via global `core.hooksPath`) — scans every push before it leaves the machine. Husky repos (shared-canvas, svb-elektrschiess) shadow the global hooksPath; they carry their own `.husky/pre-push` with `ggshield secret scan pre-push "$@"`.
-- **Claude Code hook** (`ggshield secret scan ai-hook`, PreToolUse in `~/.claude/settings.json`) — blocks secrets before they reach prompts/tool calls.
+- **Agent hook** (`ggshield secret scan ai-hook`) — install the native target
+  for the active harness (`claude-code` or `codex`) so prompts/tool calls are
+  scanned using that harness's supported hook schema.
 
-Auth: `ggshield auth login` (token in macOS keyring — NOT readable from the Bash sandbox, so sandboxed `ggshield api-status` reports "no token"; that is sandbox noise, not a broken auth). Dashboard-Ignores propagate to ggshield, so triaged test fixtures stay quiet.
+Auth: `ggshield auth login` (token in the OS keyring). Verify with
+`ggshield api-status`, `ggshield quota`, and a benign scan. If quota is zero,
+disable both hooks: the pre-push hook blocks normal pushes and the agent hook
+can only fail open with repeated warnings. Do not treat an authentication or
+quota failure as harmless. Dashboard-Ignores propagate to ggshield, so triaged
+test fixtures stay quiet.
 
 The NEVER-list above still applies to what the agent *authors* (commit messages, PR bodies, gists — content ggshield may not scan). The redaction conventions remain mandatory. Pattern details for judgment calls: `secrets-in-git-patterns.md`.
 

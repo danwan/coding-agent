@@ -1,73 +1,92 @@
 # System Verification Prompt
 
-You are tasked with verifying that the local system configuration and installed tools are fully aligned with the requirements defined in `PROVISION.md`. 
+Verify this machine against `PROVISION.md` and the selected optional
+items/modules. Do not treat an unselected optional item as a failure.
 
-Run the verification steps below. For each individual item, print a single line in the format:
-`[CATEGORY] <Item Name> — PASS`, `FAIL`, or `SKIP` (along with a brief reason or version if relevant).
+Print one concise line per check:
 
----
+`[CATEGORY] <item> — PASS | FAIL | SKIP — <evidence or reason>`
 
-## Step 0 — Identify the Environment
-Establish and print:
-* **Agent and Version:** Identify which agent you are and your version (`claude --version`, `agy --version`, etc.).
-* **Operating System:** Report OS, version, architecture, and shell.
+Never print secret values, literal auth headers, tokens, or keychain contents.
 
----
+## 0. Identify the environment
 
-## Step 1 — Verify CLI Tools (Default Set)
-Check if each of the following binaries is present and functioning by running its `--version`, `-v`, or `--help` command.
-Report **PASS** with the version/path, or **FAIL**.
+- Report the active coding agent, exact version, OS/version/architecture, shell,
+  and package manager.
+- Read the current agent's official documentation before assuming config paths
+  or schema.
+- State which optional items and modules were selected.
 
-* **`git`** (git-scm.com)
-* **`gh`** (GitHub CLI)
-* **`rg`** (ripgrep)
-* **`fd`** or **`fdfind`** (fdfind on Debian/Ubuntu with a symlink to `fd`)
-* **`sg`** or **`ast-grep`** (ast-grep)
-* **`jq`**
-* **`tree`**
-* **`tmux`**
-* **`tailscale`**
-* **`micro`** (micro text editor)
-* **`uv`** (Astral uv)
-* **`fnm`** (Fast Node Manager)
-* **`bun`**
-* **`op`** (1Password CLI)
-* **`qmd`** (npm @tobilu/qmd)
+## 1. CLI defaults
 
----
+Resolve each default tool against the canonical source in `PROVISION.md`, then
+run its version/help check: `git`, `gh`, `rg`, `fd`, `ast-grep`, `jq`, `tree`,
+`tmux`, `tailscale`, `micro`, `uv`, `fnm`, `bun`, `op`, `qmd`, `npx skills`,
+`agent-browser`, and `ggshield`.
 
-## Step 2 — Verify Shell & Environment Configuration
-Verify that the custom aliases, SSH tmux configuration, and Tailscale settings are correctly written and operational.
+Additional checks:
 
-1. **Shell Aliases:** Check `~/.bashrc` or `~/.zshrc` for the active definition of:
-   * `l` (should map to `ll` or `ls -alF`)
-   * `la` (should map to `ls -A`)
-   * `ll` (should map to `ls -alF`)
-   * `ls` (should include `--color=auto`)
-   * `grep`, `egrep`, `fgrep` (should include `--color=auto`)
-   * `alert` (should include `notify-send --urgency=low ...` or equivalent desktop alert hook)
-2. **SSH Tmux Auto-Load:** Check that `~/.bashrc` or `~/.zshrc` has an active script section starting a tmux session upon SSH connection. Specifically look for:
-   * Checks on `SSH_CONNECTION` and starting `tmux attach-session` or `tmux new-session`.
-3. **Tailscale SSH Enablement:**
-   * Run `tailscale status` to confirm Tailscale is connected.
-   * Check if Tailscale SSH is enabled on the client machine (e.g., check `sudo tailscale status` or verify if `--ssh` flag was passed during setup).
+- `agent-browser doctor --offline --quick` passes and a short session can open
+  `https://example.com`, read its title, and close cleanly.
+- `ggshield api-status` is healthy. Check `ggshield quota`; enabled Git and
+  agent hooks are a FAIL when quota is zero because they cannot scan reliably.
+- Verify every selected optional CLI/module tool in the same way.
 
----
+## 2. Authored configuration
 
-## Step 3 — Verify MCP Servers
-Check if the following MCP servers are configured in your active config file (`~/.claude/settings.json` or `~/.gemini/config/mcp_config.json` depending on your agent type) and can be loaded:
-* **`context7`** (remote URL: `https://mcp.context7.com/mcp`)
-* **`google-developer-knowledge`** (remote URL: `https://developerknowledge.googleapis.com/mcp`)
-* **`playwright`** (via `npx -y @playwright/mcp@latest`)
+- Global instructions exist in the path used by this harness.
+- Every canonical rule in `sources/claude/rules/` is represented in the active
+  always-loaded instructions and the full adapted references are available.
+- Both runbooks are available on demand.
+- All four custom agents load in the harness's native format.
+- All four authored hook behaviors are present when the harness supports
+  equivalent events.
+- The eight default own skills are present exactly once:
+  `branch-cleanup`, `challenge`, `code-search`, `git-sync`, `grill-me`,
+  `security-review`, `pr-workflow`, `stack-detection`.
+- `npx skills update -g -y` reports all tracked remote skills current, and its
+  lock contains no retired repository source.
 
----
+## 3. MCP and plugins
 
-## Step 4 — Verify Authored Config & Rules
-Verify that the global instruction files and Always-Loaded rules have been successfully translated and placed:
-1. **Global Instructions:** Check if the global instruction file exists (`GEMINI.md` in your home directory if you are Antigravity, or `~/.claude/` / `CLAUDE.md` if you are Claude Code).
-2. **Global Rules:** Verify that all canonical rule files from `sources/claude/rules/` in the repo have been copied into the agent's active rule subdirectory (e.g., `~/.gemini/config/rules/` or `~/.claude/rules/`).
+- Context7 is configured using OAuth/keychain where supported, exposes tools,
+  and completes one library-resolution call. A literal API key in a config file
+  is a FAIL when OAuth is available.
+- Verify optional Playwright and Google Developer Knowledge only when selected.
+- For every configured MCP/plugin connector, run one harmless read-only call.
+- Flag stale disabled direct servers and unauthenticated duplicate raw MCP legs.
+  Prefer a working app connector unless the raw leg adds a required capability.
 
----
+## 4. Codex-specific checks
 
-## Step 5 — Report Synthesis
-Output a final summary of results. If any item is marked **FAIL**, provide a short recommendation on how to remediate the discrepancy using the guidelines in `PROVISION.md` or the `ideas.md` improvement notes.
+When the active harness is Codex:
+
+- Confirm CLI and desktop app use the same `~/.codex/config.toml`; do not create
+  a second app-only MCP config.
+- Run `codex --strict-config` validation and `codex doctor --summary`.
+- Parse every `~/.codex/agents/*.toml` and require `name`, `description`, and
+  `developer_instructions`.
+- Validate `~/.codex/hooks.json`, shell syntax-check each script, and confirm
+  exactly the current four hook commands are trusted.
+- Confirm Browser works in the desktop app, Chrome works through the Chrome
+  plugin, and the standalone `agent-browser` CLI works independently.
+- Confirm OpenAI-curated GitHub, Gmail, Google Calendar, Google Drive, Notion,
+  and Vercel app plugins are installed/enabled when this setup selected them.
+- Ensure Claude-only command/agent/hook plugins are not installed into Codex.
+
+## 5. Shell and personal toggle
+
+Only when the personal toggle was selected:
+
+- Compare the live shell aliases/functions with `sources/shell/aliases.zsh`.
+- Verify SSH tmux auto-attach and Tailscale SSH without changing sudo-protected
+  state during a verification-only run.
+- Verify selected terminal/settings templates after placeholder substitution.
+
+## 6. Final synthesis
+
+- Compare installed state with selected `PROVISION.md` intent.
+- List remaining FAIL items with exact remediation.
+- List extras separately; do not delete them during a verification-only run.
+- A final PASS requires concrete command/tool evidence and no skipped required
+  check.

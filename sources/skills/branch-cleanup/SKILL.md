@@ -1,16 +1,6 @@
 ---
 name: branch-cleanup
-description: >
-  Take a single git repo with many branches and mixed PR states back to a clean main:
-  audit all branches and PRs, auto-merge fully-green PRs, prune [gone], merged, and
-  squash-merged branches, propose rebase/merge for behind-main branches, surface failing-CI
-  excerpts, and ask only before destructive batches. Always dry-run-able. Trigger for BULK
-  branch/PR convergence — "clean up branches", "merge everything mergeable", "wrap up
-  branches", "converge to main", "prune merged branches", "my repo is a mess", tidying up
-  before a break — and German equivalents ("branches aufräumen", "alles auf main mergen",
-  "vor dem Urlaub aufräumen", "Aufräumen"). Do NOT trigger for a single-PR merge, a
-  single-branch rebase, one known conflict you understand, or multi-repo sync (that is
-  git-sync's job).
+description: Bulk-converge one repository's branches and PRs onto clean main with a dry-run-first workflow. Use for "clean up branches", "merge everything mergeable", "converge to main", "branches aufräumen", or "alles auf main mergen". Not for one PR/branch or multi-repo sync.
 effort: medium
 ---
 

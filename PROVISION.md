@@ -1,4 +1,4 @@
-# PROVISION — Intent (Claude Code)
+# PROVISION — Intent (all supported coding agents)
 
 What this machine should have, from where, why, and how to verify. The master
 prompt (SETUP-PROMPT.md) reads this and configures the agent using its current
@@ -31,10 +31,11 @@ verify (all): the binary's `--version` (or `--help`) succeeds.
 | `op` | 1Password CLI — developer.1password.com/docs/cli | package is **`1password-cli`** (brew cask `1password-cli`; Linux via 1Password's own apt/rpm repo), binary is `op` — not in default distro repos |
 | `qmd` | npm **`@tobilu/qmd`** | install from npm ONLY — **never** a GitHub source of the same name |
 | `skills` | skills.sh — run via **`npx skills`** | no global binary needed |
-| `ggshield` | GitGuardian CLI — github.com/GitGuardian/ggshield | brew/pipx `ggshield`. Post-install (per user, interactive): `ggshield auth login` (token → OS keyring; NOT readable from sandboxed shells — sandbox "no token" errors are noise), then `ggshield install --mode global -t pre-push` and `ggshield install --mode global -t claude-code`. Husky repos need their own `.husky/pre-push` with `ggshield secret scan pre-push "$@"` (local hooksPath shadows global). Why: enforces `rules/secrets-in-git.md` — see its Enforcement section. verify: unsandboxed `ggshield api-status` reports healthy |
+| `agent-browser` | Vercel Labs — github.com/vercel-labs/agent-browser | browser automation CLI used for usability and repeatable headless UI tests. Install the browser runtime after the CLI. This is separate from Codex's in-app Browser and Chrome plugins. verify: `agent-browser doctor --offline --quick` passes and opening `https://example.com` returns the title |
+| `ggshield` | GitGuardian CLI — github.com/GitGuardian/ggshield | brew/pipx `ggshield`. Post-install (per user, interactive): `ggshield auth login` (token → OS keyring), then verify `ggshield quota` is greater than zero before installing hooks. Install the global `pre-push` target and the detected agent target (`claude-code` for Claude Code, `codex` for Codex) only while scanning quota is available; otherwise the pre-push hook blocks normal pushes and the agent hook can only fail open noisily. Husky repos need their own `.husky/pre-push` with `ggshield secret scan pre-push "$@"` (local hooksPath shadows global). Do not dismiss a failed `ggshield api-status` as sandbox noise without verifying keyring auth. Why: enforces `rules/secrets-in-git.md` — see its Enforcement section. verify: `ggshield api-status` is healthy, `ggshield quota` is positive, and a benign scan succeeds |
 
 ## MCP servers
-- context7  [default] — https://mcp.context7.com/mcp — why: current library docs — secret: CONTEXT7_API_KEY (op://Private/CONTEXT7_API_KEY/credential) — verify: server lists tools
+- context7  [default] — https://mcp.context7.com/mcp — why: current library docs — prefer the agent's OAuth/keychain flow; API-key fallback: CONTEXT7_API_KEY (op://Private/CONTEXT7_API_KEY/credential), never a literal committed header — verify: server lists tools and one library-resolution call succeeds
 - playwright  [optional] — npx @playwright/mcp@latest — why: headless browser — verify: agent can screenshot a page
 - google-developer-knowledge  [module:google] — https://developerknowledge.googleapis.com/mcp — verify: server lists tools
 
@@ -51,20 +52,39 @@ marketplaces: anthropics/claude-plugins-official, DietrichGebert/ponytail, zilli
   (op://APIKeys/greptile/credential, resolved by the `claude()` shell wrapper —
   see `sources/shell/aliases.zsh`) — verify: /plugin lists it
 
+## Plugins (Codex)
+- Browser + Chrome  [default in the desktop app] — Browser controls the
+  app-owned browser; Chrome controls the user's existing Chrome profile.
+  Browser is app-only. verify: each selected surface can open `https://example.com`
+- GitHub · Gmail · Google Calendar · Google Drive · Notion · Vercel
+  [default on this setup] — use the OpenAI-curated app plugins and their
+  authenticated app connectors. Do not add a second raw MCP leg unless it
+  provides a capability the app connector lacks. verify: one read-only profile,
+  list, or lookup call succeeds for each configured service
+- The Vercel plugin already supplies the `agent-browser` and
+  `agent-browser-verify` skills. Do not install a second standalone copy of the
+  same skill; the `agent-browser` CLI above is still required. Keep only these
+  two Vercel plugin skills globally enabled on this setup; the connector tools
+  remain available and specialized guidance can come from current docs or
+  project-local skills without overflowing Codex's skill-description budget.
+
 ## Skills — own (stored in this repo; the prompt PLACES them)  [default]
 branch-cleanup · challenge · code-search · git-sync · grill-me · security-review · pr-workflow · stack-detection
 verify: `/` shows each; skills load
 
 ## Skills — own, optional (stored, not default)  [optional]
-- config-edit — why: path syntax reference for Claude Code settings/permissions/hooks
-- convex-vercel-setup — why: standardize/audit Vercel+Convex+Modal deploy config (project-local preferred)
+- config-edit — Claude Code only; why: path syntax reference for its settings/permissions/hooks
 - convexcheck — why: report-only audit of a project's Convex+Vercel+Modal deploy footguns (project-local preferred)
 - deploy — why: safe Modal/Convex deploy delegating to project deploy-script gates (project-local preferred)
-- notion-safe-writes — why: guardrails against known Notion MCP write bugs before create/edit calls
+- notion-safe-writes — Claude/raw-Notion-MCP only; do not install for Codex's app connector
 - performance-review — why: automated Next.js+Convex+Modal performance checks (project-local preferred)
 - pin-auth — why: scaffold PIN-based auth (Convex or lightweight HMAC variant) into a Next.js app
-- review-routing — why: routing lookup to resolve which review/security tool is the default in a given case
+- review-routing — Claude Code only; why: routing lookup across its review/security plugins
 verify: `/` shows each once placed; skills load
+
+Stored but intentionally not provisioned: `convex-vercel-setup` still references
+machine-specific paths and missing central assets from the retired setup repo.
+Keep it disabled until it is rewritten around portable, repo-local assets.
 
 ## Skills — remote meta (skills.sh)  [default]
 - mcp-builder — anthropics/skills — verify: skills list shows it
@@ -76,18 +96,13 @@ Remote skills live only as installs via `npx skills add -g` (canonical copy in
 registries; this repo documents the intent, never their content. Currently:
 - convex-* (best-practices, cron-jobs, file-storage, functions, http-actions,
   migrations, realtime, schema-validator, security-audit, security-check) — waynesutton/convexskills
-- vercel-* (cli-with-tokens, composition-patterns, optimize, react-best-practices,
-  react-native-skills, react-view-transitions) · next-cache-components-* (adoption,
-  optimizer) · deploy-to-vercel · web-design-guidelines · writing-guidelines ·
-  avoid-feature-creep — vercel-labs / vercel registries
+- avoid-feature-creep — waynesutton/convexskills
+- vercel-cli-with-tokens — vercel-labs/agent-skills
 - webapp-testing · claude-api — anthropics/skills
-- vitest · orchestration — skills.sh registry
-- memory-config / memory-recall / memory-to-skill — memsearch plugin family
+- vitest — antfu/skills
 - google-agents-cli-* — installed by `uvx google-agents-cli setup` (see Module: google)
-- orca-cli — installed by the Orca app
-NOTE: this global install of stack skills is in tension with the
-"stack SKILLS are PROJECT-LOCAL" policy under Module: webservice — the live
-machine has them global; documented here as-is, resolve deliberately.
+These named global skills are deliberate cross-project exceptions. Everything
+else under Module: webservice remains project-local.
 
 ## Module: google  [ask]
 - google skills + agents-cli — `uvx google-agents-cli setup` (installs google-agents-cli-* skills globally; CLI-tied) — verify: agents-cli info
@@ -106,11 +121,11 @@ truth). A non-Claude agent translates these into its own format at provision tim
 - `sources/claude/rules/` → where this agent reads global rules (copy ALL)
 - `sources/claude/runbooks/` → referenced on demand (not auto-loaded)
 - `sources/claude/agents/` → subagent definitions
-- `sources/claude/hooks/` → lifecycle hook scripts, implemented for **Claude
-  Code** (wiring in `hooks/settings-hooks.json`, merged into settings
-  `hooks` key). Other agents: check your own current docs for a hook/event
-  mechanism — if you support equivalents, wire these scripts in; if not,
-  skip them (see `sources/claude/hooks/README.md`).
+- `sources/claude/hooks/` → lifecycle hook logic plus Claude Code's native
+  implementation. Non-Claude agents must translate both the wiring and the
+  hook input/output protocol; do not blindly reuse Claude JSON fields. Codex
+  currently supports equivalents in `~/.codex/hooks.json` (details in
+  `sources/harness-notes/codex.md`).
 
 ## System & Shell Environment  [default]
 - **Shell Aliases & Functions:** The canonical alias/function block for `~/.zshrc` is `sources/shell/aliases.zsh` (agent aliases `c`/`cc`/`co`/`oc`, git helpers, 1Password keychain token + `claude()` Greptile-key wrapper). NOTE: `op` is the 1Password CLI, never an alias.

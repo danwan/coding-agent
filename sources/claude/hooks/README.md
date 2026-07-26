@@ -17,8 +17,10 @@ of this repo — only the authored hooks above are.
 
 ## For non-Claude agents provisioning from this repo
 
-The scripts are plain shell and harness-agnostic; only the wiring is
-Claude-specific. **Check your own current documentation for a hook/event
-mechanism** (lifecycle hooks, event bus, plugin hooks, etc.). If your harness
-supports equivalents of the events above, wire these scripts in. If not, skip
-them — they are conveniences, not required guardrails.
+The hook **logic** is portable, but the checked-in scripts consume Claude's
+hook JSON and emit Claude's response shape. A non-Claude harness must translate
+both the wiring and that input/output protocol. Do not copy the scripts
+verbatim and assume they are harness-agnostic. If the harness supports
+equivalent events, implement equivalent scripts from the behavior described in
+the table; otherwise skip them. Codex-specific details live in
+`sources/harness-notes/codex.md`.

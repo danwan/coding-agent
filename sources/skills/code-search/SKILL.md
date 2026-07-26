@@ -1,6 +1,6 @@
 ---
 name: code-search
-description: Use when searching source code — selecting between rg, fd, ast-grep, jq, and tree, and choosing Explore-subagent vs direct Bash. Triggers on multi-step code search, structural pattern matching, or JSON config inspection. NOT for markdown docs/notes (use qmd CLI or mcp__qmd__* tools instead) or past sessions (use memsearch:memory-recall skill instead).
+description: Route multi-step source-code searches among rg, fd, ast-grep, jq, tree, and an explorer agent. Use for structural searches or JSON/config inspection; not for general Markdown research or session-history recall.
 ---
 
 # Code Search

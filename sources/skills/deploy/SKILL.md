@@ -1,6 +1,6 @@
 ---
 name: deploy
-description: Safe Modal/Convex backend deployment. Delegates to the project's ./deploy-backend.sh and ./deploy-backend-preview.sh scripts — those scripts own the 10-gate safety contract from ~/.claude/rules/deploy-safety.md. This skill routes to the right one, handles dirty state, and refuses to fall back to unsafe manual commands. Use when user says "deploy", "push to production", "modal deploy", "convex deploy", "deploy backend".
+description: Safely route Modal/Convex backend deploys through the project's gated deploy scripts; never fall back to manual unsafe commands. Use for "deploy", "push to production", "modal deploy", "convex deploy", or "deploy backend".
 allowed-tools: Bash, Read, Grep, Glob
 disable-model-invocation: true
 version: 2.0.0

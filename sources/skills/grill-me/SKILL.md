@@ -1,6 +1,6 @@
 ---
 name: grill-me
-description: Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when the user wants to stress-test a plan, get grilled on their design, asks you to "grill me", "challenge my plan", "poke holes", "interview me", or proposes a plan that has obvious gaps or unstated assumptions — even when they don't explicitly invoke the skill.
+description: Interview the user to stress-test a plan or design, expose gaps, and resolve decisions. Use for "grill me", "challenge my plan", "poke holes", or "interview me".
 ---
 
 # Grill Me

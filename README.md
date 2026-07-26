@@ -25,7 +25,7 @@ knowledge of tools and mechanisms at the time you run it.
 
 ## Use it
 
-1. Install Claude Code.
+1. Install the coding agent you want to provision.
 2. Paste the contents of `SETUP-PROMPT.md` into a new session — or just tell
    the agent to read the raw URL in that file and run it.
 3. Answer the prompts about optional items/modules when asked.

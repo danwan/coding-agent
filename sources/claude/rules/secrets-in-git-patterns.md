@@ -39,11 +39,14 @@ Treat these as non-matches — ignore them before checking the pattern set, so l
 - **Trailer lines:** `Co-authored-by:`, `Signed-off-by:`, `Reviewed-by:`, `Acked-by:`, `Tested-by:`, `Reported-by:` — entire line dropped.
 - **Commit-SHA references:** `commit <sha>`, `revert <sha>`, `cherry-pick <sha>`, `merge <sha>`, `see <sha>`, `parent <sha>`, `tree <sha>` — token replaced with placeholder.
 - **Commit-range refs:** `abc1234..def5678` — replaced with placeholder.
-- **Explicit redaction placeholders:** `<REDACTED:...>`, `<set via vercel env add ...>`, `<set via convex env set ...>`, `<set via chat session>`, `<rotated secret — see chat session>`, `<chat session>` — stripped before scan.
+- **Explicit redaction placeholders:** `<REDACTED:...>`, `<set via vercel env add ...>`, `<set via convex env set ...>`, `<set directly by user>`, `<rotated secret>` — stripped before scan.
 
 ## False-Positive Judgment Call
 
-If a value matches a pattern but is genuinely not a secret (e.g. a commit SHA, a test fixture), say so explicitly and proceed — there is no scanner to override, just your own judgment. When in doubt, ask the user.
+If a value matches a pattern but is genuinely not a secret (e.g. a commit SHA
+or test fixture), say so explicitly and use GitGuardian's supported ignore or
+dashboard-triage mechanism where needed. Do not bypass hooks. When in doubt,
+ask the user.
 
 ## Out of scope (intentional)
 
