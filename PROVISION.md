@@ -31,6 +31,7 @@ verify (all): the binary's `--version` (or `--help`) succeeds.
 | `op` | 1Password CLI — developer.1password.com/docs/cli | package is **`1password-cli`** (brew cask `1password-cli`; Linux via 1Password's own apt/rpm repo), binary is `op` — not in default distro repos |
 | `qmd` | npm **`@tobilu/qmd`** | install from npm ONLY — **never** a GitHub source of the same name |
 | `skills` | skills.sh — run via **`npx skills`** | no global binary needed |
+| `llm` | Simon Willison — llm.datasette.io, with `llm-openrouter` | install the Python CLI with the OpenRouter plugin via `uv`; why: second opinions from multiple providers through one OpenRouter account. Configure interactively with `llm keys set openrouter`, then choose a current model and alias it per `sources/claude/runbooks/llm-cli-openrouter.md`. ⚠️ unrelated packages also use the name `llm`. verify: `llm --version`, `llm models -q openrouter`, and one prompt through the configured alias succeed |
 | `agent-browser` | Vercel Labs — github.com/vercel-labs/agent-browser | browser automation CLI used for usability and repeatable headless UI tests. Install the browser runtime after the CLI. This is separate from Codex's in-app Browser and Chrome plugins. verify: `agent-browser doctor --offline --quick` passes and opening `https://example.com` returns the title |
 | `ggshield` | GitGuardian CLI — github.com/GitGuardian/ggshield | brew/pipx `ggshield`. Post-install (per user, interactive): `ggshield auth login` (token → OS keyring), then verify `ggshield quota` is greater than zero before installing hooks. Install the global `pre-push` target and the detected agent target (`claude-code` for Claude Code, `codex` for Codex) only while scanning quota is available; otherwise the pre-push hook blocks normal pushes and the agent hook can only fail open noisily. Husky repos need their own `.husky/pre-push` with `ggshield secret scan pre-push "$@"` (local hooksPath shadows global). Do not dismiss a failed `ggshield api-status` as sandbox noise without verifying keyring auth. Why: enforces `rules/secrets-in-git.md` — see its Enforcement section. verify: `ggshield api-status` is healthy, `ggshield quota` is positive, and a benign scan succeeds |
 
@@ -139,5 +140,6 @@ truth). A non-Claude agent translates these into its own format at provision tim
 ## Secrets
 - CONTEXT7_API_KEY — op://Private/CONTEXT7_API_KEY/credential
 - GREPTILE_API_KEY — op://APIKeys/greptile/credential (resolved per-start by the `claude()` wrapper)
+- OPENROUTER_KEY — optional environment alternative; prefer `llm keys set openrouter` so the value stays in the CLI key store (see `sources/claude/runbooks/llm-cli-openrouter.md`)
 - OP_SERVICE_ACCOUNT_TOKEN — macOS Keychain item `op-service-account` (basis for all `op run`/`op read`)
 - (REF_API_KEY, EXA_API_KEY are Cursor-only — not in the Claude default)

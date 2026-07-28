@@ -36,6 +36,11 @@ Run `code --version` or verify the active secure tunnel service.
 
 ## 🤖 2. OpenCode, OpenRouter, & LiteLLM Integration
 
+> **OpenRouter is no longer an idea** — it ships via the `llm` CLI. See
+> `PROVISION.md` (CLI tools) and
+> `sources/claude/runbooks/llm-cli-openrouter.md`. Only OpenCode and LiteLLM
+> below are still open.
+
 ### Overview
 These utilities provide robust LLM orchestration, proxying, and client interfaces for unified agent execution across diverse models and providers.
 
