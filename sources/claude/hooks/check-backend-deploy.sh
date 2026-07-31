@@ -11,12 +11,28 @@
 # Diffing against the branch you are standing on always yields empty, which
 # silently disabled this guard on main — i.e. exactly in production.
 #
-# Wire with `if: "Bash(git push*)"` so it runs on pushes, not on every Bash call.
+# Claude Code can pre-filter this with `if: "Bash(git push*)"`, but not every
+# harness supports that field, so the script checks the command itself. Relying
+# on the wiring alone would make correctness depend on a feature the target may
+# not have — and a hook that never matches is indistinguishable from one that
+# matched and found nothing.
 
 emit_allow() {
   printf '%s\n' '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow"}}'
   exit 0
 }
+
+# Only pushes are interesting. stdin is the hook payload; if it is absent or
+# unparseable, fall through rather than blocking on a malformed event.
+HOOK_INPUT=$(cat 2>/dev/null)
+if [ -n "$HOOK_INPUT" ]; then
+  CMD=$(printf '%s' "$HOOK_INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null)
+  case "$CMD" in
+    *"git push"*) ;;          # proceed
+    "")           ;;          # no command in payload — let the checks decide
+    *) emit_allow ;;
+  esac
+fi
 
 PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || emit_allow
 [ -z "$PROJECT_ROOT" ] && emit_allow

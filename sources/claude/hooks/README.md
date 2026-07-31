@@ -15,6 +15,26 @@ key of the settings file).
 Machine-specific hooks installed by third-party apps (e.g. Orca) are NOT part
 of this repo — only the authored hooks above are.
 
+## Scripts self-filter; wiring is only an optimization
+
+Each script decides for itself whether it applies: the formatters check the file
+extension, `check-backend-deploy.sh` checks that the command is a push. Claude
+Code's `if:` field then avoids even spawning them, but correctness does not
+depend on it — other harnesses have no equivalent, and a hook that never matches
+looks exactly like a hook that matched and found nothing.
+
+Two live examples of that failure mode, both found on 2026-07-31:
+
+- Codex had the formatters wired to `Stop` instead of `PostToolUse`. A `Stop`
+  payload carries no `tool_input.file_path`, so both scripts read an empty path
+  and exited 0. They had never formatted anything.
+- `check-backend-deploy.sh` compared against the local default branch while
+  standing on it, making the production path unreachable, and emitted a response
+  shape with no recognized fields.
+
+**So: pick the event that actually carries the data the script needs, and prove
+it with a payload before trusting the wiring.**
+
 ## For non-Claude agents provisioning from this repo
 
 The hook **logic** is portable, but the checked-in scripts consume Claude's
