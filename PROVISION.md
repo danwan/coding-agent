@@ -139,10 +139,6 @@ verify: `/` shows each; skills load
 - review-routing — Claude Code only; why: routing lookup across its review/security plugins
 verify: `/` shows each once placed; skills load
 
-## Skills — remote meta (skills.sh)  [optional]
-- mcp-builder — anthropics/skills — why: Anthropic's own process for MCP-server
-  quality; keep `off` in skillOverrides until an MCP server is actually being built
-
 ## Skills — remote, globally installed (documented only — NOT stored in this repo)  [optional]
 Remote skills live only as installs via `npx skills add -g` (canonical copy in
 `~/.agents/skills/`, symlinked into each harness). Re-install from their
@@ -154,16 +150,16 @@ Context7 fetches live, and several such skills tell the agent to "fetch the
 latest documentation" in their own body. Install a remote skill only when it
 carries a *procedure* (an ordered, failure-avoiding recipe) or setup knowledge
 that is not in any public doc. Currently:
+- agent-browser — vercel-labs/agent-skills; why: drives the `agent-browser` CLI
+  (see CLI tools above) — procedure, not vendor docs
+- skill-development — why: structure/progressive-disclosure guidance when
+  authoring skills for this repo
 - vercel-cli-with-tokens — vercel-labs/agent-skills; why: token auth without
   leaking values into shell history, team scoping, env-var handling
 - vercel-optimize — vercel-labs/agent-skills; why: metrics-first gating plus
   scripts; keep `off` until a real Vercel cost question exists
 - next-cache-components-adoption · next-cache-components-optimizer — vercel/next.js;
   why: a test-driven migration loop; keep `off` until such a migration is due
-- claude-api — anthropics/skills; why: model ids and pricing drift faster than
-  any model's training data
-- web-design-guidelines — vercel-labs/agent-skills; why: a stub that fetches the
-  guidelines live, so it cannot go stale; keep `off` until doing design work
 - computer-use · orca-cli · orchestration — stablyai/orca; why: stubs whose
   reference comes from the `orca` binary; keep `off` unless Orca is in use
 These named global skills are deliberate cross-project exceptions. Everything
