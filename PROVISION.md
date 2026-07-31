@@ -193,9 +193,10 @@ field is omitted so the agent inherits the session model. No argument
 = dry run, `--apply` = write, absent harnesses are skipped, and it is idempotent.
 Run it after any change under `sources/`. verify: a second `./sync.sh` reports
 `zu schreiben: 0`. Per-harness format limits are documented in
-`sources/harness-notes/README.md` — Windsurf's 6 KB cap and Cursor's `.mdc`
-frontmatter requirement in particular mean "identical" is not achievable
-everywhere, and the script fails loud rather than truncating.
+`sources/harness-notes/README.md` — Cursor's `.mdc` frontmatter requirement and
+Codex's `project_doc_max_bytes` in particular mean "identical" is not achievable
+everywhere, and the script fails loud rather than truncating. Windsurf is
+deliberately out of scope; see the same file for why.
 
 ## Authored config (placed from this repo)  [default]
 Stored ONCE, in Claude Code's format, under `sources/claude/` (single source of

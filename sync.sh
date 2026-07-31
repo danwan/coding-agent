@@ -202,20 +202,6 @@ if need "$HOME/.factory"; then
   place "$SRC/CLAUDE.md" "$HOME/.factory/AGENTS.md"
 fi
 
-# ── Windsurf ────────────────────────────────────────────────────────────────
-# global_rules.md is capped at 6000 characters and is the ONLY global surface —
-# there is no global rules directory. Only CLAUDE.md fits; the rules stay out.
-head2 "Windsurf  ~/.codeium/windsurf"
-if need "$HOME/.codeium/windsurf"; then
-  ws_size=$(wc -c < "$SRC/CLAUDE.md" | tr -d ' ')
-  if (( ws_size > 6000 )); then
-    say "  !! CLAUDE.md ist $ws_size B, Windsurf-Limit 6000 B — würde abgeschnitten. Übersprungen."
-  else
-    place "$SRC/CLAUDE.md" "$HOME/.codeium/windsurf/memories/global_rules.md"
-    say "  ($ws_size/6000 B belegt; Rules passen dort nicht — Windsurf hat kein Rules-Verzeichnis)"
-  fi
-fi
-
 head2 "Ergebnis"
 say "  identisch: $same   zu schreiben: $changed   übersprungen: $skipped"
 if (( ! APPLY )) && (( changed > 0 )); then

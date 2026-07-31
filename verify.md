@@ -53,7 +53,7 @@ Additional checks:
   already carries the current authored content. A non-zero count means drift,
   not a failure of this check.
 - No skill directory contains a dangling symlink:
-  `find ~/.claude/skills ~/.agents/skills ~/.codex/skills ~/.cursor/skills ~/.gemini/antigravity-cli/skills ~/.codeium/windsurf/skills -maxdepth 1 -type l ! -exec test -e {} \; -print`
+  `find ~/.claude/skills ~/.agents/skills ~/.codex/skills ~/.cursor/skills ~/.gemini/antigravity-cli/skills -maxdepth 1 -type l ! -exec test -e {} \; -print`
   prints nothing.
 - `npx skills update -g -y` reports all tracked remote skills current, and its
   lock contains no retired repository source.

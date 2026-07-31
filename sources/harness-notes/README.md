@@ -25,7 +25,6 @@ disagree, the current docs win.
 | Antigravity / Gemini | [`antigravity.md`](antigravity.md) | `~/.gemini/` |
 | Cursor | [`cursor.md`](cursor.md) | `~/.cursor/` |
 | Factory Droid | [`droid.md`](droid.md) | `~/.factory/` |
-| Windsurf | [`windsurf.md`](windsurf.md) | `~/.codeium/windsurf/` |
 
 ## Placement is mechanized — `../../sync.sh`
 
@@ -46,13 +45,20 @@ places, and it is better to name them than to pretend otherwise.
 
 | Constraint | Consequence |
 | --- | --- |
-| Windsurf's global surface is one file capped at 6 000 characters, with no rules directory | Only `CLAUDE.md` fits. The rules cannot go there at all. |
 | Codex has no rules directory | The rules are concatenated into `AGENTS.md`, bounded by `project_doc_max_bytes`. |
 | Cursor documents no global instruction file | `~/.cursor/rules/*.mdc` is an undocumented path. Rules there need `.mdc` **with** frontmatter — a plain `.md` is silently ignored. |
 | Gemini's `GEMINI.md` is shared with plugin-managed blocks | Merge into a marked block; overwriting destroys the Context7 instructions. |
 | OpenCode has no shell-hook system | Its plugins are JS/TS event handlers. Authored hook scripts do not port. |
-| Windsurf hooks are exit-code only, Gemini's events are named differently | Hook *logic* is portable, the response protocol is not. |
-| Windsurf documents no user-defined subagents | The four subagents have no home there. |
+
+## Deliberately out of scope
+
+**Windsurf.** Its only global surface is one file capped at 6 000 characters with
+no rules directory, its hooks are exit-code-only with unrelated event names, and
+it documents no user-defined subagents — so it could never carry this content and
+every attempt would have to be a second, separately-maintained short version.
+It is not provisioned, not synced, and not verified here. That is a scope
+decision, not an oversight: if it comes back, it needs its own note and its own
+abbreviated ruleset, not a carve-out in the shared path.
 
 Deeper, version-specific research (kept for reference, **not** authoritative) is
 under [`docs/harness-research/`](../../docs/harness-research/).
