@@ -78,6 +78,29 @@ the plugin is invoked or not.
 | frontend-design | 0 (was disabled) | Covered by the built-in `dataviz` and `artifact-design` skills. |
 | memsearch | 0 (not enabled) | Superseded by native auto-memory. Removed everywhere, not just disabled. |
 
+### Considered and measured, not installed
+All 276 plugins in the official marketplace were filtered against the selection
+rule and against the stack this machine actually uses. Most are vendor
+integrations for services not in use; the overlapping ones (context7, notion,
+sentry, exa, github, gitkraken, playwright) are already configured as MCP
+servers, and the code-search and security ones (serena, lumen, sourcegraph,
+semgrep, sonarqube, claude-security) duplicate greptile, coderabbit and ggshield.
+
+One genuine candidate survived that filter and was installed to measure:
+**`convex`** — official, and its MCP server offers live deployment introspection
+(schema, functions, logs, real queries), which is exactly the "capability the
+model does not have" the rule asks for. Measured: **~3,332 always-on tokens**,
+nearly the same as the pr-review-toolkit that was removed. The breakdown is the
+decisive part: the MCP server and the three hooks cost nothing (tool schemas
+resolve at runtime), while all 3.3k sit in 18 bundled skills — `auth`, `crons`,
+`env`, `migrate`, `seed`, `test`, `domains` — the same vendor documentation this
+audit had just deleted in its standalone form.
+
+Taming it would mean 17 `skillOverrides` entries to keep the MCP and suppress
+the rest: exactly the maintenance ballast this audit set out to remove. So it
+was uninstalled. **If live Convex introspection is wanted, add the MCP server
+alone, project-local** — per the stack-skills rule below, not as a global plugin.
+
 The kept six all clear the bar for a different reason each: coderabbit and
 greptile are external services, the two LSPs are real language servers costing
 nothing, skill-creator provides evals no prompt replaces, commit-commands is
