@@ -18,6 +18,9 @@ Install later plugin updates with `uv tool upgrade llm`.
 
 ## Configure the key
 
+This needs a pay-as-you-go OpenRouter API key. Consumer subscriptions
+(Claude Pro, ChatGPT Plus) grant no API access and cannot be used here.
+
 Use the interactive prompt so the key does not enter shell history:
 
 ```bash
@@ -56,8 +59,10 @@ A response verifies the installation, plugin, stored key, selected model, and
 alias together. `Unknown model` means the catalog or alias needs refreshing;
 an authentication error means the OpenRouter key is missing or invalid.
 
-Prompts and responses are logged locally. Treat `llm logs` output as sensitive
-because it can contain source text or other supplied context.
+Prompts, responses and token counts are logged to a local SQLite database;
+`llm logs path` prints its location and `llm logs -n 1 --short --usage` shows
+what the last call consumed. Treat `llm logs` output as sensitive because it
+can contain source text or other supplied context.
 
 ## Use
 
