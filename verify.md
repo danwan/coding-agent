@@ -46,6 +46,9 @@ Additional checks:
   `security-review`, `pr-workflow`, `stack-detection`.
 - On Claude Code, `chrome-ui-explorer` is present as a real directory under
   `~/.claude/skills/` and absent from the `~/.agents/skills/` hub.
+- `./sync-agents.py` (no argument) reports `zu schreiben: 0`, and every
+  generated `~/.codex/agents/*.toml` parses as TOML with a non-empty
+  `developer_instructions`.
 - `./sync.sh` (no argument) reports `zu schreiben: 0` — every installed harness
   already carries the current authored content. A non-zero count means drift,
   not a failure of this check.

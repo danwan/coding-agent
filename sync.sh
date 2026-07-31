@@ -156,7 +156,7 @@ except Exception: print(65536)")
   place_dir "$SRC/runbooks" "$HOME/.codex/runbooks"
   place_dir "$SRC/hooks"    "$HOME/.codex/hooks" '*.sh'
   (( APPLY )) && chmod +x "$HOME"/.codex/hooks/*.sh 2>/dev/null
-  say "  note: Subagents liegen als .toml vor — Prompt-Bodies via sync-agents.py"
+  say "  note: Subagents werden von ./sync-agents.py verwaltet (Codex nutzt TOML)"
 fi
 
 # ── OpenCode — loads AGENTS.md + rules/*.md via its instructions array ───────
@@ -165,7 +165,8 @@ if need "$HOME/.config/opencode"; then
   place     "$SRC/CLAUDE.md" "$HOME/.config/opencode/AGENTS.md"
   place_dir "$SRC/rules"     "$HOME/.config/opencode/rules"
   place_dir "$SRC/runbooks"  "$HOME/.config/opencode/runbooks"
-  place_dir "$SRC/agents"    "$HOME/.config/opencode/agents"
+  # Subagents are NOT copied raw here — their frontmatter differs per harness.
+  # ./sync-agents.py owns every agents/ directory.
 fi
 
 # ── Gemini / Antigravity ────────────────────────────────────────────────────

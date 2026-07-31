@@ -36,7 +36,7 @@ verify (all): the binary's `--version` (or `--help`) succeeds.
 | `ggshield` | GitGuardian CLI — github.com/GitGuardian/ggshield | brew/pipx `ggshield`. Post-install (per user, interactive): `ggshield auth login` (token → OS keyring), then verify `ggshield quota` is greater than zero before installing hooks. Install the global `pre-push` target and the detected agent target (`claude-code` for Claude Code, `codex` for Codex) only while scanning quota is available; otherwise the pre-push hook blocks normal pushes and the agent hook can only fail open noisily. Husky repos need their own `.husky/pre-push` with `ggshield secret scan pre-push "$@"` (local hooksPath shadows global). Do not dismiss a failed `ggshield api-status` as sandbox noise without verifying keyring auth. Why: enforces `rules/secrets-in-git.md` — see its Enforcement section. verify: `ggshield api-status` is healthy, `ggshield quota` is positive, and a benign scan succeeds |
 
 ## MCP servers
-- context7  [default] — https://mcp.context7.com/mcp — why: current library docs — prefer the agent's OAuth/keychain flow; API-key fallback: CONTEXT7_API_KEY (op://Private/CONTEXT7_API_KEY/credential), never a literal committed header — verify: server lists tools and one library-resolution call succeeds
+- context7  [default] — https://mcp.context7.com/mcp — why: current library docs — prefer the agent's OAuth/keychain flow; API-key fallback: CONTEXT7_API_KEY from op://APIKeys/context7/credential via the harness's shell wrapper, **never a literal in a config file** — verify: server lists tools and one library-resolution call succeeds
 - playwright  [optional] — npx @playwright/mcp@latest — why: headless browser — verify: agent can screenshot a page
 - google-developer-knowledge  [optional] — https://developerknowledge.googleapis.com/mcp — why: Google-platform docs — verify: server lists tools
 
@@ -63,6 +63,28 @@ justification here.
   `claude()` shell wrapper — see `sources/shell/aliases.zsh`) — verify: /plugin lists it
 - typescript-lsp / pyright-lsp  [optional] — why: real language servers; zero
   context cost — verify: /plugin lists it
+
+### Evaluated and rejected (2026-07-31)
+Recorded so the next audit does not re-litigate it. Measured with
+`claude plugin details <name>`; "always-on" is charged to every session whether
+the plugin is invoked or not.
+
+| Plugin | Always-on | Why it went |
+| --- | --- | --- |
+| pr-review-toolkit | ~3.6k tok | Six agent descriptions full of `<example>` dialogue land in the tool schema every session. Prompt-only reviewers; collides three ways with `/code-review`, `/simplify` and coderabbit. |
+| ponytail | ~1k tok + a SessionStart injection repeated on **every** SubagentStart | A style preference, not a capability. The per-subagent re-injection makes it the most expensive plugin under fan-out. |
+| superpowers | ~0.7k tok + SessionStart injection | Fourteen process skills that duplicate built-ins (plan mode, `EnterWorktree`, the Agent tool) or restate what current models do unprompted. Its TDD and verification skills are the exact scaffolding the Opus 5 guide says to delete. |
+| aikido | 0 (was disabled) | Would be a third security layer beside ggshield (local) and GitGuardian (server) plus an `npx` MCP process per session. |
+| frontend-design | 0 (was disabled) | Covered by the built-in `dataviz` and `artifact-design` skills. |
+| memsearch | 0 (not enabled) | Superseded by native auto-memory. Removed everywhere, not just disabled. |
+
+The kept six all clear the bar for a different reason each: coderabbit and
+greptile are external services, the two LSPs are real language servers costing
+nothing, skill-creator provides evals no prompt replaces, commit-commands is
+three cheap slash commands. Nothing was installed to fill a gap, because the
+audit found none: everything a candidate plugin would have added is either a
+built-in (`/code-review`, `/simplify`, plan mode, worktrees, auto-memory,
+Monitor, `/usage`) or a capability of the model.
 
 ## Plugins (Codex)
 - Browser + Chrome  [default in the desktop app] — Browser controls the
@@ -139,7 +161,12 @@ else under Module: webservice remains project-local.
   vercel-labs/agent-skills · vercel/next.js · waynesutton/convexskills · (Modal: uv is in baseline)
 
 ## Keeping harnesses in sync  [default]
-`./sync.sh` places the authored content into every installed agent. No argument
+`./sync.sh` places the authored content into every installed agent, and
+`./sync-agents.py` translates the four subagent definitions into each
+harness's own container (Codex wants TOML with the prompt inline; the rest
+want markdown with differently-named frontmatter keys). Model names are not
+translated — an existing per-harness model choice is preserved, otherwise the
+field is omitted so the agent inherits the session model. No argument
 = dry run, `--apply` = write, absent harnesses are skipped, and it is idempotent.
 Run it after any change under `sources/`. verify: a second `./sync.sh` reports
 `zu schreiben: 0`. Per-harness format limits are documented in
