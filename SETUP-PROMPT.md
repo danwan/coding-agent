@@ -38,7 +38,7 @@ your version. If a mechanism changed since this doc was written, adapt.
 
 ## Step 3 — Ask which optional items and modules to add
 On top of the `[default]` set, ask me about: the `[optional]` entries (e.g.
-playwright, memsearch), the "personal" toggle (dotfiles + settings), and the
+playwright), the "personal" toggle (dotfiles + settings), and the
 modules `google` and/or `webservice`.
 
 Use the harness detected in Step 0. Do not ask the user to choose Codex or

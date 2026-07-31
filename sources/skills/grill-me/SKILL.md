@@ -7,7 +7,7 @@ description: Interview the user to stress-test a plan or design, expose gaps, an
 
 A structured interview to stress-test a plan or design. The aim is shared understanding — every load-bearing decision examined, every unstated assumption surfaced — so subsequent execution doesn't drift on hidden disagreements.
 
-This skill is for **after** the user has a rough plan in mind. It's not brainstorming (use `superpowers:brainstorming` for vague → concrete), and it's not formalization (use `superpowers:writing-plans` once the plan is settled). It sits between the two.
+This skill is for **after** the user has a rough plan in mind. It is not open-ended ideation (vague → concrete), and it is not formalization (writing the settled plan down). It sits between the two.
 
 ## When to use
 
@@ -76,7 +76,7 @@ Don't keep grilling out of completeness if the user is clearly satisfied. Dimini
 
 ## End-of-grill synthesis
 
-Once stopped, produce a compact summary inline (no file — the user will use it directly or feed it into `superpowers:writing-plans`):
+Once stopped, produce a compact summary inline (no file — the user will use it directly or feed it into a plan):
 
     ## Decisions
     - [decision 1]: [resolved answer]

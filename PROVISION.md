@@ -38,20 +38,31 @@ verify (all): the binary's `--version` (or `--help`) succeeds.
 ## MCP servers
 - context7  [default] — https://mcp.context7.com/mcp — why: current library docs — prefer the agent's OAuth/keychain flow; API-key fallback: CONTEXT7_API_KEY (op://Private/CONTEXT7_API_KEY/credential), never a literal committed header — verify: server lists tools and one library-resolution call succeeds
 - playwright  [optional] — npx @playwright/mcp@latest — why: headless browser — verify: agent can screenshot a page
-- google-developer-knowledge  [module:google] — https://developerknowledge.googleapis.com/mcp — verify: server lists tools
+- google-developer-knowledge  [optional] — https://developerknowledge.googleapis.com/mcp — why: Google-platform docs — verify: server lists tools
 
 ## Plugins (Claude Code)
-marketplaces: anthropics/claude-plugins-official, DietrichGebert/ponytail, zilliztech/memsearch
-- superpowers  [default] — why: lifecycle process skills — verify: /plugin lists it
-- skill-creator  [default] — why: author new skills — verify: /plugin lists it
+marketplaces: anthropics/claude-plugins-official (the only one — do not register
+others unless a plugin below requires it)
+
+**Selection rule: a plugin must provide a capability the model does not have.**
+An external service, an index, a language server, a paid engine — something that
+exists outside the model. Plugins that only inject prompt text (process
+checklists, style guardrails, review personas written as sub-agents) do not
+qualify: a current frontier model already does that, and their agent and skill
+descriptions are charged to *every* session's context whether invoked or not.
+Measure before adding: `claude plugin details <name>` prints the always-on token
+cost. Treat anything above ~1k always-on tokens as needing a written
+justification here.
+
 - commit-commands  [default] — why: /commit, /commit-push-pr, /clean_gone — verify: /plugin lists it
-- pr-review-toolkit  [default] — why: multi-agent PR review — verify: /plugin lists it
-- ponytail  [default] — why: simplicity guardrail — verify: /plugin lists it
-- memsearch  [optional] — why: cross-session memory recall (needs Python memsearch[onnx]) — verify: /plugin lists it
-- coderabbit / frontend-design / typescript-lsp / pyright-lsp  [optional]
-- greptile  [optional] — why: Greptile code-review MCP; needs GREPTILE_API_KEY
-  (op://APIKeys/greptile/credential, resolved by the `claude()` shell wrapper —
-  see `sources/shell/aliases.zsh`) — verify: /plugin lists it
+- skill-creator  [default] — why: authoring plus evals/benchmarks for skills — verify: /plugin lists it
+- coderabbit  [default] — why: external review engine, own CLI quota and
+  subscription; the default reviewer — verify: `coderabbit --version` and /plugin lists it
+- greptile  [default] — why: server-side repo index (a capability no local model
+  has); needs GREPTILE_API_KEY (op://APIKeys/greptile/credential, resolved by the
+  `claude()` shell wrapper — see `sources/shell/aliases.zsh`) — verify: /plugin lists it
+- typescript-lsp / pyright-lsp  [optional] — why: real language servers; zero
+  context cost — verify: /plugin lists it
 
 ## Plugins (Codex)
 - Browser + Chrome  [default in the desktop app] — Browser controls the
@@ -70,8 +81,14 @@ marketplaces: anthropics/claude-plugins-official, DietrichGebert/ponytail, zilli
   project-local skills without overflowing Codex's skill-description budget.
 
 ## Skills — own (stored in this repo; the prompt PLACES them)  [default]
-branch-cleanup · challenge · code-search · git-sync · grill-me · security-review · pr-workflow · stack-detection
+branch-cleanup · challenge · git-sync · grill-me · security-review · pr-workflow · stack-detection
 verify: `/` shows each; skills load
+
+- chrome-ui-explorer  [default, Claude Code only] — why: exploratory full-app UI
+  testing through the user's real Chrome via the Claude-in-Chrome extension.
+  Placement exception: it goes into `~/.claude/skills/` as a real directory, NOT
+  into the `~/.agents/skills/` hub, because no other harness drives that
+  extension — verify: `/` shows it and the extension answers one `tabs_context` call
 
 ## Skills — own, optional (stored, not default)  [optional]
 - config-edit — Claude Code only; why: path syntax reference for its settings/permissions/hooks
@@ -83,36 +100,52 @@ verify: `/` shows each; skills load
 - review-routing — Claude Code only; why: routing lookup across its review/security plugins
 verify: `/` shows each once placed; skills load
 
-Stored but intentionally not provisioned: `convex-vercel-setup` still references
-machine-specific paths and missing central assets from the retired setup repo.
-Keep it disabled until it is rewritten around portable, repo-local assets.
-
-## Skills — remote meta (skills.sh)  [default]
-- mcp-builder — anthropics/skills — verify: skills list shows it
-- find-skills — vercel-labs/skills — verify: skills list shows it
+## Skills — remote meta (skills.sh)  [optional]
+- mcp-builder — anthropics/skills — why: Anthropic's own process for MCP-server
+  quality; keep `off` in skillOverrides until an MCP server is actually being built
 
 ## Skills — remote, globally installed (documented only — NOT stored in this repo)  [optional]
 Remote skills live only as installs via `npx skills add -g` (canonical copy in
 `~/.agents/skills/`, symlinked into each harness). Re-install from their
-registries; this repo documents the intent, never their content. Currently:
-- convex-* (best-practices, cron-jobs, file-storage, functions, http-actions,
-  migrations, realtime, schema-validator, security-audit, security-check) — waynesutton/convexskills
-- avoid-feature-creep — waynesutton/convexskills
-- vercel-cli-with-tokens — vercel-labs/agent-skills
-- webapp-testing · claude-api — anthropics/skills
-- vitest — antfu/skills
-- google-agents-cli-* — installed by `uvx google-agents-cli setup` (see Module: google)
+registries; this repo documents the intent, never their content.
+
+**Selection rule: do not install vendor documentation as a skill.** A skill that
+restates a library's public docs is stale the day it is written, duplicates what
+Context7 fetches live, and several such skills tell the agent to "fetch the
+latest documentation" in their own body. Install a remote skill only when it
+carries a *procedure* (an ordered, failure-avoiding recipe) or setup knowledge
+that is not in any public doc. Currently:
+- convex-best-practices · convex-functions · convex-security-audit ·
+  convex-security-check — waynesutton/convexskills; why: the Zen-of-Convex
+  design stance and the security checklists, not the API reference
+- vercel-cli-with-tokens — vercel-labs/agent-skills; why: token auth without
+  leaking values into shell history, team scoping, env-var handling
+- vercel-optimize — vercel-labs/agent-skills; why: metrics-first gating plus
+  scripts; keep `off` until a real Vercel cost question exists
+- next-cache-components-adoption · next-cache-components-optimizer — vercel/next.js;
+  why: a test-driven migration loop; keep `off` until such a migration is due
+- claude-api — anthropics/skills; why: model ids and pricing drift faster than
+  any model's training data
+- web-design-guidelines — vercel-labs/agent-skills; why: a stub that fetches the
+  guidelines live, so it cannot go stale; keep `off` until doing design work
+- computer-use · orca-cli · orchestration — stablyai/orca; why: stubs whose
+  reference comes from the `orca` binary; keep `off` unless Orca is in use
 These named global skills are deliberate cross-project exceptions. Everything
 else under Module: webservice remains project-local.
 
-## Module: google  [ask]
-- google skills + agents-cli — `uvx google-agents-cli setup` (installs google-agents-cli-* skills globally; CLI-tied) — verify: agents-cli info
-- google-developer-knowledge MCP (see MCP section)
-
 ## Module: webservice  [ask]  — mostly project-local
-- optional global plugins: frontend-design, typescript-lsp
+- optional global plugins: typescript-lsp
 - stack SKILLS are PROJECT-LOCAL — inside each project: `npx skills add <source>` WITHOUT -g, commit .agents/ + skills-lock.json:
   vercel-labs/agent-skills · vercel/next.js · waynesutton/convexskills · (Modal: uv is in baseline)
+
+## Keeping harnesses in sync  [default]
+`./sync.sh` places the authored content into every installed agent. No argument
+= dry run, `--apply` = write, absent harnesses are skipped, and it is idempotent.
+Run it after any change under `sources/`. verify: a second `./sync.sh` reports
+`zu schreiben: 0`. Per-harness format limits are documented in
+`sources/harness-notes/README.md` — Windsurf's 6 KB cap and Cursor's `.mdc`
+frontmatter requirement in particular mean "identical" is not achievable
+everywhere, and the script fails loud rather than truncating.
 
 ## Authored config (placed from this repo)  [default]
 Stored ONCE, in Claude Code's format, under `sources/claude/` (single source of
@@ -138,8 +171,33 @@ truth). A non-Claude agent translates these into its own format at provision tim
 - settings.json (permissions, env, statusLine) + statusline.sh → Claude settings (permissions are personal; not applied unless chosen)
 
 ## Secrets
-- CONTEXT7_API_KEY — op://Private/CONTEXT7_API_KEY/credential
+No API key value belongs in any config file on disk, in any harness. The target
+state is that every key is resolved from 1Password at process start. Where a
+harness supports config-time substitution, it references an env var that a shell
+wrapper fills from `op read` — never a literal. Vault is `APIKeys`; there is no
+`Private` vault on this machine.
+
+- CONTEXT7_API_KEY — op://APIKeys/context7/credential, exported by the
+  `opencode()` wrapper in `sources/shell/aliases.zsh`; `opencode.json` references
+  it as `{env:CONTEXT7_API_KEY}`. ⚠️ opencode substitutes a **missing** variable
+  with the empty string instead of erroring, so the wrapper checks explicitly and
+  says so — otherwise an unauthenticated Context7 looks like a working one.
+  For Claude Code, Context7 uses its own OAuth/keychain flow and needs no key.
+  Codex holds the same key; its secure form is the HTTP transport with
+  `env_http_headers` (header name → env var name) instead of a stdio server with
+  a literal `[mcp_servers.context7.env]` block:
+  ```toml
+  [mcp_servers.context7]
+  url = "https://mcp.context7.com/mcp"
+  env_http_headers = { CONTEXT7_API_KEY = "CONTEXT7_API_KEY" }
+  ```
+  filled by the `codex()` wrapper. Do not flip either config before the
+  1Password item exists — both harnesses fail *quietly* without the key.
 - GREPTILE_API_KEY — op://APIKeys/greptile/credential (resolved per-start by the `claude()` wrapper)
 - OPENROUTER_KEY — optional environment alternative; prefer `llm keys set openrouter` so the value stays in the CLI key store (see `sources/claude/runbooks/llm-cli-openrouter.md`)
-- OP_SERVICE_ACCOUNT_TOKEN — macOS Keychain item `op-service-account` (basis for all `op run`/`op read`)
+- OP_SERVICE_ACCOUNT_TOKEN — macOS Keychain item `op-service-account` (basis for all `op run`/`op read`). It is **read-only** on the `APIKeys` vault: creating or updating an item fails with `(101) You do not have permission`. New secrets have to be added interactively by the user; an agent can read them but never write them.
+
+Audit: no config file under any harness should contain a literal key.
+`grep -rEl '(sk-|ctx7sk-|Bearer [A-Za-z0-9]{20})' ~/.claude ~/.codex ~/.config/opencode ~/.cursor ~/.gemini ~/.factory --include='*.json' --include='*.toml' 2>/dev/null`
+should print nothing.
 - (REF_API_KEY, EXA_API_KEY are Cursor-only — not in the Claude default)

@@ -39,6 +39,43 @@ As of 2026-04-19, the following vars were exported globally in `~/.zshrc`:
 
 ---
 
+## The 2026-07-31 Incident — the guard was dead in production
+
+`~/.claude/hooks/check-backend-deploy.sh` is the PreToolUse guard for Golden
+Rule #7 (Convex/Modal do not auto-deploy). An audit found it had **never fired
+on the default branch** — i.e. never in production.
+
+Two independent defects, both verified by reproduction, not by reading:
+
+1. **Wrong baseline.** It compared with `git diff "$DEFAULT_BRANCH"` while
+   standing on that branch. `git diff main` on `main` is empty by definition, so
+   the entire `ENV=PRODUCTION` code path was unreachable. The same Convex change
+   warned on a feature branch and was silent on `main`. Fix: diff against
+   `origin/$DEFAULT_BRANCH`, which on `main` means "local commits not yet
+   pushed" — the deployed baseline, which is what the rule is actually about.
+2. **Undocumented output schema.** It emitted `{"result":"warn","message":…}`.
+   Neither key exists in Claude Code's hook contract, so even the branch that
+   did fire had its warning silently discarded. Fix: `systemMessage` plus
+   `hookSpecificOutput.permissionDecision` (`"ask"`, so the push actually
+   stops), `hookEventName: "PreToolUse"`.
+
+A third latent bug: `git symbolic-ref … | sed … || echo main` never reaches the
+fallback, because `sed` exits 0 even with empty output — so `DEFAULT_BRANCH`
+became the empty string in any repo without `refs/remotes/origin/HEAD`, and
+`git diff ""` errored into silence.
+
+**The lesson is about hooks generally, not this hook.** A hook that fails is
+loud; a hook that emits an unrecognized schema, or computes an always-empty
+diff, looks *exactly* like a hook that ran and found nothing. Both failure modes
+present as green.
+
+**Therefore: every guard hook needs a reproduction of the case it exists to
+catch — including the highest-stakes branch.** Construct a throwaway repo, force
+the condition, assert the hook fires with the expected `permissionDecision`.
+Add a "clean" case too, so you know it can also stay quiet. Wiring is proven
+separately: temporarily prefix the command with a sentinel write, trigger the
+matching tool once, confirm the sentinel, then strip it.
+
 ## Reference: Canonical Deploy Script Template
 
 Template incorporating learnings from l-automation hardening (2026-04-19+):

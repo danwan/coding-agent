@@ -39,8 +39,7 @@ each approach was chosen — plus the features that have no OpenCode equivalent
 | --- | --- | --- |
 | Master rules (`CLAUDE.md` + `rules/*.md`) | `instructions: ["AGENTS.md","~/.agents/AGENTS.md","~/.claude/rules/*.md"]` | Glob loading confirmed in OpenCode schema. All always-on rules + the CLAUDE.md Working/Golden Rules load identically (counts per current `sources/claude/`). |
 | Subagents (challenger, codebase-audit, git-status, learner) | `sources/opencode/agents/*.md` | Bodies byte-identical to Claude (Claude is master for shared authored content). |
-| Skills | auto-loaded from `~/.claude/skills/*/SKILL.md` AND `~/.agents/skills/*/SKILL.md` | All 44 skills reachable (authored + remote + 3 memsearch-bundled). |
-| memsearch plugin | `@zilliz/memsearch-opencode` (npm) | Equivalent to Claude's `memsearch@memsearch-plugins`; bundles the same 3 skills. |
+| Skills | auto-loaded from `~/.claude/skills/*/SKILL.md` AND `~/.agents/skills/*/SKILL.md` | All authored + remote skills reachable. |
 | LSP | `lsp: true` | Covers Claude's `typescript-lsp` + `pyright-lsp` plugins via built-ins. |
 | Permission deny-list | `permission.bash: {rm -rf/r/sudo/chmod 777 → deny}` | Mirrors Claude's `permissions.deny`. |
 | `external_directory` allowlist | `permission.external_directory` | `~/code/**, ~/.claude/**, ~/.agents/**, /tmp/**`. |
@@ -71,7 +70,7 @@ architecturally exclusive to Claude Code and are documented here, not fixed.
 | Claude's SessionStart git-summary behavior | OpenCode's `event` hook fires for every bus event (no dedicated session-start hook); the value is low in OpenCode's TUI. **Decision: skip.** |
 | MCP servers: Exa, Gmail, Google Calendar, Drive, n8n, Sentry | Roam via claude.ai login (account-bound); no portable standalone equivalent. |
 | MCP `node_repl` (Codex CUA binary) | **Deliberately omitted.** OpenCode ships a native `node_repl_js` tool (and `node_repl_js_add_node_module_dir`, `node_repl_js_reset`) — no MCP server needed. Claude Code uses the Codex.app-bundled `node_repl` binary as a shortcut (Claude lacks native JS exec), but that cross-tool binary dependency is fragile and redundant in OpenCode. |
-| Plugins: pr-review-toolkit, frontend-design, skill-creator, coderabbit, superpowers, ponytail | Claude-Code-marketplace-only; no npm/OpenCode build. ponytail (live session log) and coderabbit (PR review API) could be reimplemented as OpenCode plugins, but that is net-new work, not config. |
+| Plugins: skill-creator, coderabbit, greptile, commit-commands | Claude-Code-marketplace-only; no npm/OpenCode build. coderabbit (PR review API) and greptile (repo-index MCP) could be reimplemented as OpenCode plugins, but that is net-new work, not config. |
 
 ## Secret / template contract
 

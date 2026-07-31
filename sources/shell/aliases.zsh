@@ -38,10 +38,40 @@ alias gwl='git worktree list'
 alias gwprune='git worktree prune && git branch --merged | grep -v "\*\|main\|master" | xargs -r git branch -d'
 
 # === Codex CLI ===
+# Context7 MCP key, same source as the opencode wrapper below.
+# NOTE: Codex's shell-environment policy strips *KEY*/*SECRET*/*TOKEN* from the
+# inherited environment by default, so exporting this globally would not reach a
+# shell command anyway — it is passed to the codex process itself, which then
+# hands it to the MCP server via env_http_headers.
+codex() {
+  local key
+  key="$(op read op://APIKeys/context7/credential 2>/dev/null)"
+  if [[ -z "$key" ]]; then
+    print -u2 "codex: context7 key nicht aus 1Password lesbar -> Context7 MCP wird ohne Auth starten"
+    command codex "$@"
+    return
+  fi
+  CONTEXT7_API_KEY="$key" command codex "$@"
+}
 alias co='codex'
 alias coo='codex --dangerously-bypass-approvals-and-sandbox'
 
 # === OpenCode ===
+# Context7 MCP API key -> op://APIKeys/context7/credential.
+# opencode.json references it as {env:CONTEXT7_API_KEY}. That substitution
+# resolves a MISSING variable to the empty string rather than failing, so a
+# broken key would show up as Context7 silently answering nothing. Hence the
+# explicit check here — fail loud instead.
+opencode() {
+  local key
+  key="$(op read op://APIKeys/context7/credential 2>/dev/null)"
+  if [[ -z "$key" ]]; then
+    print -u2 "opencode: context7 key nicht aus 1Password lesbar -> Context7 MCP wird ohne Auth starten"
+    command opencode "$@"
+    return
+  fi
+  CONTEXT7_API_KEY="$key" command opencode "$@"
+}
 alias oc='opencode'
 
 # === 1Password (op = the 1Password CLI binary, NOT an alias) ===

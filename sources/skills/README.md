@@ -10,16 +10,14 @@ installed tool's skill dir (`~/.claude/skills`, `~/.codex/skills`,
 Remote skills (installed via `npx skills add`) are declared as intent in
 `PROVISION.md` (the "Skills — remote meta" section), not here.
 
-## Inventory (17 skills)
+## Inventory (15 skills)
 
 | Skill | Purpose |
 | --- | --- |
 | `branch-cleanup` | Converge a messy git repo onto clean main: audit branches/PRs, plan merge order, auto-merge green PRs, prune gone/merged branches. Dry-run-able. |
 | `challenge` | Dispatch the `@challenger` subagent to stress-test another sub-agent's output against first-answer bias and the TDD-bug-fix gate. |
 | `chrome-ui-explorer` | Explore and interact with web UIs via the Claude-in-Chrome extension. Claude-only exception: lives as a real dir in `~/.claude/skills/`, not in the `~/.agents/skills/` hub. |
-| `code-search` | Routing guide for source-code search: rg, fd, ast-grep, jq, tree, and Explore-subagent vs direct Bash. |
 | `config-edit` | Reference for path syntax in Claude Code `settings.json` and hooks (permissions, sandbox, hook paths, directory patterns). |
-| `convex-vercel-setup` | Standardize, audit, scaffold, and migrate Vercel + Convex + optional Modal deployment configuration. |
 | `convexcheck` | Audit the current project's deploy setup (Convex + Vercel + Modal + shell) for footguns from `deploy-safety.md`. Report-only. |
 | `deploy` | Safe Modal/Convex backend deployment. Delegates to project deploy scripts that own the 10-gate safety contract. |
 | `git-sync` | Sync all git repos in the current directory across machines, or check their state. Triggers: "git sync", "Feierabend", "guten Morgen". |

@@ -41,9 +41,17 @@ Additional checks:
 - All four custom agents load in the harness's native format.
 - All four authored hook behaviors are present when the harness supports
   equivalent events.
-- The eight default own skills are present exactly once:
-  `branch-cleanup`, `challenge`, `code-search`, `git-sync`, `grill-me`,
+- The seven default own skills are present exactly once:
+  `branch-cleanup`, `challenge`, `git-sync`, `grill-me`,
   `security-review`, `pr-workflow`, `stack-detection`.
+- On Claude Code, `chrome-ui-explorer` is present as a real directory under
+  `~/.claude/skills/` and absent from the `~/.agents/skills/` hub.
+- `./sync.sh` (no argument) reports `zu schreiben: 0` — every installed harness
+  already carries the current authored content. A non-zero count means drift,
+  not a failure of this check.
+- No skill directory contains a dangling symlink:
+  `find ~/.claude/skills ~/.agents/skills ~/.codex/skills ~/.cursor/skills ~/.gemini/antigravity-cli/skills ~/.codeium/windsurf/skills -maxdepth 1 -type l ! -exec test -e {} \; -print`
+  prints nothing.
 - `npx skills update -g -y` reports all tracked remote skills current, and its
   lock contains no retired repository source.
 

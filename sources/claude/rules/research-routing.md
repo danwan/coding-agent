@@ -1,6 +1,6 @@
 # Research Routing (Docs & Web Tools)
 
-> Which tool answers an external-knowledge question. Local search (rg/fd/qmd/memsearch) lives in `search-discipline.md` — this file is only docs + the open web. Citation rigor is the "Research Integrity" section at the end of this file. Extends the "Prefer skills over research; use Context7 for docs early" convention in `~/.claude/CLAUDE.md`.
+> Which tool answers an external-knowledge question. Local search (rg/fd/qmd) lives in `search-discipline.md` — this file is only docs + the open web. Citation rigor is the "Research Integrity" section at the end of this file. Extends the "Prefer skills over research; use Context7 for docs early" convention in `~/.claude/CLAUDE.md`.
 
 ## Decision order
 

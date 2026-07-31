@@ -40,7 +40,7 @@ This is a heuristic — it'll miss some cases (e.g. compile errors that say "x i
 - Does not analyze test code or propose fixes
 - Does not annotate the PR with comments
 
-If the user wants any of those, they invoke a separate skill (`pr-review-toolkit:pr-test-analyzer`, `superpowers:systematic-debugging`).
+If the user wants any of those, that is a separate task — diagnose the failure directly or run `/code-review` on the branch.
 
 ## Output format in the audit
 

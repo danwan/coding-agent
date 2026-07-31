@@ -63,10 +63,10 @@ Run every check below. Skipping a check is itself a failure — note it explicit
 - If the sub-agent considered exactly one cause, that is suspicious.
 
 ### (f) Failing test FIRST (bug fixes to executable code) — HARD GATE
-- For any bug fix to executable code: was a **failing test that reproduces the bug** written **before** the fix code, per `superpowers:test-driven-development`?
+- For any bug fix to executable code: was a **failing test that reproduces the bug** written **before** the fix code?
 - The sub-agent's output must reference the test file path and the failing output before the fix.
 - **If no failing test exists → VERDICT = `REJECTED`. No exceptions** (within scope below).
-- This rule is enforced by `superpowers:test-driven-development` (Iron Law) and `superpowers:systematic-debugging` (Phase 4). Sub-agents that skip it are violating documented policy.
+- This is Working Rule #2 in `~/.claude/CLAUDE.md` ("Bug fix → failing test first, then make it pass"). Sub-agents that skip it are violating documented policy.
 
 **In scope (test REQUIRED):** bug fixes to source files with a testable contract — `*.ts`, `*.tsx`, `*.js`, `*.jsx`, `*.py`, `*.go`, `*.rs`, `*.java`, Convex functions, server-route handlers, library/module code with callable functions or exported classes/components.
 
@@ -87,7 +87,7 @@ Run every check below. Skipping a check is itself a failure — note it explicit
 
 ### (h) Verification claims have evidence
 - "Tests pass", "build succeeds", "verified" — was this actually run, or asserted?
-- Per `superpowers:verification-before-completion`: evidence before assertions, always.
+- Per Working Rule #7 in `~/.claude/CLAUDE.md` (fail loud): evidence before assertions, always.
 
 ## Output Format
 

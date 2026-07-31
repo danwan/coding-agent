@@ -10,7 +10,7 @@ maxTurns: 50
 
 # Codebase Audit Agent
 
-> Scans the ENTIRE codebase for systemic issues. For recent changes only, use pr-review-toolkit. For Convex-specific security, use `/convex-security-audit`.
+> Scans the ENTIRE codebase for systemic issues. For recent changes only, use `/code-review` or the `coderabbit` plugin. For Convex-specific security, use `/convex-security-audit`.
 
 Performs comprehensive security and quality audit of the entire codebase.
 

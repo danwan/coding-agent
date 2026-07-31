@@ -201,11 +201,10 @@ Re-run `audit.sh` and diff against the Phase 1 audit. Report:
 | `commit-commands:clean_gone` | Equivalent to part of Phase 5a but slash-command only. This skill inlines the [gone]-detection so it can sequence with merges. |
 | `commit-commands:commit-push-pr` | No overlap. That skill creates new PRs; this one reconciles existing ones. |
 | `pr-workflow` | No overlap. Comment-thread replies. |
-| `superpowers:finishing-a-development-branch` | Single-branch finalization. Runs after a feature; this skill runs across many branches. They can chain. |
 
 ## When NOT to use this skill
 
-- Single-PR review or merge → use `gh pr merge` or `pr-review-toolkit:review-pr` directly.
+- Single-PR review or merge → use `gh pr merge` or `/code-review` directly.
 - Resolving a known conflict you understand → just resolve it. This skill is for *bulk* convergence, not deep per-conflict work.
 - Cleaning up across many repos → start with `git-sync` to triage, then run this in the worst-offender repos.
 - Repos where main is protected by branch rules and you can't merge from CLI → the skill will detect and report; manual web UI merges are the right path.

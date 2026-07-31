@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Dispatches the `@challenger` agent to critically review the most recent sub-agent output, or a specific target the user provides as an argument.
 
-This skill is **explicit-only** (`disable-model-invocation: true`) — it never auto-triggers. Invoke when the user types `/challenge`, asks to "challenge" a result, or when the CLAUDE.md §9 Sub-Agent Dispatch Discipline requires a Challenger pass after a bug-fix or debug sub-agent.
+This skill is **explicit-only** (`disable-model-invocation: true`) — it never auto-triggers, by design. Current models verify their own work, and routing verification through a subagent causes over-verification rather than catching more. Invoke it only when the user asks: they type `/challenge`, or ask to "challenge" a result. Never dispatch it on your own initiative as a routine step after a sub-agent finishes.
 
 ## Usage
 
@@ -25,9 +25,9 @@ The `@challenger` agent (see `~/.claude/agents/challenger.md`) runs eight mandat
 (c) Every referenced file/function actually exists (Grep verification)
 (d) Fix addresses cause, not just symptom
 (e) Alternative explanations were considered
-(f) **Hard gate for bug fixes:** failing test written FIRST, per `superpowers:test-driven-development`
+(f) **Hard gate for bug fixes:** failing test written FIRST (CLAUDE.md Working Rule #2)
 (g) Test actually fails without fix and passes with it
-(h) Verification claims backed by evidence (per `superpowers:verification-before-completion`)
+(h) Verification claims backed by evidence (CLAUDE.md Working Rule #7: fail loud)
 
 ## Output
 
@@ -35,7 +35,6 @@ The `@challenger` agent (see `~/.claude/agents/challenger.md`) runs eight mandat
 
 ## When to use
 
-- After any bug-fix or debugging sub-agent finishes (mandatory per CLAUDE.md §9 Sub-Agent Dispatch Discipline).
 - When you suspect a sub-agent took the first plausible hit without verification.
 - Before accepting a fix that lacks a failing-test reference.
 

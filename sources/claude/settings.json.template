@@ -43,21 +43,9 @@
     "commit-commands@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
-    "pr-review-toolkit@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
-    "memsearch@memsearch-plugins": true,
     "coderabbit@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
-  },
-  "extraKnownMarketplaces": {
-    "memsearch-plugins": {
-      "source": {
-        "source": "github",
-        "repo": "zilliztech/memsearch"
-      },
-      "autoUpdate": true
-    }
+    "greptile@claude-plugins-official": true
   },
   "sandbox": {
     "enabled": true,
@@ -129,7 +117,6 @@
         "~/.local/share/fnm/**",
         "~/.config/gh/**",
         "~/.config/gcloud/**",
-        "~/.memsearch/**",
         "~/.config/qmd/**",
         "~/.cache/qmd/**",
         "//tmp/**",

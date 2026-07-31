@@ -14,7 +14,6 @@ claude-config/.secrets/
 zz-plans/
 
 # Local agent memory/cache data
-.memsearch/
 
 # Build artifacts in skill eval scaffolds and autoresearch experiment outputs
 **/node_modules/

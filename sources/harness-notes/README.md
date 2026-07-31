@@ -22,8 +22,37 @@ disagree, the current docs win.
 | Claude Code | nothing extra — `sources/claude/` is native | `~/.claude/` |
 | Codex | [`codex.md`](codex.md) | `~/.codex/` |
 | OpenCode | [`opencode.md`](opencode.md) | `~/.config/opencode/` |
-| Antigravity | [`antigravity.md`](antigravity.md) | `~/.gemini/antigravity-cli/` |
+| Antigravity / Gemini | [`antigravity.md`](antigravity.md) | `~/.gemini/` |
 | Cursor | [`cursor.md`](cursor.md) | `~/.cursor/` |
+| Factory Droid | [`droid.md`](droid.md) | `~/.factory/` |
+| Windsurf | [`windsurf.md`](windsurf.md) | `~/.codeium/windsurf/` |
+
+## Placement is mechanized — `../../sync.sh`
+
+Copies drift only because nobody re-copies them. `sync.sh` at the repo root
+places the canonical content into every installed harness, skips the ones that
+are absent, and is idempotent: run it with no arguments for a dry run, with
+`--apply` to write. That is the maintenance answer to "why does Codex still have
+last month's rules".
+
+Harnesses get **copies, never symlinks into this repo.** A symlink would make
+`git checkout <old-branch>` silently rewrite every agent's global instructions,
+and would break all of them if the repo moved.
+
+## What the harnesses genuinely cannot share
+
+These are not preferences; they are limits that make "100 % identical" false in
+places, and it is better to name them than to pretend otherwise.
+
+| Constraint | Consequence |
+| --- | --- |
+| Windsurf's global surface is one file capped at 6 000 characters, with no rules directory | Only `CLAUDE.md` fits. The rules cannot go there at all. |
+| Codex has no rules directory | The rules are concatenated into `AGENTS.md`, bounded by `project_doc_max_bytes`. |
+| Cursor documents no global instruction file | `~/.cursor/rules/*.mdc` is an undocumented path. Rules there need `.mdc` **with** frontmatter — a plain `.md` is silently ignored. |
+| Gemini's `GEMINI.md` is shared with plugin-managed blocks | Merge into a marked block; overwriting destroys the Context7 instructions. |
+| OpenCode has no shell-hook system | Its plugins are JS/TS event handlers. Authored hook scripts do not port. |
+| Windsurf hooks are exit-code only, Gemini's events are named differently | Hook *logic* is portable, the response protocol is not. |
+| Windsurf documents no user-defined subagents | The four subagents have no home there. |
 
 Deeper, version-specific research (kept for reference, **not** authoritative) is
 under [`docs/harness-research/`](../../docs/harness-research/).
