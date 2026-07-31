@@ -28,14 +28,6 @@ These are produced by the `project-docs` skill family and usually answer "where 
 
 **≥3 chained queries OR result >200 lines OR unfamiliar repo → Explore subagent.** Otherwise direct `Bash`. Explore keeps the main context clean when you only need the conclusion, not the file dumps.
 
-## 4. Read only what's needed
-
-Use `Read` with `offset`/`limit` for files >500 lines or when only a section is needed. Don't read whole files when a `rg` hit gave you the line.
-
-## 5. Avoid (skip unless explicitly required)
-
-`node_modules/`, `.next/`, `dist/`, `build/`, `coverage/`, `.venv/`, `__pycache__/`, `target/`, generated files, large logs.
-
 ## Pre-action check
 
-*"Project docs checked first, cheapest tool for the domain — or am I reading a whole file when a `rg` line would do?"*
+*"Project docs checked first, cheapest tool for the domain?"*

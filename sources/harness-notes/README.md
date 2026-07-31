@@ -1,7 +1,7 @@
 # Harness notes
 
 `sources/claude/` is the **single source of truth** for all authored content
-(instructions, rules, runbooks, subagents) — written in Claude Code's format.
+(instructions, rules, subagents) — written in Claude Code's format.
 `sources/skills/` is the source of truth for own skills.
 
 A non-Claude harness (Codex, OpenCode, Antigravity, Cursor, …) does **not** get
@@ -48,7 +48,7 @@ places, and it is better to name them than to pretend otherwise.
 | Codex has no rules directory | The rules are concatenated into `AGENTS.md`, bounded by `project_doc_max_bytes`. |
 | Cursor documents no global instruction file | `~/.cursor/rules/*.mdc` is an undocumented path. Rules there need `.mdc` **with** frontmatter — a plain `.md` is silently ignored. |
 | Gemini's `GEMINI.md` is shared with plugin-managed blocks | Merge into a marked block; overwriting destroys the Context7 instructions. |
-| OpenCode has no shell-hook system | Its plugins are JS/TS event handlers. Authored hook scripts do not port. |
+| OpenCode has no shell-hook system | Its plugins are JS/TS event handlers. (Moot for now — no hooks are authored anymore.) |
 
 ## Deliberately out of scope
 

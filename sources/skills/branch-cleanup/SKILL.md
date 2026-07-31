@@ -89,7 +89,7 @@ Do not proceed without explicit approval. Approval here is the analog of `ExitPl
 
 Make `main` (or the repo's default branch — detect via `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`) up to date locally and remotely. Steps:
 
-1. **Safety tag** — `git tag claude-cleanup-backup-$(date +%s) HEAD` so any branch the skill touches can be recovered. Tell the user the tag name.
+1. **Safety tag** — `git tag claude-cleanup-backup-$(date +%s) HEAD` records the starting HEAD. The tag covers HEAD only — every *other* branch the skill touches is recoverable via `git reflog` plus the per-branch SHAs the scripts print (the final report lists them). Tell the user the tag name.
 2. **Enable rerere + autoupdate** — `git config rerere.enabled true && git config rerere.autoupdate true`. Idempotent. Why both: `rerere.enabled` records and replays resolutions on identical conflicts; `rerere.autoupdate` *stages* the replayed resolution so the index has zero unmerged paths afterward. Without autoupdate, a replayed resolution sits in the working tree but the index still shows the conflict — `try-merge.sh`'s "did rerere resolve everything?" check would never fire and it would abort a merge it could have completed. Background in `references/conflict-handling.md`.
 3. **Fetch + prune** — `git fetch --all --prune`. Removes stale remote-tracking refs.
 4. **Switch to default branch** — `git switch main` (or detected default).
@@ -125,16 +125,16 @@ If `GH_STATE` was not `OK` in the audit, skip this phase entirely — there are 
 
 ## Phase 5 — Branch convergence + cleanup (highest risk)
 
-For each remaining local branch (skip the default branch). Process in this order:
+For each remaining local branch (skip the default branch). Execution order matches the plan's Section 4: **5b′/5b decisions first, then 5a deletes, then 5c stale batch** — asking before deleting means a misclassification is caught while every branch still exists. The subsections below are grouped by case type, not execution order:
 
 ### 5a. `[gone]` branches and locally-merged branches → delete
 
-Use `scripts/safe-delete.sh <branch>` (add `--force-squashed` only for branches the audit flagged `squashed=true`). The script:
+Use `scripts/safe-delete.sh <branch>` (add `--force-squashed` only for branches the audit flagged `squashed=true`). Squash-flagged branches — including `[gone]` ones — always get a one-line confirm before `-D`: `git cherry` cannot distinguish squash-merge from cherry-pick (edge case #1), so the plan puts them in the ask-bucket, never in the silent auto-delete batch. The script:
 - Refuses if the branch is currently checked out in any worktree (`git worktree list` check)
 - Uses `git branch -d` (lowercase, refuses unmerged work); `-D` only under `--force-squashed`, and only after re-confirming at exec time that `git cherry` shows no unique commits
 - Reports the deleted commit hash so recovery is possible via `git reflog` or the safety tag
 
-Read the exit code, don't just eyeball stdout: `0` = deleted, `2` = safety refusal (worktree blocking, or `git -d` judged the branch unmerged), `3` = dry-run echo, `1` = hard error (bad args, missing branch). An exit `2` on a branch you expected to be gone-and-merged is a signal to stop and look, not to reach for `-D`. If a worktree blocks deletion, ask the user: remove the worktree (`git worktree remove <path>`) or skip this branch?
+Read the exit code, don't just eyeball stdout: `0` = deleted, `2` = safety refusal (worktree blocking, `git -d` judged the branch unmerged, or the squash check couldn't be verified), `3` = dry-run echo, `1` = hard error (bad args, missing branch), `4` = local branch deleted but the `--with-remote` remote delete failed (reconcile manually). An exit `2` on a branch you expected to be gone-and-merged is a signal to stop and look, not to reach for `-D`. If a worktree blocks deletion, ask the user: remove the worktree (`git worktree remove <path>`) or skip this branch?
 
 ### 5b. Behind/diverged branches → ask before merging main in
 
@@ -144,6 +144,8 @@ For each, ask the user: **rebase / merge main / skip**. Defaults to skip if no a
 - **rerere replayed a previously-recorded resolution** (exit `10`, `RERERE_RESOLVED`) → the same conflict the user already resolved once; committed and pushed. The script prints "rerere replayed cached resolutions" so the user knows to glance at the result.
 - **Real conflict with no cached resolution** (exit `20`) → `git merge --abort` / `git rebase --abort`, leaves the branch exactly as it was, reports as blocked-by-conflict, moves on.
 - **Push rejected** (exit `30`, `LEASE_FAILED`) → someone pushed in parallel; the local update stands but wasn't published. Report and let the user reconcile.
+- **Branch checked out in another worktree** (exit `2`, `REFUSED`) → nothing touched; ask the user: run the merge in that worktree, remove it, or skip the branch.
+- It also warns (without stopping) when the local default branch is behind its upstream — in the skill flow Phase 3 prevents that, but standalone use would otherwise converge onto stale content.
 
 Push policy: the script pushes **only** when the branch has a configured upstream that still exists. A branch with no upstream is left updated locally (publishing it is the user's call); a branch whose upstream is `[gone]` is not resurrected. Both cases still return `0`/`10` — the update succeeded, it just wasn't pushed — and the script says which.
 
@@ -157,7 +159,7 @@ A branch whose remote was deleted but that still has commits **not** in main (au
 
 ### 5c. Stale-by-time branches → batch ask at the end
 
-After all 5a/5b decisions, present the stale-by-time list (>3 months no commit) as a single batch question: "Delete these N branches (locally + remote where applicable)? (y/N)". Default no. List each branch with its last commit date and whether it has an open PR (skip those — they're handled in 5d).
+After all 5a/5b decisions, present the stale-by-time list (>3 months no commit) as a single batch question: "Delete these N branches (locally + remote where applicable)? (y/N)". Default no. List each branch with its last commit date and whether it has an open PR (skip those — they're handled in 5d). If approved, delete each via `safe-delete.sh <branch> --with-remote` — the flag also deletes the branch's live upstream and skips remote deletion with a note when there is none (never resurrects a `[gone]` upstream).
 
 ### 5d. Branches with open PRs that aren't auto-mergeable
 

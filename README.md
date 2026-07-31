@@ -17,7 +17,7 @@ knowledge of tools and mechanisms at the time you run it.
 | --- | --- |
 | `PROVISION.md` | Intent: what to install, from where, why, how to verify |
 | `SETUP-PROMPT.md` | Paste-and-go master prompt — detects the harness/OS, then installs + translates |
-| `sources/claude/` | **Single source of truth**: authored CLAUDE.md, rules, runbooks, agents, settings |
+| `sources/claude/` | **Single source of truth**: authored CLAUDE.md, rules, agents, settings |
 | `sources/skills/` | Own skills (source of truth) |
 | `sources/harness-notes/` | Per-harness translation notes — only what a non-Claude agent can't derive |
 | `sources/shell/`, `sources/wezterm/` | Personal dotfiles (optional toggle) |

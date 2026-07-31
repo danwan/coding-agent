@@ -28,7 +28,7 @@ This discipline overrides any wording in the rest of this agent definition that 
 
 ### 1. Security Patterns
 
-- Hardcoded secrets (API keys, passwords, tokens) — use the pattern catalog + FP-whitelist in `~/.claude/rules/secrets-in-git-patterns.md`, don't invent regexes
+- Hardcoded secrets (API keys, passwords, tokens)
 - SQL/NoSQL injection vulnerabilities
 - XSS vulnerabilities in templates/JSX
 - Authentication/authorization gaps

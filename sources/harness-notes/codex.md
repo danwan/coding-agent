@@ -16,18 +16,12 @@ mapping, not a schema you should copy verbatim.
   compact but complete statement of every binding rule into `AGENTS.md`, then
   place the full adapted references under `~/.codex/guidance/` and link them.
   Copy **all** rules — do not silently drop any.
-- **Runbooks:** `sources/claude/runbooks/` are consult-on-demand references;
-  adapt paths and agent-specific claims, place them under
-  `~/.codex/runbooks/`, and link them from `AGENTS.md`.
 - **Subagents:** `sources/claude/agents/*.md` → your TOML agent definitions.
   Store standalone files under `~/.codex/agents/`. Preserve intent, but adapt
   Claude-only tools, paths, lifecycle names, and unsupported constraints.
 - **Skills:** placed in the shared `~/.agents/skills/` hub; link into your skills dir.
   Skip optional skills marked Claude-only in `PROVISION.md`, and do not install
   stored-but-disabled skills.
-- **Hooks:** translate the four authored hooks into Codex's current hook schema
-  under `~/.codex/hooks.json`; keep adapted scripts under
-  `~/.codex/hooks/`. Hooks require explicit trust in a fresh Codex session.
 - **Browser tooling:** keep the three surfaces distinct: desktop Browser
   (app-only), Chrome plugin (existing user Chrome), and the standalone
   `agent-browser` CLI (headless usability automation). The Vercel Codex plugin
@@ -45,17 +39,6 @@ mapping, not a schema you should copy verbatim.
 | `tools:` allow-list | no custom-agent equivalent; tool access is session/sandbox-controlled, so adapt the behavioral intent instead of copying tool names |
 | `maxTurns` | no custom-agent equivalent; omit it |
 | body (markdown) | `developer_instructions` as a TOML multiline string |
-
-## Hook translation notes
-
-- Claude's `if` handler filter is not a Codex field. Put command/path filtering
-  inside the script.
-- Codex matchers filter tool names, not the shell command itself.
-- For `apply_patch`, extract affected paths from the patch text in
-  `tool_input.command`; do not expect Claude's `file_path`.
-- Emit Codex hook output fields, not Claude's `result` shape.
-- Merge GitGuardian's native Codex hooks with the authored hook file instead of
-  replacing either set.
 
 ## No direct equivalent — skip or degrade gracefully
 

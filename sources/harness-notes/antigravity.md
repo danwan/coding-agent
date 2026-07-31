@@ -9,7 +9,6 @@ format. Check your **own current docs** for exact paths — the below is durable
   rules (an Antigravity plugin such as `house-rules/rules/` under your CLI's
   plugins dir works). Reference them from `GEMINI.md` so they are always applied.
   Copy **all** rules — don't drop any.
-- **Runbooks:** consult-on-demand references; place with your other docs.
 - **Subagents / skills:** if your version supports subagents, translate
   `sources/claude/agents/*.md` (body verbatim, map frontmatter to your fields);
   otherwise skip. Skills come from the shared `~/.agents/skills/` hub.

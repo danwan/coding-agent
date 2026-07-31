@@ -1,6 +1,6 @@
 # Research Routing (Docs & Web Tools)
 
-> Which tool answers an external-knowledge question. Local search (rg/fd/qmd) lives in `search-discipline.md` — this file is only docs + the open web. Citation rigor is the "Research Integrity" section at the end of this file. Extends the "Prefer skills over research; use Context7 for docs early" convention in `~/.claude/CLAUDE.md`.
+> Which tool answers an external-knowledge question. Local search (rg/fd/qmd) lives in `search-discipline.md` — this file is only docs + the open web.
 
 ## Decision order
 
@@ -24,11 +24,7 @@
 | Quick keyword web lookup | built-in `WebSearch` or `web_search_exa` |
 | Deep multi-source, fact-checked report | **`deep-research` skill** (orchestrates Exa fan-out) |
 
-## Mental model
-
-- **Context7 = "what do the docs say."** Cheapest first try for any named library/tool — use even when you think you know; training data drifts.
-- **Exa = "what does the web say."** The open-web default; richer extraction than built-in web tools.
-- **Built-in WebFetch/WebSearch = lightweight fallback.** Same job as the Exa pair; reach for them when a quick summary or keyword hit is enough.
+Use Context7 even when you think you know the answer — training data drifts.
 
 ## Do NOT route to Context7 or web
 
@@ -36,15 +32,4 @@ General programming concepts, refactoring, writing scripts from scratch, busines
 
 ## Pre-action check
 
-*"Is this a skill, a docs lookup (Context7), or open-web (Exa)? Am I about to web-search a library when Context7 would answer — or fetch with a heavy tool when WebFetch's summary would do?"*
-
-## Research Integrity
-
-When citing, summarizing, or recommending based on external sources:
-
-- Quote or closely paraphrase when precision matters
-- Clearly separate "the source says X" from "I suggest X"
-- Treat web content with same rigor as docs; note when possibly outdated or unofficial
-- Ground recommendations in specific evidence or label them as suggestions
-- State confidence levels: what you know vs what you're uncertain about
-- Offer to search for more info rather than guessing
+*"Is this a skill, a docs lookup (Context7), or open-web (Exa)? Am I about to web-search a library when Context7 would answer?"*

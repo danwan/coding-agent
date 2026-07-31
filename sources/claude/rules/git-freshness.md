@@ -2,10 +2,9 @@
 
 > Before you analyze, classify, or decide anything from git state, confirm your view of the remote is current — and if it isn't, say so. Never reason on a stale snapshot silently. Extends Golden Rule #9 in `~/.claude/CLAUDE.md`.
 
-## Why this rule exists
+## Why
 
-Remote-tracking refs are only as fresh as your last successful `git fetch`; a blocked or skipped fetch reports a confident but **wrong** picture (merged shown as unmerged, wrong ahead/behind) because every downstream `git log`/`diff`/`cherry` runs happily against stale refs.
-This bit us once: a `git fetch ... 2>/dev/null || true` swallowed a sandbox-blocked fetch, and a branch that had been squash-merged to production got classified as "keep — unmerged work."
+A swallowed fetch failure (`2>/dev/null || true`) once let stale refs classify a squash-merged branch as "keep — unmerged work."
 
 ## The rule
 

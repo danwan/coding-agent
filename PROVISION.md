@@ -31,9 +31,9 @@ verify (all): the binary's `--version` (or `--help`) succeeds.
 | `op` | 1Password CLI — developer.1password.com/docs/cli | package is **`1password-cli`** (brew cask `1password-cli`; Linux via 1Password's own apt/rpm repo), binary is `op` — not in default distro repos |
 | `qmd` | npm **`@tobilu/qmd`** | install from npm ONLY — **never** a GitHub source of the same name |
 | `skills` | skills.sh — run via **`npx skills`** | no global binary needed |
-| `llm` | Simon Willison — llm.datasette.io, with `llm-openrouter` | install the Python CLI with the OpenRouter plugin via `uv`; why: second opinions from multiple providers through one OpenRouter account. Configure interactively with `llm keys set openrouter`, then choose a current model and alias it per `sources/claude/runbooks/llm-cli-openrouter.md`. ⚠️ unrelated packages also use the name `llm`. verify: `llm --version`, `llm models -q openrouter`, and one prompt through the configured alias succeed |
+| `llm` | Simon Willison — llm.datasette.io, with `llm-openrouter` | install the Python CLI with the OpenRouter plugin via `uv`; why: second opinions from multiple providers through one OpenRouter account. Configure interactively with `llm keys set openrouter`, then pick a current model from `llm models -q openrouter` and alias it. ⚠️ unrelated packages also use the name `llm`. verify: `llm --version`, `llm models -q openrouter`, and one prompt through the configured alias succeed |
 | `agent-browser` | Vercel Labs — github.com/vercel-labs/agent-browser | browser automation CLI used for usability and repeatable headless UI tests. Install the browser runtime after the CLI. This is separate from Codex's in-app Browser and Chrome plugins. verify: `agent-browser doctor --offline --quick` passes and opening `https://example.com` returns the title |
-| `ggshield` | GitGuardian CLI — github.com/GitGuardian/ggshield | brew/pipx `ggshield`. Post-install (per user, interactive): `ggshield auth login` (token → OS keyring), then verify `ggshield quota` is greater than zero before installing hooks. Install the global `pre-push` target and the detected agent target (`claude-code` for Claude Code, `codex` for Codex) only while scanning quota is available; otherwise the pre-push hook blocks normal pushes and the agent hook can only fail open noisily. Husky repos need their own `.husky/pre-push` with `ggshield secret scan pre-push "$@"` (local hooksPath shadows global). Do not dismiss a failed `ggshield api-status` as sandbox noise without verifying keyring auth. Why: enforces `rules/secrets-in-git.md` — see its Enforcement section. verify: `ggshield api-status` is healthy, `ggshield quota` is positive, and a benign scan succeeds |
+| `ggshield` | GitGuardian CLI — github.com/GitGuardian/ggshield | brew/pipx `ggshield`. Post-install (per user, interactive): `ggshield auth login` (token → OS keyring), then verify `ggshield quota` is greater than zero before installing hooks. Install the global `pre-push` target and the detected agent target (`claude-code` for Claude Code, `codex` for Codex) only while scanning quota is available; otherwise the pre-push hook blocks normal pushes and the agent hook can only fail open noisily. Husky repos need their own `.husky/pre-push` with `ggshield secret scan pre-push "$@"` (local hooksPath shadows global). Do not dismiss a failed `ggshield api-status` as sandbox noise without verifying keyring auth. Why: blocks secret leaks in pushes and agent traffic. verify: `ggshield api-status` is healthy, `ggshield quota` is positive, and a benign scan succeeds |
 
 ## MCP servers
 - context7  [default] — https://mcp.context7.com/mcp — why: current library docs — prefer the agent's OAuth/keychain flow; API-key fallback: CONTEXT7_API_KEY from op://APIKeys/context7/credential via the harness's shell wrapper, **never a literal in a config file** — verify: server lists tools and one library-resolution call succeeds
@@ -58,11 +58,12 @@ justification here.
 - skill-creator  [default] — why: authoring plus evals/benchmarks for skills — verify: /plugin lists it
 - coderabbit  [default] — why: external review engine, own CLI quota and
   subscription; the default reviewer — verify: `coderabbit --version` and /plugin lists it
-- greptile  [default] — why: server-side repo index (a capability no local model
-  has); needs GREPTILE_API_KEY (op://APIKeys/greptile/credential, resolved by the
-  `claude()` shell wrapper — see `sources/shell/aliases.zsh`) — verify: /plugin lists it
-- typescript-lsp / pyright-lsp  [optional] — why: real language servers; zero
-  context cost — verify: /plugin lists it
+- greptile  [optional, installed but disabled] — why: server-side repo index (a
+  capability no local model has); needs GREPTILE_API_KEY
+  (op://APIKeys/greptile/credential, resolved by the `claude()` shell wrapper —
+  see `sources/shell/aliases.zsh`) — verify: /plugin lists it
+- typescript-lsp / pyright-lsp  [optional, installed but disabled] — why: real
+  language servers; zero context cost — verify: /plugin lists it
 
 ### Evaluated and rejected (2026-07-31)
 Recorded so the next audit does not re-litigate it. Measured with
@@ -126,22 +127,15 @@ Monitor, `/usage`) or a capability of the model.
   project-local skills without overflowing Codex's skill-description budget.
 
 ## Skills — own (stored in this repo; the prompt PLACES them)  [default]
-branch-cleanup · challenge · git-sync · grill-me · security-review · pr-workflow · stack-detection
+branch-cleanup · git-sync · stack-detection
 verify: `/` shows each; skills load
-
-- chrome-ui-explorer  [default, Claude Code only] — why: exploratory full-app UI
-  testing through the user's real Chrome via the Claude-in-Chrome extension.
-  Placement exception: it goes into `~/.claude/skills/` as a real directory, NOT
-  into the `~/.agents/skills/` hub, because no other harness drives that
-  extension — verify: `/` shows it and the extension answers one `tabs_context` call
 
 ## Skills — own, optional (stored, not default)  [optional]
 - config-edit — Claude Code only; why: path syntax reference for its settings/permissions/hooks
-- convexcheck — why: report-only audit of a project's Convex+Vercel+Modal deploy footguns (project-local preferred)
+- convexcheck — why: report-only audit of a project's Convex+Vercel+Modal deploy footguns (currently `off` in skillOverrides)
 - deploy — why: safe Modal/Convex deploy delegating to project deploy-script gates (project-local preferred)
 - notion-safe-writes — Claude/raw-Notion-MCP only; do not install for Codex's app connector
-- performance-review — why: automated Next.js+Convex+Modal performance checks (project-local preferred)
-- pin-auth — why: scaffold PIN-based auth (Convex or lightweight HMAC variant) into a Next.js app
+- pin-auth — why: scaffold PIN-based auth (Convex or lightweight HMAC variant) into a Next.js app (currently `off` in skillOverrides)
 - review-routing — Claude Code only; why: routing lookup across its review/security plugins
 verify: `/` shows each once placed; skills load
 
@@ -211,13 +205,12 @@ truth). A non-Claude agent translates these into its own format at provision tim
 (see `sources/harness-notes/<harness>.md` for the format mapping).
 - `sources/claude/CLAUDE.md` → the agent's global instruction file
 - `sources/claude/rules/` → where this agent reads global rules (copy ALL)
-- `sources/claude/runbooks/` → referenced on demand (not auto-loaded)
 - `sources/claude/agents/` → subagent definitions
-- `sources/claude/hooks/` → lifecycle hook logic plus Claude Code's native
-  implementation. Non-Claude agents must translate both the wiring and the
-  hook input/output protocol; do not blindly reuse Claude JSON fields. Codex
-  currently supports equivalents in `~/.codex/hooks.json` (details in
-  `sources/harness-notes/codex.md`).
+
+There are no lifecycle hooks and no runbooks anymore: the hooks were retired
+2026-07-31 (ggshield quota at zero made them fail-open noise; the
+backend-deploy check lives on as the `deploy-safety.md` rule), and the runbook
+content was either folded into the rules or retired with its feature.
 
 ## System & Shell Environment  [default]
 - **Shell Aliases & Functions:** The canonical alias/function block for `~/.zshrc` is `sources/shell/aliases.zsh` (agent aliases `c`/`cc`/`co`/`oc`, git helpers, 1Password keychain token + `claude()` Greptile-key wrapper). NOTE: `op` is the 1Password CLI, never an alias.
@@ -252,7 +245,7 @@ wrapper fills from `op read` — never a literal. Vault is `APIKeys`; there is n
   filled by the `codex()` wrapper. Do not flip either config before the
   1Password item exists — both harnesses fail *quietly* without the key.
 - GREPTILE_API_KEY — op://APIKeys/greptile/credential (resolved per-start by the `claude()` wrapper)
-- OPENROUTER_KEY — optional environment alternative; prefer `llm keys set openrouter` so the value stays in the CLI key store (see `sources/claude/runbooks/llm-cli-openrouter.md`)
+- OPENROUTER_KEY — optional environment alternative; prefer `llm keys set openrouter` so the value stays in the CLI key store
 - OP_SERVICE_ACCOUNT_TOKEN — macOS Keychain item `op-service-account` (basis for all `op run`/`op read`). It is **read-only** on the `APIKeys` vault: creating or updating an item fails with `(101) You do not have permission`. New secrets have to be added interactively by the user; an agent can read them but never write them.
 
 Audit: no config file under any harness should contain a literal key.

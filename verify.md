@@ -37,15 +37,11 @@ Additional checks:
 - Global instructions exist in the path used by this harness.
 - Every canonical rule in `sources/claude/rules/` is represented in the active
   always-loaded instructions and the full adapted references are available.
-- Both runbooks are available on demand.
 - All four custom agents load in the harness's native format.
-- All four authored hook behaviors are present when the harness supports
-  equivalent events.
-- The seven default own skills are present exactly once:
-  `branch-cleanup`, `challenge`, `git-sync`, `grill-me`,
-  `security-review`, `pr-workflow`, `stack-detection`.
-- On Claude Code, `chrome-ui-explorer` is present as a real directory under
-  `~/.claude/skills/` and absent from the `~/.agents/skills/` hub.
+- No lifecycle hooks are configured (they were retired 2026-07-31); a hook
+  wired in settings whose script no longer exists is a FAIL.
+- The three default own skills are present exactly once:
+  `branch-cleanup`, `git-sync`, `stack-detection`.
 - `./sync-agents.py` (no argument) reports `zu schreiben: 0`, and every
   generated `~/.codex/agents/*.toml` parses as TOML with a non-empty
   `developer_instructions`.
@@ -77,8 +73,6 @@ When the active harness is Codex:
 - Run `codex --strict-config` validation and `codex doctor --summary`.
 - Parse every `~/.codex/agents/*.toml` and require `name`, `description`, and
   `developer_instructions`.
-- Validate `~/.codex/hooks.json`, shell syntax-check each script, and confirm
-  exactly the current four hook commands are trusted.
 - Confirm Browser works in the desktop app, Chrome works through the Chrome
   plugin, and the standalone `agent-browser` CLI works independently.
 - Confirm OpenAI-curated GitHub, Gmail, Google Calendar, Google Drive, Notion,

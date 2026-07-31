@@ -108,10 +108,7 @@ head2 "Claude Code  ~/.claude"
 if need "$HOME/.claude"; then
   place     "$SRC/CLAUDE.md"  "$HOME/.claude/CLAUDE.md"
   place_dir "$SRC/rules"      "$HOME/.claude/rules"
-  place_dir "$SRC/runbooks"   "$HOME/.claude/runbooks"
   place_dir "$SRC/agents"     "$HOME/.claude/agents"
-  place_dir "$SRC/hooks"      "$HOME/.claude/hooks" '*.sh'
-  (( APPLY )) && chmod +x "$HOME"/.claude/hooks/*.sh 2>/dev/null
 fi
 
 # ── Shared skill hub — every harness symlinks its skills out of here ─────────
@@ -121,16 +118,11 @@ if need "$HOME/.agents"; then
   place "$SRC/CLAUDE.md" "$HOME/.agents/AGENTS.md"
   for d in "$REPO"/sources/skills/*/; do
     s="$d"; name="$(basename "$d")"
-    # chrome-ui-explorer is Claude-only: it drives the Claude-in-Chrome
-    # extension, which no other harness can talk to.
-    [[ "$name" == "chrome-ui-explorer" ]] && continue
     for f in "$s"SKILL.md "$s"references/*.md "$s"scripts/*; do
       [[ -e "$f" ]] || continue
       place "$f" "$HOME/.agents/skills/$name/${f#$s}"
     done
   done
-  place "$REPO/sources/skills/chrome-ui-explorer/SKILL.md" \
-        "$HOME/.claude/skills/chrome-ui-explorer/SKILL.md"
 fi
 
 # ── Codex — same content, its own filenames ─────────────────────────────────
@@ -153,9 +145,6 @@ except Exception: print(65536)")
     place_str "$codex_doc" "$HOME/.codex/AGENTS.md"
   fi
   place_dir "$SRC/rules"    "$HOME/.codex/rules"
-  place_dir "$SRC/runbooks" "$HOME/.codex/runbooks"
-  place_dir "$SRC/hooks"    "$HOME/.codex/hooks" '*.sh'
-  (( APPLY )) && chmod +x "$HOME"/.codex/hooks/*.sh 2>/dev/null
   say "  note: Subagents werden von ./sync-agents.py verwaltet (Codex nutzt TOML)"
 fi
 
@@ -164,7 +153,6 @@ head2 "OpenCode  ~/.config/opencode"
 if need "$HOME/.config/opencode"; then
   place     "$SRC/CLAUDE.md" "$HOME/.config/opencode/AGENTS.md"
   place_dir "$SRC/rules"     "$HOME/.config/opencode/rules"
-  place_dir "$SRC/runbooks"  "$HOME/.config/opencode/runbooks"
   # Subagents are NOT copied raw here — their frontmatter differs per harness.
   # ./sync-agents.py owns every agents/ directory.
 fi

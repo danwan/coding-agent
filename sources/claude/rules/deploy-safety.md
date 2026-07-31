@@ -12,15 +12,14 @@ paths:
 # Deploy Safety Rules
 
 > Codified from the lanalyzer-overwrite incident (2026-04-19, svb-manager).
-> Incident background, canonical deploy-script template, retrofit checklist,
-> sabotage tests, and per-repo audit script: `~/.claude/runbooks/deploy-safety-postmortem.md`.
+> This file is self-contained; the former postmortem runbook has been retired.
 
 ## The 10-Gate Checklist for Every Deploy Script
 
 A deploy script is only safe when ALL 10 gates pass. Fail any one → exit 1 before touching any remote service.
 
 1. **Project-scoped env var names.** Forbidden: `CONVEX_PROD_DEPLOY_KEY`, `CONVEX_DEPLOY_KEY`, `DEPLOY_KEY`. Required: `CONVEX_DEPLOYMENT_PROD`, `MYPROJECT_CONVEX_PROD_KEY`, etc. Generic names get populated by shell exports from other projects.
-2. **Read keys from `.env`, never from shell environment.** Use `grep`/`sed` from project's `.env`, not `${ENV_VAR}` lookup. Path anchored to script location, never `$CWD`. Code template in postmortem runbook.
+2. **Read keys from `.env`, never from shell environment.** Use `grep`/`sed` from project's `.env`, not `${ENV_VAR}` lookup. Path anchored to script location, never `$CWD`.
 3. **Hard-fail when key is absent.** `[[ -z "$KEY" ]] && { echo "ERROR …" >&2; exit 1; }`.
 4. **Target-prefix check (hardcoded `EXPECTED_DEPLOYMENT` constant).** Assert `[[ "$KEY" == "prod:${EXPECTED_DEPLOYMENT}|"* ]]` before `npx convex deploy`. Last line of defense even if Gate 2 is bypassed.
 5. **Separate scripts for prod vs dev.** No `--env` switching. Use `deploy-backend.sh` / `deploy-backend-dev.sh`, each with own hardcoded `EXPECTED_DEPLOYMENT`.
@@ -29,8 +28,6 @@ A deploy script is only safe when ALL 10 gates pass. Fail any one → exit 1 bef
 8. **Dry-run / echo-before-act.** `echo "Deploying to Convex: ${EXPECTED_DEPLOYMENT} …"` before the deploy command.
 9. **Never commit `.env` with deploy keys.** `.gitignore`d. Commit `.env.example` with placeholders.
 10. **Post-deploy verification.** `npx convex env list 2>/dev/null | head -5` after deploy. If output doesn't reference expected deployment → alert and recommend rollback from git tag.
-
-Bash code templates for each gate: postmortem runbook (link above).
 
 ## Lint Rule for Agents (Convex deploy scripts)
 
@@ -58,7 +55,7 @@ When reviewing any Modal deploy script (`.py` or shell wrapper invoking `modal d
 Flag as **WARNING** if:
 - Modal CLI not installed/authenticated check missing (script silently no-ops)
 
-> **Out of scope (separate plan):** Modal post-deploy verification command (Convex equivalent: Gate 10). Modal canonical template + retrofit checklist parallel to runbook.
+> **Out of scope (separate plan):** Modal post-deploy verification command (Convex equivalent: Gate 10).
 
 ## Vercel must not hold Convex or Modal deploy keys
 

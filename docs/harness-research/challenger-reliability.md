@@ -62,9 +62,8 @@ Pattern: boundary cases where "how severe is this?" is subjective. The substance
 
 ## How to Invoke Majority-Vote
 
-See `~/.claude/skills/challenge/SKILL.md` — use `/challenge --triple` for 3-run majority voting.
-
-Alternatively, manually dispatch `@challenger` 3 times with the same target and take the majority verdict. If all 3 disagree, escalate to the user.
+The former `challenge` skill (retired) automated this as `/challenge --triple`.
+Today: manually dispatch `@challenger` 3 times with the same target and take the majority verdict. If all 3 disagree, escalate to the user.
 
 ## Source Evidence
 

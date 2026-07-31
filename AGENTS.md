@@ -7,7 +7,7 @@
   is current when you run this. The intent is the contract, not any specific
   command.
 - **Authored content is stored once, in Claude format.** `sources/claude/` is
-  the single source of truth (CLAUDE.md, rules, runbooks, agents). Non-Claude
+  the single source of truth (CLAUDE.md, rules, agents). Non-Claude
   harnesses translate it at provision time via `sources/harness-notes/<harness>.md`
   — keep those notes principle-based, not version-pinned. Never commit a
   pre-translated per-tool copy of the authored content; it only drifts.

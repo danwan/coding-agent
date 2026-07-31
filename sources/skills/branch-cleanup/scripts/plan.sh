@@ -114,10 +114,14 @@ def is_cleanup_safe(b):
 
 nondefault = [b for b in branches if b.get("class") != "DEFAULT"]
 gone_all = [b for b in nondefault if b.get("gone") == "true"]
-gone_safe = [b for b in gone_all if is_cleanup_safe(b)]
+# Only truly-merged [gone] branches are auto-deleted. gone+squashed goes into
+# the squashed ask-bucket instead: `git cherry` cannot distinguish squash-merge
+# from cherry-pick (SKILL.md edge case #1), so squash-flagged branches get the
+# same one-line confirm whether their remote is gone or not.
+gone_merged = [b for b in gone_all if b.get("class") == "MERGED_INTO_DEFAULT"]
 gone_unmerged = [b for b in gone_all if not is_cleanup_safe(b)]
 merged = [b for b in nondefault if b.get("class") == "MERGED_INTO_DEFAULT" and b.get("gone") != "true"]
-squashed = [b for b in nondefault if b.get("squashed") == "true" and b.get("gone") != "true"
+squashed = [b for b in nondefault if b.get("squashed") == "true"
             and b.get("class") != "MERGED_INTO_DEFAULT"]
 handled = {b.get("name") for b in gone_all} | {b.get("name") for b in merged} | {b.get("name") for b in squashed}
 stale = [b for b in nondefault if b.get("stale") == "true"
@@ -146,6 +150,15 @@ if fetch_status not in ("OK", "NO_REMOTE"):
     lines.append("")
     lines.append(f"`FETCH_STATUS={fetch_status}`")
     lines.append("Fix the fetch (network/auth/sandbox), re-run the audit, regenerate the plan.")
+    lines.append("")
+
+# Hard blocker: default branch has no local commit — merged/squashed/ahead/behind
+# classifications were computed against a missing ref and are meaningless.
+if kv.get("DEFAULT_BRANCH_RESOLVED") == "false":
+    lines.append("## ⛔ Default branch does not resolve to a local commit — do not trust this plan")
+    lines.append("")
+    lines.append(f"`DEFAULT_BRANCH={default_branch}` has no local ref. Every merged/squashed/ahead/behind bucket below is unreliable.")
+    lines.append("Create or fetch the default branch locally, re-run the audit, regenerate the plan.")
     lines.append("")
 
 # Hard blocker: dirty tree
@@ -244,9 +257,9 @@ if diverged:
 # Section 3: cleanup
 lines.append("## 3. Cleanup (after main is up-to-date in Phase 3)")
 lines.append("")
-if gone_safe:
-    lines.append("**[gone] tracking refs, content in main (will delete locally — remote already gone):**")
-    for b in gone_safe:
+if gone_merged:
+    lines.append("**[gone] tracking refs, content merged into main (will delete locally — remote already gone):**")
+    for b in gone_merged:
         lines.append(f"- `{b_link(b)}` (was tracking `{b.get('upstream','?')}`)")
     lines.append("")
 if merged:
@@ -259,12 +272,19 @@ if merged:
 if squashed:
     lines.append("**Likely squash-merged (will ask before `-D`):**")
     for b in squashed:
-        lines.append(f"- `{b_link(b)}` — `git cherry` shows no unique commits vs default")
+        gone_note = ", remote already gone" if b.get("gone") == "true" else ""
+        lines.append(f"- `{b_link(b)}` — `git cherry` shows no unique commits vs default{gone_note}")
     lines.append("")
 if stale:
     lines.append("**Stale by time (will batch-ask):**")
     for b in stale:
         lines.append(f"- `{b_link(b)}` (last commit {b.get('age_days','?')} days ago, {b.get('class','?')})")
+    lines.append("")
+if ahead:
+    lines.append("**Ahead of main (working branches — left untouched, listed for visibility):**")
+    for b in ahead:
+        has_pr = b.get("name") in pr_branches
+        lines.append(f"- `{b_link(b)}` ({b.get('class','?')}, last commit {b.get('age_days','?')} days ago){' — has open PR' if has_pr else ''}")
     lines.append("")
 if remotes:
     lines.append("**Remote-only branches (no local copy — left as-is, listed for visibility):**")
@@ -287,13 +307,16 @@ n = 2
 if auto_merge:
     lines.append(f"{n}. **Phase 4** — Auto-merge {len(auto_merge)} PR(s), pulling main between each.")
     n += 1
+if mergeable_no_review:
+    lines.append(f"{n}. **Phase 4′** — Ask about {len(mergeable_no_review)} mergeable-but-unreviewed PR(s).")
+    n += 1
 ask_branches = [b for b in behind + diverged if b.get("name") not in pr_branches]
 if ask_branches or gone_unmerged:
     lines.append(f"{n}. **Phase 5b** — For {len(ask_branches)} branch(es), ask rebase/merge/skip"
                  + (f"; decide {len(gone_unmerged)} [gone]-with-unique-work branch(es)" if gone_unmerged else "") + ".")
     n += 1
-if gone_safe or merged or squashed:
-    lines.append(f"{n}. **Phase 5a** — Delete {len(gone_safe)+len(merged)} merged/[gone] branches.")
+if gone_merged or merged or squashed:
+    lines.append(f"{n}. **Phase 5a** — Delete {len(gone_merged)+len(merged)} merged/[gone] branches.")
     if squashed:
         lines.append(f"   - Ask before deleting {len(squashed)} squash-merged branch(es).")
     n += 1

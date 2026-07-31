@@ -11,10 +11,9 @@ This directory holds the authored OpenCode config that mirrors Danny's Claude
 Code setup as closely as OpenCode's config schema allows. The repo is the
 source of truth; live config at `~/.config/opencode/` is placed by the setup
 prompt (see repo root). Edits are file edits + commit — there is no separate
-sync/apply step. Lifecycle hooks exist for Claude Code (`sources/claude/hooks/`);
-translate them only if OpenCode's current event mechanism supports equivalents.
-The old secret-scan hook stays retired — see `sources/claude/rules/secrets-in-git.md`
-for the self-enforce model.
+sync/apply step. No lifecycle hooks are authored anymore (retired 2026-07-31;
+the old secret-scan hook was already retired 2026-07-18 in favor of ggshield,
+and the `secrets-in-git.md` rule was removed 2026-07-31).
 
 This document records **what** was translated, **how** it is wired, and **why**
 each approach was chosen — plus the features that have no OpenCode equivalent

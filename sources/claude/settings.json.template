@@ -34,19 +34,37 @@
     "ask": [],
     "defaultMode": "auto"
   },
-  "skillOverrides": {},
+  "model": "claude-fable-5[1m]",
+  "skillOverrides": {
+    "next-cache-components-adoption": "off",
+    "next-cache-components-optimizer": "off",
+    "vercel-optimize": "off",
+    "computer-use": "off",
+    "orca-cli": "off",
+    "orchestration": "off",
+    "web-design-guidelines": "off",
+    "mcp-builder": "off",
+    "performance-review": "off",
+    "pin-auth": "off",
+    "convexcheck": "off"
+  },
+  "worktree": {
+    "baseRef": "fresh"
+  },
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
   "enabledPlugins": {
     "commit-commands@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true,
-    "pyright-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": false,
+    "pyright-lsp@claude-plugins-official": false,
     "skill-creator@claude-plugins-official": true,
     "coderabbit@claude-plugins-official": true,
-    "greptile@claude-plugins-official": true
+    "greptile@claude-plugins-official": false,
+    "frontend-design@claude-plugins-official": false
   },
+  "extraKnownMarketplaces": {},
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
@@ -125,8 +143,9 @@
     },
     "enableWeakerNetworkIsolation": true
   },
-  "effortLevel": "high",
+  "effortLevel": "medium",
   "plansDirectory": "./zz-plans",
+  "tui": "fullscreen",
   "prefersReducedMotion": true,
   "autoMemoryEnabled": true,
   "autoDreamEnabled": true,
@@ -134,6 +153,7 @@
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
   "editorMode": "vim",
-  "agentPushNotifEnabled": true,
-  "tui": "fullscreen"
+  "remoteControlAtStartup": false,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true
 }

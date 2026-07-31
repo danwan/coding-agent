@@ -9,6 +9,7 @@
 # Exit codes:
 #   0  CLEAN — operation completed (and pushed, if the branch has a live upstream)
 #   1  hard error
+#   2  REFUSED — branch is checked out in another worktree (skip or remove it)
 #   10 RERERE_RESOLVED — rerere replayed cached resolutions; completed (and pushed)
 #   20 REAL_CONFLICT — aborted, branch left untouched, user must resolve manually
 #   30 LEASE_FAILED — completed locally but push was rejected (someone pushed in parallel)
@@ -44,6 +45,20 @@ if ! git rev-parse --verify "refs/heads/$BRANCH" >/dev/null 2>&1; then
   exit 1
 fi
 
+# Refuse (classified) when the branch is checked out in ANOTHER worktree —
+# `git switch` would fail anyway, but with a raw git error instead of a reason.
+# substr($0,10) keeps worktree paths with spaces intact ("worktree " is 9 chars).
+WORKTREE_PATH=$(git worktree list --porcelain | awk -v br="$BRANCH" '
+  /^worktree /{p=substr($0,10)}
+  /^branch /{ if (substr($2,12) == br) print p }
+' | head -1)
+CUR_ROOT=$(git rev-parse --show-toplevel)
+if [[ -n "$WORKTREE_PATH" && "$WORKTREE_PATH" != "$CUR_ROOT" ]]; then
+  echo "REFUSED: branch '$BRANCH' is checked out in worktree at: $WORKTREE_PATH" >&2
+  echo "  Run the merge/rebase there, or remove the worktree first." >&2
+  exit 2
+fi
+
 # Working tree must be clean
 if [[ -n "$(git status --porcelain)" ]]; then
   echo "ERROR: working tree dirty; commit or stash first" >&2
@@ -59,6 +74,17 @@ if [[ -z "$DEFAULT_BRANCH" ]]; then
   if git rev-parse --verify refs/heads/main >/dev/null 2>&1; then DEFAULT_BRANCH=main
   elif git rev-parse --verify refs/heads/master >/dev/null 2>&1; then DEFAULT_BRANCH=master
   else echo "ERROR: cannot determine default branch" >&2; exit 1; fi
+fi
+
+# Freshness note: this script merges the LOCAL default branch. In the skill
+# flow Phase 3 has just synced it; standalone, a stale local default silently
+# converges onto stale content — warn (but proceed) when its upstream is ahead.
+DEFAULT_UPSTREAM=$(git rev-parse --abbrev-ref "$DEFAULT_BRANCH@{upstream}" 2>/dev/null || true)
+if [[ -n "$DEFAULT_UPSTREAM" ]] && git rev-parse --verify "$DEFAULT_UPSTREAM" >/dev/null 2>&1; then
+  DEFAULT_BEHIND=$(git rev-list --count "$DEFAULT_BRANCH..$DEFAULT_UPSTREAM" 2>/dev/null || echo 0)
+  if [[ "$DEFAULT_BEHIND" -gt 0 ]]; then
+    echo "WARN: local $DEFAULT_BRANCH is $DEFAULT_BEHIND commit(s) behind $DEFAULT_UPSTREAM — converging onto a stale default. Sync it first (Phase 3 / 'git pull --ff-only') unless that is intentional." >&2
+  fi
 fi
 
 # rerere must auto-STAGE replayed resolutions, not just write them to the
@@ -121,7 +147,15 @@ if [[ "$OUTCOME" == "CONFLICT" ]]; then
   if [[ "$UNMERGED" -eq 0 ]]; then
     echo "→ rerere replayed cached resolutions"
     if [[ "$STRATEGY" == "merge" ]]; then
-      git commit --no-edit
+      # Fail loud (same guard as the rebase case): a failed commit — e.g. a
+      # hook — would otherwise kill the script mid-merge via set -e, leaving
+      # the merge state in place and the start branch not restored.
+      if ! git commit --no-edit; then
+        echo "→ commit failed after rerere replay; aborting merge" >&2
+        git merge --abort
+        restore_start_branch
+        exit 20
+      fi
     else
       # Fail loud: a failed --continue means we're still mid-rebase.
       if ! GIT_EDITOR=true git rebase --continue; then

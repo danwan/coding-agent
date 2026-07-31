@@ -38,6 +38,13 @@ if [[ -z "$DEFAULT_BRANCH" ]]; then
   else DEFAULT_BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo main); fi
 fi
 
+# Verify the resolved name actually points at a local commit — everything below
+# (merge-base, rev-list, cherry) silently misclassifies against a missing ref.
+DEFAULT_BRANCH_RESOLVED="true"
+if ! git rev-parse --verify --quiet "${DEFAULT_BRANCH}^{commit}" >/dev/null; then
+  DEFAULT_BRANCH_RESOLVED="false"
+fi
+
 # Refresh remote refs once. --prune drops stale tracking refs so [gone] detection is correct.
 # Do NOT swallow a failed fetch: a blocked/failed fetch (sandbox SSH, network, auth) leaves every
 # ref below stale, which silently corrupts merge/[gone]/behind classification. Capture and report it.
@@ -66,6 +73,7 @@ echo "REPO_NAME=$REPO_NAME"
 echo "REPO_ROOT=$REPO_ROOT"
 echo "REMOTE=${REMOTE:-NONE}"
 echo "DEFAULT_BRANCH=$DEFAULT_BRANCH"
+echo "DEFAULT_BRANCH_RESOLVED=$DEFAULT_BRANCH_RESOLVED"
 echo "FETCH_STATUS=$FETCH_STATUS"
 echo "CURRENT_BRANCH=$CURRENT"
 echo "WORKTREE=$WORKTREE_STATE"
@@ -102,7 +110,8 @@ echo "MAIN_STATE=$MAIN_STATE"
 
 # Worktrees
 echo "WORKTREES_START"
-git worktree list --porcelain | awk '/^worktree /{path=$2} /^branch /{print path"|"substr($2,12)}'
+# substr($0,10) keeps worktree paths with spaces intact ("worktree " is 9 chars).
+git worktree list --porcelain | awk '/^worktree /{path=substr($0,10)} /^branch /{print path"|"substr($2,12)}'
 echo "WORKTREES_END"
 
 # Local branches with metadata
@@ -146,11 +155,15 @@ git for-each-ref --format='%(refname:short)|%(upstream:short)|%(upstream:track)|
     if [[ "$AGE_DAYS" -gt "$STALE_DAYS" ]]; then
       STALE="true"
     fi
-    # Squash-detect: if cherry says no unique commits → safe to delete despite "not merged"
+    # Squash-detect: if cherry says no unique commits → safe to delete despite "not merged".
+    # A FAILED cherry (e.g. default branch missing) must not look like an empty
+    # result — that would flag every branch as squashed. Only trust success.
     SQUASHED="false"
     if [[ "$CLASS" != "DEFAULT" && "$CLASS" != "MERGED_INTO_DEFAULT" ]]; then
-      if [[ -z "$(git cherry "$DEFAULT_BRANCH" "$BR" 2>/dev/null | grep '^+')" ]]; then
-        SQUASHED="true"
+      if CHERRY_OUT=$(git cherry "$DEFAULT_BRANCH" "$BR" 2>/dev/null); then
+        if ! printf '%s\n' "$CHERRY_OUT" | grep -q '^+'; then
+          SQUASHED="true"
+        fi
       fi
     fi
     echo "BRANCH|name=$BR|upstream=$UP|track=$TRACK|class=$CLASS|gone=$GONE|stale=$STALE|squashed=$SQUASHED|age_days=$AGE_DAYS|last_commit=$CDATE_I|subject=$SUBJ"
@@ -173,11 +186,12 @@ echo "REMOTE_ONLY_END"
 
 # Open PRs — GitHub-only section. Degrade loudly, not silently:
 # GH_STATE tells the caller WHY PR data is absent so it can skip PR phases with a clear message.
+# PR_TMP is reused by the CI-log section below — deleted there, not here.
+PR_TMP="${TMPDIR:-/tmp}/branch-cleanup-prs-$$.json"
 echo "PRS_START"
 if ! command -v gh >/dev/null 2>&1; then
   echo "GH_STATE=NO_GH_CLI"
 else
-  PR_TMP="${TMPDIR:-/tmp}/branch-cleanup-prs-$$.json"
   if GH_ERR=$(gh pr list --state open --limit 100 \
       --json number,title,headRefName,isDraft,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup,url \
       2>&1 >"$PR_TMP"); then
@@ -234,19 +248,21 @@ PYEOF
     esac
     echo "GH_ERROR=$ERR_SHORT"
   fi
-  rm -f "$PR_TMP"
 fi
 echo "PRS_END"
 
-# Failing CI excerpts (only for blocked-by-ci PRs; cap at 20 lines per failure)
+# Failing CI excerpts (only for blocked-by-ci PRs; cap at 20 lines per failure).
+# Reuses the PR JSON fetched above — a second `gh pr list` would waste an API
+# call and could see a different state than the one already classified.
 echo "CI_LOGS_START"
-if command -v gh >/dev/null 2>&1; then
-  CI_TMP="${TMPDIR:-/tmp}/branch-cleanup-ci-$$.json"
-  if gh pr list --state open --limit 100 --json number,statusCheckRollup > "$CI_TMP" 2>/dev/null; then
-    python3 - "$CI_TMP" <<'PYEOF' || true
-import json, sys, subprocess
-with open(sys.argv[1]) as f:
-    data = json.load(f)
+if [[ -s "$PR_TMP" ]]; then
+  python3 - "$PR_TMP" <<'PYEOF' || true
+import json, re, subprocess, sys
+try:
+    with open(sys.argv[1]) as f:
+        data = json.load(f)
+except Exception:
+    sys.exit(0)
 for pr in data:
     checks = pr.get('statusCheckRollup') or []
     failing = [c for c in checks if (c.get('conclusion') in ('FAILURE','CANCELLED','TIMED_OUT'))]
@@ -257,10 +273,21 @@ for pr in data:
     for fjob in failing[:3]:
         name = fjob.get('name') or fjob.get('context') or '?'
         print(f"---JOB:{name}---")
-        run_id = fjob.get('detailsUrl','').rsplit('/',1)[-1] if fjob.get('detailsUrl') else None
-        if run_id and run_id.isdigit():
+        # detailsUrl is usually .../actions/runs/<run-id>/job/<job-id> — the last
+        # path segment is the JOB id, not the run id. Extract both explicitly:
+        # prefer the job-scoped log, fall back to the whole run's failed logs.
+        url = fjob.get('detailsUrl') or ''
+        job_m = re.search(r'/job/(\d+)', url)
+        run_m = re.search(r'/runs/(\d+)', url)
+        if job_m:
+            cmd = ['gh', 'run', 'view', '--job', job_m.group(1), '--log-failed']
+        elif run_m:
+            cmd = ['gh', 'run', 'view', run_m.group(1), '--log-failed']
+        else:
+            cmd = None
+        if cmd:
             try:
-                out = subprocess.run(['gh','run','view',run_id,'--log-failed'], capture_output=True, text=True, timeout=15)
+                out = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
                 lines = (out.stdout or out.stderr).splitlines()
                 idx = 0
                 for i, l in enumerate(lines):
@@ -273,9 +300,8 @@ for pr in data:
         else:
             print("(no run id available)")
 PYEOF
-  fi
-  rm -f "$CI_TMP"
 fi
+rm -f "$PR_TMP"
 echo "CI_LOGS_END"
 
 echo "===AUDIT_END==="
