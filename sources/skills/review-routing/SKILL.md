@@ -31,7 +31,7 @@ version: 2.0.0
 |---|---|---|
 | Quick review of current diff | built-in `/code-review` | coderabbit (deeper SAST) → `/code-review ultra` (large/risky PR) |
 | Simplify / clean recently written code (clarity only) | built-in `/simplify` | coderabbit (it flags complexity too) |
-| Security scan of pending changes | built-in `/security-review` | user `security-review` skill (pre-merge checklist) → `/convex-security-audit` (Convex deep) → `deepsec` (deep on-demand full-repo scan) |
+| Security scan of pending changes | built-in `/security-review` | `/convex-security-audit` (Convex deep) → `deepsec` (deep on-demand full-repo scan) |
 | Comprehensive multi-dimension pre-PR pass | `/coderabbit:coderabbit-review` | `/code-review ultra` |
 
 ## Stack-Scoping (read before any review dispatch)
@@ -42,7 +42,6 @@ Stack-specific tools apply **only** when the stack artifact exists in the projec
 |---|---|
 | `/convex-security-check`, `/convex-security-audit` | `convex/` directory with non-generated `.ts` files exists |
 | Convex rules in `@codebase-audit` | same as above |
-| Modal cold-start / image checks in `/performance-review` | `modal` referenced in `pyproject.toml` or Python imports |
 | Rate-limiting / session-token checks in security review | server-side endpoints exist (`app/api/`, `pages/api/`, `convex/`, `middleware.ts`) |
 | UV/ruff/ty enforcement | `pyproject.toml` or `*.py` files exist |
 
@@ -69,9 +68,8 @@ Stack-specific tools apply **only** when the stack artifact exists in the projec
 | Situation | Tool |
 |-----------|------|
 | Before every PR (multi-dimension) | `/coderabbit:coderabbit-review` |
-| Before every PR (security) | built-in `/security-review`, then user `security-review` skill for the pre-merge checklist |
+| Before every PR (security) | built-in `/security-review` |
 | Convex changes in PR | `/convex-security-check` (if not run during dev) |
-| Performance-sensitive changes | `/performance-review` |
 | Large/risky PR (many files, security-critical, cross-cutting) | `/code-review ultra` (parallel multi-agent cloud review; `/ultrareview` is a deprecated alias) |
 
 ### Targeted Reviews (as needed)
@@ -96,9 +94,9 @@ Three names are shared across engines. Qualify the namespace explicitly when inv
 - built-in `/code-review`, `/simplify` are the **defaults** — free, native, on the current diff.
 - `coderabbit:code-review` skill = the external-engine variant. Use it when you need that engine, not by accident.
 
-**`security-review`** (built-in vs user skill):
-- built-in `/security-review` — native scan of pending changes on the current branch (run first).
-- user `security-review` skill — pre-merge checklists + audit commands for auth/data/API changes (the deeper, project-specific gate).
+**`security-review`**: only the built-in `/security-review` exists — native scan
+of pending changes on the current branch (the former user skill of the same
+name is retired).
 
 ## Solo-Dev Development Process (budget order, since 2026-07-18)
 
@@ -119,12 +117,11 @@ manual-only. Monitor with `@coderabbitai rate limit` on any PR (costs nothing).
 4. **PR open (PR quota, conserved):** CodeRabbit reviews once, auto-pauses
    after 2 commits — further pushes cost nothing. When truly done: one
    `@coderabbitai review` as final gate. Throttled? → `@greptileai` fallback.
-   Aikido + GitGuardian checks run automatically.
+   GitGuardian checks run automatically.
 5. **Merge;** Dependabot PRs land grouped weekly — review in one batch
    (`branch-cleanup` skill can automerge green ones).
-6. **Periodic / pre-launch (whole repo):** `@codebase-audit`, then
-   `/performance-review`. Heavy artillery (`/code-review ultra`, deepsec,
-   workflow fan-out) only on explicit decision.
+6. **Periodic / pre-launch (whole repo):** `@codebase-audit`. Heavy artillery
+   (`/code-review ultra`, deepsec, workflow fan-out) only on explicit decision.
 7. **Escalation:** if `@coderabbitai rate limit` shows sustained throttling
    despite configs → cancel Marketplace sub, re-subscribe direct (enables
    usage-based add-on; ~prorated refund from GitHub).

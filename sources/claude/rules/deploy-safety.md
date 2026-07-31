@@ -59,7 +59,7 @@ Flag as **WARNING** if:
 
 ## Vercel must not hold Convex or Modal deploy keys
 
-Vercel deploys automatically on `git push`. Convex and Modal are deployed manually (Golden Rule #7). Therefore:
+Vercel deploys automatically on `git push`. Convex and Modal are deployed manually (rule E6). Therefore:
 
 - `vercel env` (production AND preview) must NOT contain `CONVEX_DEPLOY_KEY`, project-scoped `CONVEX_DEPLOYMENT_PROD` / `CONVEX_DEPLOYMENT_DEV`, or `MODAL_TOKEN`. The Vercel build path has no business invoking `npx convex deploy` / `modal deploy` — that is the deploy script's job, run from a developer's machine.
 - Vercel only needs read-only client config: `NEXT_PUBLIC_CONVEX_URL`, `NEXT_PUBLIC_CONVEX_SITE_URL`, public app URLs.

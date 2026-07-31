@@ -128,9 +128,8 @@ Do NOT deploy manually via `npx convex deploy` with shell-expanded keys
 That is the exact anti-pattern that caused the 2026-04-19 cross-project-deploy
 incident — a shell export from another project silently redirected the deploy.
 
-Create the scripts per the canonical template:
-  ~/.claude/runbooks/deploy-safety-postmortem.md → "Reference: Canonical Deploy Script Template"
-(Enforceable rule + 10-gate contract: ~/.claude/rules/deploy-safety.md)
+Create the scripts per the enforceable rule + 10-gate contract:
+  ~/.claude/rules/deploy-safety.md
 
 The template enforces all 10 gates:
   1  project-scoped env var names          6  branch guard
@@ -185,7 +184,7 @@ The script prompts interactively. If invoked by Claude non-interactively, the pr
 - **Does not ask for confirmation.** `/deploy` is the confirmation.
 - **Does not offer `--force` / `--skip-tests` / "hotfix mode".** If a gate fails, fix the underlying issue.
 - **Does not deploy via manual CLI commands** if the script is missing. See "Hard Stops".
-- **Does not manage Vercel env vars.** Vercel deploys automatically on `git push` (Golden Rule #4). Env-var CRUD is separate — use `vercel env` CLI commands directly per `docs/ENV.md`.
+- **Does not manage Vercel env vars.** Vercel deploys automatically on `git push` (rule E4: branch = environment). Env-var CRUD is separate — use `vercel env` CLI commands directly per `docs/ENV.md`.
 - **Does not rename Convex Preview deployments** — feature branches share a single Convex dev instance in most projects. Two parallel dev deploys race each other; the last one wins. The user should know this. Not this skill's job to prevent.
 
 ---

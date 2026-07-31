@@ -27,9 +27,7 @@ lanalyzer's Convex prod instance because `~/.zshrc` globally exported
 script fell back to the shell var when its `.env` had no key. No target-
 match check existed. The wrong project's schema + functions got overwritten.
 
-10-gate contract + lint rule: **`~/.claude/rules/deploy-safety.md`**.
-Full post-mortem, canonical deploy-script template, retrofit checklist:
-**`~/.claude/runbooks/deploy-safety-postmortem.md`**. Read both first.
+10-gate contract + lint rule: **`~/.claude/rules/deploy-safety.md`**. Read it first.
 
 ## What the audit checks
 
@@ -142,7 +140,7 @@ directory present):
    - Production has `NEXT_PUBLIC_CONVEX_URL`, `NEXT_PUBLIC_CONVEX_SITE_URL`,
      and any `NEXT_PUBLIC_APP_URL` the code uses.
    - Vercel does **NOT** have `CONVEX_DEPLOY_KEY` or project-scoped deploy
-     keys set. If it does → **HIGH** (breaks Golden Rule #7).
+     keys set. If it does → **HIGH** (breaks `deploy-safety.md`: Vercel must not hold deploy keys).
 2. Preview env vars must NOT be pinned to a single branch. Output shows
    `(Branch: <name>)` after pinned vars — flag any pinned preview var as
    **MEDIUM** (other preview branches build without Convex URL).

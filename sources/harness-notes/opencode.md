@@ -30,5 +30,4 @@ below is the durable mapping.
 (theme/vim/fullscreen), auto-memory/dream, and Claude-marketplace-only plugins.
 MCP servers that are claude.ai-account-bound (Exa, Gmail, Calendar, Drive, …)
 have no portable standalone form. Configure MCP `context7` (remote URL + API-key
-header) and any OAuth remote MCP; skip the rest. Rationale + the full mapping:
-`docs/harness-research/opencode-translation-reference.md`.
+header) and any OAuth remote MCP; skip the rest.

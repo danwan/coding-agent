@@ -21,7 +21,7 @@ knowledge of tools and mechanisms at the time you run it.
 | `sources/skills/` | Own skills (source of truth) |
 | `sources/harness-notes/` | Per-harness translation notes — only what a non-Claude agent can't derive |
 | `sources/shell/`, `sources/wezterm/` | Personal dotfiles (optional toggle) |
-| `docs/` | Design specs, plans, and per-harness research (reference) |
+| `docs/` | Per-harness research (reference, not authoritative) |
 
 ## Use it
 

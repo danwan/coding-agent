@@ -1,5 +1,4 @@
 # Sensitive data
-claude-config/.secrets/
 *.secret
 *.key
 .env*
@@ -9,18 +8,15 @@ claude-config/.secrets/
 
 # Claude Code session data
 .claude/*
-!.claude/CLAUDE.md
-!.claude/skills/
 zz-plans/
 
-# Local agent memory/cache data
-
-# Build artifacts in skill eval scaffolds and autoresearch experiment outputs
+# Build artifacts
 **/node_modules/
 **/.next/
 **/.convex/
 **/.turbo/
-claude-config/skills/*/autoresearch-*/
+__pycache__/
+.ruff_cache/
 
 # Local agents store (managed by skills CLI, not versioned)
 .agents/

@@ -21,7 +21,7 @@ Never print secret values, literal auth headers, tokens, or keychain contents.
 
 Resolve each default tool against the canonical source in `PROVISION.md`, then
 run its version/help check: `git`, `gh`, `rg`, `fd`, `ast-grep`, `jq`, `tree`,
-`tmux`, `tailscale`, `micro`, `uv`, `fnm`, `bun`, `op`, `qmd`, `npx skills`,
+`tmux`, `micro`, `uv`, `fnm`, `bun`, `op`, `qmd`, `npx skills`,
 `agent-browser`, and `ggshield`.
 
 Additional checks:
@@ -84,8 +84,6 @@ When the active harness is Codex:
 Only when the personal toggle was selected:
 
 - Compare the live shell aliases/functions with `sources/shell/aliases.zsh`.
-- Verify SSH tmux auto-attach and Tailscale SSH without changing sudo-protected
-  state during a verification-only run.
 - Verify selected terminal/settings templates after placeholder substitution.
 
 ## 6. Final synthesis

@@ -7,7 +7,6 @@ description: Verify which stack components (Next.js, server endpoints, Convex, M
 
 > **Purpose:** Prevent reviewer/auditor agents from fabricating stack dependencies from global default assumptions. The default is not evidence — the project's actual files are. This is the canonical reference for all stack-scoping decisions.
 >
-> **Reference implementer:** `~/.claude/skills/performance-review/SKILL.md` already uses this pattern correctly — consult it for a working example.
 
 ## Core Rule
 
@@ -87,6 +86,4 @@ When skipping a section due to stack absence, surface it explicitly: "N/A — pr
 
 ## See Also
 
-- `~/.claude/CLAUDE.md` Golden Rule "Stack-verification before recommending" — the binding rule
-- The `security-review` skill → "Rate Limiting" — scoped version
-- `~/.claude/skills/performance-review/SKILL.md` — reference implementation
+- `~/.claude/rules/deploy-safety.md` — the stack-specific rules this detection gates

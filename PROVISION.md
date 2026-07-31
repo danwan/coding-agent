@@ -23,7 +23,6 @@ verify (all): the binary's `--version` (or `--help`) succeeds.
 | `jq` | jqlang.github.io/jq (`jq`) | — |
 | `tree` | `tree` in every package manager | — |
 | `tmux` | `tmux` in every package manager | — |
-| `tailscale` | tailscale.com | VPN client and secure network overlay. Enables secure SSH access via Tailscale SSH. |
 | `micro` | micro editor — github.com/zyedidia/micro | package/binary **`micro`** (brew/apt/snap/scoop/winget id `zyedidia.micro`). ⚠️ collides with **go-micro** (micro.dev, github.com/micro/micro) — a different CLI also named `micro`; install the editor, not the microservices toolkit |
 | `uv` | Astral — github.com/astral-sh/uv (`uv`) | astral.sh installer or brew/pipx/winget `uv` |
 | `fnm` | Fast Node Manager — github.com/Schniz/fnm | package/binary `fnm` (winget id `Schniz.fnm`) |
@@ -31,7 +30,6 @@ verify (all): the binary's `--version` (or `--help`) succeeds.
 | `op` | 1Password CLI — developer.1password.com/docs/cli | package is **`1password-cli`** (brew cask `1password-cli`; Linux via 1Password's own apt/rpm repo), binary is `op` — not in default distro repos |
 | `qmd` | npm **`@tobilu/qmd`** | install from npm ONLY — **never** a GitHub source of the same name |
 | `skills` | skills.sh — run via **`npx skills`** | no global binary needed |
-| `llm` | Simon Willison — llm.datasette.io, with `llm-openrouter` | install the Python CLI with the OpenRouter plugin via `uv`; why: second opinions from multiple providers through one OpenRouter account. Configure interactively with `llm keys set openrouter`, then pick a current model from `llm models -q openrouter` and alias it. ⚠️ unrelated packages also use the name `llm`. verify: `llm --version`, `llm models -q openrouter`, and one prompt through the configured alias succeed |
 | `agent-browser` | Vercel Labs — github.com/vercel-labs/agent-browser | browser automation CLI used for usability and repeatable headless UI tests. Install the browser runtime after the CLI. This is separate from Codex's in-app Browser and Chrome plugins. verify: `agent-browser doctor --offline --quick` passes and opening `https://example.com` returns the title |
 | `ggshield` | GitGuardian CLI — github.com/GitGuardian/ggshield | brew/pipx `ggshield`. Post-install (per user, interactive): `ggshield auth login` (token → OS keyring), then verify `ggshield quota` is greater than zero before installing hooks. Install the global `pre-push` target and the detected agent target (`claude-code` for Claude Code, `codex` for Codex) only while scanning quota is available; otherwise the pre-push hook blocks normal pushes and the agent hook can only fail open noisily. Husky repos need their own `.husky/pre-push` with `ggshield secret scan pre-push "$@"` (local hooksPath shadows global). Do not dismiss a failed `ggshield api-status` as sandbox noise without verifying keyring auth. Why: blocks secret leaks in pushes and agent traffic. verify: `ggshield api-status` is healthy, `ggshield quota` is positive, and a benign scan succeeds |
 
@@ -210,11 +208,9 @@ content was either folded into the rules or retired with its feature.
 
 ## System & Shell Environment  [default]
 - **Shell Aliases & Functions:** The canonical alias/function block for `~/.zshrc` is `sources/shell/aliases.zsh` (agent aliases `c`/`cc`/`co`/`oc`, git helpers, 1Password keychain token + `claude()` Greptile-key wrapper). NOTE: `op` is the 1Password CLI, never an alias.
-- **SSH Tmux Auto-Load:** Shell configured to automatically launch or attach to a default tmux session when connected via SSH.
-- **Tailscale SSH:** Tailscale installed and initialized with SSH enablement flag (`sudo tailscale up --ssh`) to allow secure passwordless access.
 
 ## Personal  [optional toggle]
-- shell/aliases.zsh, shell/tmux.conf, wezterm/wezterm.lua → dotfiles
+- shell/aliases.zsh, wezterm/wezterm.lua → dotfiles
 - settings.json (permissions, env, statusLine) + statusline.sh → Claude settings (permissions are personal; not applied unless chosen)
 
 ## Secrets
@@ -241,7 +237,6 @@ wrapper fills from `op read` — never a literal. Vault is `APIKeys`; there is n
   filled by the `codex()` wrapper. Do not flip either config before the
   1Password item exists — both harnesses fail *quietly* without the key.
 - GREPTILE_API_KEY — op://APIKeys/greptile/credential (resolved per-start by the `claude()` wrapper)
-- OPENROUTER_KEY — optional environment alternative; prefer `llm keys set openrouter` so the value stays in the CLI key store
 - OP_SERVICE_ACCOUNT_TOKEN — macOS Keychain item `op-service-account` (basis for all `op run`/`op read`). It is **read-only** on the `APIKeys` vault: creating or updating an item fails with `(101) You do not have permission`. New secrets have to be added interactively by the user; an agent can read them but never write them.
 
 Audit: no config file under any harness should contain a literal key.
