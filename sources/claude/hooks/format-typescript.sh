@@ -10,8 +10,18 @@ else
   FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 fi
 
-# Exit silently if no file path
-[[ -z "$FILE_PATH" ]] && exit 0
+# No file path at all. Two very different cases:
+#  - nothing on stdin and no argv  -> the hook fired on an event that carries no
+#    file (e.g. wired to Stop instead of PostToolUse), or a harness whose payload
+#    uses different field names. Say so: a formatter that silently does nothing
+#    is indistinguishable from one that ran and found nothing to change.
+#  - genuinely empty input          -> nothing to do.
+if [[ -z "$FILE_PATH" ]]; then
+  if [[ -n "${INPUT:-}" ]]; then
+    printf '%s\n' "format-typescript.sh: kein .tool_input.file_path im Hook-Payload — falsches Event oder fremdes Schema; es wurde nichts formatiert" >&2
+  fi
+  exit 0
+fi
 
 # Only process TypeScript files
 [[ "$FILE_PATH" != *.ts && "$FILE_PATH" != *.tsx ]] && exit 0
