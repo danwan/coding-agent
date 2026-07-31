@@ -160,9 +160,6 @@ Context7 fetches live, and several such skills tell the agent to "fetch the
 latest documentation" in their own body. Install a remote skill only when it
 carries a *procedure* (an ordered, failure-avoiding recipe) or setup knowledge
 that is not in any public doc. Currently:
-- convex-best-practices · convex-functions · convex-security-audit ·
-  convex-security-check — waynesutton/convexskills; why: the Zen-of-Convex
-  design stance and the security checklists, not the API reference
 - vercel-cli-with-tokens — vercel-labs/agent-skills; why: token auth without
   leaking values into shell history, team scoping, env-var handling
 - vercel-optimize — vercel-labs/agent-skills; why: metrics-first gating plus
@@ -177,6 +174,16 @@ that is not in any public doc. Currently:
   reference comes from the `orca` binary; keep `off` unless Orca is in use
 These named global skills are deliberate cross-project exceptions. Everything
 else under Module: webservice remains project-local.
+
+**Convex skills are NOT among them.** waynesutton/convexskills is installed
+per-project (see Module: webservice below), never with `-g`. This section
+previously claimed four of them — convex-best-practices, convex-functions,
+convex-security-audit, convex-security-check — as globally installed; audited
+2026-07-31, none was present in `~/.agents/skills/`, in any harness, or in
+`.skill-lock.json`. The entry documented an intent that had never been carried
+out and that contradicted the project-local rule anyway. Do not re-add it: a
+list that asserts installed state without it being true reads as verified
+coverage when there is none.
 
 ## Module: webservice  [ask]  — mostly project-local
 - optional global plugins: typescript-lsp

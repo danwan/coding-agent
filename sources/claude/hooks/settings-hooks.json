@@ -12,59 +12,6 @@
           }
         ]
       }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/session-start.sh"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit|NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/format-python.sh",
-            "if": "Write(*.py)",
-            "timeout": 10
-          },
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/format-python.sh",
-            "if": "Edit(*.py)",
-            "timeout": 10
-          },
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/format-typescript.sh",
-            "if": "Write(*.ts)",
-            "timeout": 10
-          },
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/format-typescript.sh",
-            "if": "Edit(*.ts)",
-            "timeout": 10
-          },
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/format-typescript.sh",
-            "if": "Write(*.tsx)",
-            "timeout": 10
-          },
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/format-typescript.sh",
-            "if": "Edit(*.tsx)",
-            "timeout": 10
-          }
-        ]
-      }
     ]
   }
 }
