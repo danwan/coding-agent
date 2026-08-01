@@ -229,7 +229,11 @@ copy under `~/.grok/rules/` would load every rule twice per session; `sync.sh`
 reports it as inherited and warns if that directory is not empty. The trade-off
 is that Grok does not get the four subagents — see `sources/harness-notes/grok.md`.
 
-Supported harnesses are Claude Code, Codex, Grok, OpenCode and Antigravity.
+Supported harnesses are Claude Code, Codex, Grok, OpenCode and Antigravity, and
+they are **not equal**: Claude Code is the main workhorse and carries the full
+set; the other four verify work independently and take over when Claude runs out
+of tokens. They need the same rules — so they judge by the same standards — plus
+the skills they can actually run. Feature parity is explicitly not the goal.
 Cursor and Factory Droid were removed from scope 2026-08-01 (both were trials);
 Windsurf never was. See `sources/harness-notes/README.md` for the reasoning.
 

@@ -20,6 +20,23 @@ disagree, the current docs win.
 Five harnesses are in scope: **Claude Code, Codex, Grok, OpenCode, Antigravity.**
 Anything else is out of scope — see below.
 
+## They do not have equal roles
+
+**Claude Code is the main workhorse and gets the full set** — every rule, every
+subagent, every skill, the plugins, the MCP servers. When something has to be
+complete somewhere, it is complete there.
+
+**Codex, Grok, OpenCode and Antigravity are secondary**: used to verify work
+independently, and as the fallback when Claude runs out of tokens. They need the
+authored *rules* (so they judge by the same standards) and the *skills* they can
+actually run. They do not need feature parity, and chasing it has a real cost —
+it is what produced the duplicate rule copies and the double-loading this repo
+had to clean up.
+
+So a gap in a secondary harness is only a defect if it changes how that harness
+*judges* work. Grok not having the four subagents is fine. Grok loading the
+rules twice, or loading a stale copy, is not.
+
 | If you are… | Read | Config lives (verify against your own docs) |
 | --- | --- | --- |
 | Claude Code | nothing extra — `sources/claude/` is native | `~/.claude/` |
