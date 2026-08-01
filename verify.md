@@ -76,7 +76,9 @@ When the active harness is Codex:
 
 - Confirm CLI and desktop app use the same `~/.codex/config.toml`; do not create
   a second app-only MCP config.
-- Run `codex --strict-config` validation and `codex doctor --summary`.
+- Run `codex doctor --summary`; `0 fail` is the bar. Warnings about rollout files
+  or the state DB are Codex-internal session bookkeeping, not a config finding.
+  (`codex --strict-config` needs a TTY and cannot be checked from a script.)
 - Parse every `~/.codex/agents/*.toml` and require `name`, `description`, and
   `developer_instructions`.
 - Confirm Browser works in the desktop app, Chrome works through the Chrome

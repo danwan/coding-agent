@@ -179,10 +179,11 @@ Context7 fetches live, and several such skills tell the agent to "fetch the
 latest documentation" in their own body. Install a remote skill only when it
 carries a *procedure* (an ordered, failure-avoiding recipe) or setup knowledge
 that is not in any public doc. Currently:
-- agent-browser — vercel-labs/agent-skills; why: drives the `agent-browser` CLI
-  (see CLI tools above) — procedure, not vendor docs
-- skill-development — why: structure/progressive-disclosure guidance when
-  authoring skills for this repo
+- agent-browser — **vercel-labs/agent-browser** (its own repo, not
+  `agent-skills` — that was recorded wrongly until 2026-08-01); why: drives the
+  `agent-browser` CLI (see CLI tools above) — procedure, not vendor docs
+- skill-development — anthropics/claude-code; why: structure/progressive-disclosure
+  guidance when authoring skills for this repo
 - vercel-cli-with-tokens — vercel-labs/agent-skills; why: token auth without
   leaking values into shell history, team scoping, env-var handling
 - vercel-optimize — vercel-labs/agent-skills; why: metrics-first gating plus
