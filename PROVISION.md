@@ -205,6 +205,38 @@ out and that contradicted the project-local rule anyway. Do not re-add it: a
 list that asserts installed state without it being true reads as verified
 coverage when there is none.
 
+## The account level — NOT provisioned by this repo
+Anthropic keeps a second configuration layer bound to the signed-in account,
+stored server-side. This repo cannot create it, cannot verify it, and cannot
+restore it: a fresh machine provisioned from `SETUP-PROMPT.md` gets none of it,
+and wiping the machine loses none of it. It is recorded here only so the next
+audit does not go looking for these things on disk — they are not there.
+
+What lives there (as of 2026-08-01): the Skills under claude.ai → Customize →
+Skills (`notion-workspace`, `humanizer`, `canvas-design`, `mcp-builder`,
+`morning`, `skill-creator`, `theme-factory`); the plugins `Operations` and
+`Human Resources`; and every Connector of type **Web** (Context7, Exa, GitHub,
+Gmail, Google Calendar, Google Drive, googledevapi, n8n, Notion, Sentry).
+
+Two consequences worth knowing:
+- **Web Connectors DO reach Claude Code.** They appear in `claude mcp list` as
+  `claude.ai <name>`. So the account level is not fully separate — it leaks into
+  the local tooling in exactly one direction, and that is why this repo's MCP
+  section stays silent about them: they are configured in the account, not here.
+- **The Claude desktop app is three surfaces, not one.** Its Chat and Cowork
+  tabs read the account level plus locally installed *Extensions*
+  (`~/Library/Application Support/Claude/Claude Extensions/`) and
+  `claude_desktop_config.json`. Its Code tab reads the same Claude Code
+  configuration as the CLI. None of the desktop Extensions or that config file
+  affect Claude Code — verified 2026-08-01: `claude_desktop_config.json` holds
+  only a GitKraken server, and the other three servers the app lists come from
+  Extensions. Do not "fix" a difference between the two; it is by design.
+
+Open question, unanswered by the official docs: whether plugins installed at the
+account level become visible to Claude Code. Six plugins currently appear in both
+lists, and the file evidence cannot say whether that is one source read twice or
+two installs that happen to match. Do not assume either.
+
 ## Module: webservice  [ask]  — mostly project-local
 - optional global plugins: typescript-lsp
 - stack SKILLS are PROJECT-LOCAL — inside each project: `npx skills add <source>` WITHOUT -g, commit .agents/ + skills-lock.json:

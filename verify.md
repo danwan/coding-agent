@@ -39,6 +39,12 @@ Additional checks:
 - Global instructions exist in the path used by this harness.
 - Every canonical rule in `sources/claude/rules/` is represented in the active
   always-loaded instructions and the full adapted references are available.
+- **No harness carries a rule that is NOT canonical.** Count the files: each
+  rules directory holds exactly the four canonical rules (plus a harness's own
+  files, e.g. Antigravity's `default.rules`). An extra `*.md` is a leftover from
+  an older revision and a FAIL — three such files survived in Antigravity until
+  2026-08-01 and were still being loaded into every session, pointing at rules
+  and runbooks that no longer exist. `sync.sh` places files; it never deletes.
 - All four custom agents load in the harness's native format (except Grok — see
   section 4b).
 - The ADR and feature-spec templates are present in `~/.agents/templates/`.
