@@ -4,7 +4,7 @@
 (instructions, rules, subagents) — written in Claude Code's format.
 `sources/skills/` is the source of truth for own skills.
 
-A non-Claude harness (Codex, OpenCode, Antigravity, Cursor, …) does **not** get
+A non-Claude harness (Codex, OpenCode, Antigravity, Grok) does **not** get
 its own pre-translated copy in this repo — that only drifts. Instead, the setup
 prompt (`SETUP-PROMPT.md`) has the target agent **translate the canonical files
 into its own format at provision time**, after checking its own current docs for
@@ -17,14 +17,16 @@ features that have no equivalent (skip them). They are deliberately
 (those change and would mislead). When a note and the harness's current docs
 disagree, the current docs win.
 
+Five harnesses are in scope: **Claude Code, Codex, Grok, OpenCode, Antigravity.**
+Anything else is out of scope — see below.
+
 | If you are… | Read | Config lives (verify against your own docs) |
 | --- | --- | --- |
 | Claude Code | nothing extra — `sources/claude/` is native | `~/.claude/` |
 | Codex | [`codex.md`](codex.md) | `~/.codex/` |
+| Grok | [`grok.md`](grok.md) | `~/.grok/` — but it reads `~/.claude/` directly |
 | OpenCode | [`opencode.md`](opencode.md) | `~/.config/opencode/` |
 | Antigravity / Gemini | [`antigravity.md`](antigravity.md) | `~/.gemini/` |
-| Cursor | [`cursor.md`](cursor.md) | `~/.cursor/` |
-| Factory Droid | [`droid.md`](droid.md) | `~/.factory/` |
 
 ## Placement is mechanized — `../../sync.sh`
 
@@ -46,19 +48,26 @@ places, and it is better to name them than to pretend otherwise.
 | Constraint | Consequence |
 | --- | --- |
 | Codex has no rules directory | The rules are concatenated into `AGENTS.md`, bounded by `project_doc_max_bytes`. |
-| Cursor documents no global instruction file | `~/.cursor/rules/*.mdc` is an undocumented path. Rules there need `.mdc` **with** frontmatter — a plain `.md` is silently ignored. |
 | Gemini's `GEMINI.md` is shared with plugin-managed blocks | Merge into a marked block; overwriting destroys the Context7 instructions. |
+| Grok reads Claude's config directly | Nothing is placed for it; a copy would double-load every rule. In exchange it does not get the subagents. See [`grok.md`](grok.md). |
 | OpenCode has no shell-hook system | Its plugins are JS/TS event handlers. (Moot for now — no hooks are authored anymore.) |
 
 ## Deliberately out of scope
+
+Only the five harnesses above are provisioned, synced and verified. Everything
+else was a trial and none of it is in production use. If one comes back it needs
+its own note and its own entry in `sync.sh` — not a carve-out in the shared path.
+
+**Cursor** and **Factory Droid** were removed 2026-08-01. Both were tests. Cursor
+additionally documents no global instruction file at all, so its rules had to go
+to an undocumented `~/.cursor/rules/*.mdc` path with mandatory frontmatter, where
+a plain `.md` is silently ignored. Note that Grok scans `~/.cursor/` by default —
+that compat source is switched off here so Cursor leftovers cannot leak back in.
 
 **Windsurf.** Its only global surface is one file capped at 6 000 characters with
 no rules directory, its hooks are exit-code-only with unrelated event names, and
 it documents no user-defined subagents — so it could never carry this content and
 every attempt would have to be a second, separately-maintained short version.
-It is not provisioned, not synced, and not verified here. That is a scope
-decision, not an oversight: if it comes back, it needs its own note and its own
-abbreviated ruleset, not a carve-out in the shared path.
 
 Deeper, version-specific research (kept for reference, **not** authoritative) is
 under [`docs/harness-research/`](../../docs/harness-research/).

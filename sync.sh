@@ -27,14 +27,25 @@ head2() { printf '\n\033[1m%s\033[0m\n' "$*"; }
 place() {
   local s="$1" d="$2"
   [[ -f "$s" ]] || { say "  !! Quelle fehlt: ${s#$REPO/}"; return 1; }
+  # A symlink into this repo must be replaced by a real copy — and it has to be
+  # caught BEFORE the cmp below, because a link to the source compares equal to
+  # itself and would be reported as "identisch" forever. That is exactly how
+  # ~/.config/opencode kept a live link into the repo unnoticed until 2026-08-01.
+  if [[ -L "$d" ]]; then
+    changed=$((changed+1))
+    if (( APPLY )); then
+      rm -f "$d" && cp "$s" "$d" && say "  ~> ${d/#$HOME/\~} (Symlink durch Kopie ersetzt)"
+    else
+      say "  would replace symlink ${d/#$HOME/\~} -> $(readlink "$d")"
+    fi
+    return 0
+  fi
   if [[ -f "$d" ]] && cmp -s "$s" "$d"; then
     same=$((same+1)); return 0
   fi
   changed=$((changed+1))
   if (( APPLY )); then
     mkdir -p "$(dirname "$d")"
-    # Never clobber a symlink silently — replace it with a real file.
-    [[ -L "$d" ]] && rm -f "$d"
     cp "$s" "$d" && say "  ~> ${d/#$HOME/\~}"
   else
     say "  would write ${d/#$HOME/\~}"
@@ -94,6 +105,17 @@ PY
 place_dir() {
   local sd="$1" dd="$2" glob="${3:-*.md}"
   [[ -d "$sd" ]] || return 0
+  # A linked destination DIRECTORY is worse than a linked file: every write below
+  # would land back inside this repo. Break the link before placing anything.
+  if [[ -L "$dd" ]]; then
+    changed=$((changed+1))
+    if (( APPLY )); then
+      rm -f "$dd" && mkdir -p "$dd" && say "  ~> ${dd/#$HOME/\~}/ (Symlink-Verzeichnis durch echtes ersetzt)"
+    else
+      say "  would replace symlinked dir ${dd/#$HOME/\~} -> $(readlink "$dd")"
+      return 0
+    fi
+  fi
   local f
   for f in "$sd"/$glob; do
     [[ -e "$f" ]] || continue
@@ -123,6 +145,9 @@ if need "$HOME/.agents"; then
       place "$f" "$HOME/.agents/skills/$name/${f#$s}"
     done
   done
+  # Document templates (ADR, feature spec). Harness-neutral, so they live in the
+  # hub under one path every agent can reference; search-discipline.md points here.
+  place_dir "$SRC/templates" "$HOME/.agents/templates"
 fi
 
 # ── Codex — same content, its own filenames ─────────────────────────────────
@@ -166,28 +191,19 @@ if need "$HOME/.gemini"; then
   place_dir "$SRC/rules" "$HOME/.gemini/antigravity-cli/plugins/house-rules/rules"
 fi
 
-# ── Cursor CLI ──────────────────────────────────────────────────────────────
-# Cursor has no documented GLOBAL instruction file; ~/.cursor/rules/ is an
-# undocumented path that this machine already uses (context7.mdc, convex_rules.mdc).
-# Rules there must be .mdc WITH frontmatter — plain .md is silently ignored.
-head2 "Cursor  ~/.cursor"
-if need "$HOME/.cursor"; then
-  for r in "$SRC/CLAUDE.md" "$SRC"/rules/*.md; do
-    base="$(basename "$r" .md)"
-    [[ "$base" == "CLAUDE" ]] && base="global-operating-rules"
-    dst="$HOME/.cursor/rules/$base.mdc"
-    place_str "$(printf -- '---\ndescription: %s\nalwaysApply: true\n---\n' "$base"; cat "$r")" "$dst"
-  done
-  say "  note: globaler Instruktionspfad ist bei Cursor undokumentiert — nach einem"
-  say "        Cursor-Update prüfen, ob ~/.cursor/rules noch gelesen wird"
-fi
-
-# ── Factory Droid ───────────────────────────────────────────────────────────
-# Droid searches ~/.factory/ AND ~/.agents/ for AGENTS.md, and also accepts
-# CLAUDE.md. The hub copy above already reaches it; place the explicit one too.
-head2 "Factory Droid  ~/.factory"
-if need "$HOME/.factory"; then
-  place "$SRC/CLAUDE.md" "$HOME/.factory/AGENTS.md"
+# ── Grok ────────────────────────────────────────────────────────────────────
+# Nothing is placed here ON PURPOSE. Grok's [compat.claude] reads ~/.claude/
+# directly — CLAUDE.md, rules/, skills/ and the settings permissions — so a copy
+# under ~/.grok/rules/ would load every rule TWICE. Verify with `grok inspect`:
+# the authored rules must appear tagged [claude], and ~/.grok/rules/ stay empty.
+head2 "Grok  ~/.grok"
+if need "$HOME/.grok"; then
+  if [[ -n "$(ls -A "$HOME/.grok/rules" 2>/dev/null)" ]]; then
+    say "  !! ~/.grok/rules/ ist nicht leer — Regeln laden doppelt (siehe grok.md)"
+  else
+    say "  erbt ~/.claude via [compat.claude] — nichts zu platzieren"
+    same=$((same+1))
+  fi
 fi
 
 head2 "Ergebnis"

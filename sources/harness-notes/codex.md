@@ -14,21 +14,29 @@ mapping, not a schema you should copy verbatim.
 - **Rules:** the files in `sources/claude/rules/` are always-loaded guidance.
   Codex does not import arbitrary Markdown files from `AGENTS.md`. Fold a
   compact but complete statement of every binding rule into `AGENTS.md`, then
-  place the full adapted references under `~/.codex/guidance/` and link them.
+  place the full references under `~/.codex/rules/`, matching `sync.sh`.
   Copy **all** rules — do not silently drop any.
 - **Subagents:** `sources/claude/agents/*.md` → your TOML agent definitions.
   Store standalone files under `~/.codex/agents/`. Preserve intent, but adapt
   Claude-only tools, paths, lifecycle names, and unsupported constraints.
 - **Skills:** placed in the shared `~/.agents/skills/` hub; link into your skills dir.
   Skip optional skills marked Claude-only in `PROVISION.md`, and do not install
-  stored-but-disabled skills.
+  stored-but-disabled skills. Because Codex also discovers the shared hub,
+  remove obsolete `~/.codex/skills/` links and add `[[skills.config]]` entries
+  with `enabled = false` for every shared-hub skill that must stay available to
+  another harness but disabled in Codex.
 - **Browser tooling:** keep the three surfaces distinct: desktop Browser
   (app-only), Chrome plugin (existing user Chrome), and the standalone
   `agent-browser` CLI (headless usability automation). The Vercel Codex plugin
   supplies the relevant skills; no duplicate global skill is needed. Disable
   unused bundled Vercel skills with `[[skills.config]]` while keeping the
   connector enabled; this setup keeps only `agent-browser` and
-  `agent-browser-verify` globally active.
+  `agent-browser-verify` globally active. Plugin updates can change the cached
+  skill paths, so re-check the overrides after a Vercel plugin update.
+- **Hooks:** keep only the external Orca integration hooks from
+  `~/.orca/agent-hooks/`. Do not restore the retired backend-deploy or
+  pre-publish secret-scan hooks; their surviving policy belongs in rules and
+  normal git tooling.
 
 ## Frontmatter → TOML mapping (map to your current keys, don't pin values)
 | Claude frontmatter | Codex equivalent |

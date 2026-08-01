@@ -47,9 +47,8 @@ codex() {
   local key
   key="$(op read op://APIKeys/context7/credential 2>/dev/null)"
   if [[ -z "$key" ]]; then
-    print -u2 "codex: context7 key nicht aus 1Password lesbar -> Context7 MCP wird ohne Auth starten"
-    command codex "$@"
-    return
+    print -u2 "codex: context7 key nicht aus 1Password lesbar -> Start abgebrochen"
+    return 1
   fi
   CONTEXT7_API_KEY="$key" command codex "$@"
 }
@@ -66,9 +65,10 @@ opencode() {
   local key
   key="$(op read op://APIKeys/context7/credential 2>/dev/null)"
   if [[ -z "$key" ]]; then
-    print -u2 "opencode: context7 key nicht aus 1Password lesbar -> Context7 MCP wird ohne Auth starten"
-    command opencode "$@"
-    return
+    # opencode substitutes a MISSING variable with the empty string instead of
+    # erroring, so an unauthenticated Context7 would look like a working one.
+    print -u2 "opencode: context7 key nicht aus 1Password lesbar -> Start abgebrochen"
+    return 1
   fi
   CONTEXT7_API_KEY="$key" command opencode "$@"
 }
@@ -80,16 +80,20 @@ alias oc='opencode'
 # token lives only in the Keychain.
 export OP_SERVICE_ACCOUNT_TOKEN="$(security find-generic-password -s op-service-account -a 1password -w 2>/dev/null)"
 
-# Greptile MCP API key -> op://APIKeys/greptile/credential
-# Only Claude Code needs it. `op read` costs ~1.8s (network), so it is
-# resolved at Claude start instead of globally in every shell.
+# Context7 + Greptile MCP API keys from 1Password. Resolve them at Claude
+# startup instead of persisting either value in ~/.claude.json.
 claude() {
-  local key
-  key="$(op read op://APIKeys/greptile/credential 2>/dev/null)"
-  if [[ -z "$key" ]]; then
+  local context7_key greptile_key
+  context7_key="$(op read op://APIKeys/context7/credential 2>/dev/null)"
+  if [[ -z "$context7_key" ]]; then
+    print -u2 "claude: context7 key nicht aus 1Password lesbar -> Start abgebrochen"
+    return 1
+  fi
+  greptile_key="$(op read op://APIKeys/greptile/credential 2>/dev/null)"
+  if [[ -z "$greptile_key" ]]; then
     print -u2 "claude: greptile key nicht aus 1Password lesbar -> starte ohne Greptile"
-    command claude "$@"
+    CONTEXT7_API_KEY="$context7_key" command claude "$@"
     return
   fi
-  GREPTILE_API_KEY="$key" command claude "$@"
+  CONTEXT7_API_KEY="$context7_key" GREPTILE_API_KEY="$greptile_key" command claude "$@"
 }
