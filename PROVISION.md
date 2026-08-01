@@ -148,11 +148,12 @@ Monitor, `/usage`) or a capability of the model.
 - Notion in Codex therefore runs over the **raw MCP leg**, not a connector — it
   is the only access path there, and removing it would cut Notion off entirely.
 - Claude-marketplace plugins in Codex [default on this setup]: `coderabbit`,
-  `commit-commands`, `skill-creator`, `typescript-lsp`, `pyright-lsp` are
-  installed and enabled; `linear` is installed but disabled. Codex registers the
-  `claude-plugins-official` marketplace and runs these natively — the same
-  selection rule applies as for Claude Code. verify: `codex plugin list` shows
-  them as installed/enabled.
+  `commit-commands`, `skill-creator`, `typescript-lsp`, `pyright-lsp` — installed
+  and enabled. Codex registers the `claude-plugins-official` marketplace and runs
+  these natively, so the same selection rule applies as for Claude Code. That is
+  the complete list; anything else found installed is a prune candidate. (`linear`
+  was installed-but-disabled and removed 2026-08-01 — Linear is not in use.)
+  verify: `codex plugin list` shows exactly these five as installed/enabled.
 
 ## Skills — own (stored in this repo; the prompt PLACES them)  [default]
 branch-cleanup · git-sync · stack-detection
