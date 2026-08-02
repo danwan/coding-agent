@@ -80,23 +80,14 @@ alias oc='opencode'
 # token lives only in the Keychain.
 export OP_SERVICE_ACCOUNT_TOKEN="$(security find-generic-password -s op-service-account -a 1password -w 2>/dev/null)"
 
-# Context7 + Greptile MCP API keys from 1Password. Resolve them at Claude
-# startup instead of persisting either value in ~/.claude.json.
+# Context7 MCP API key from 1Password. Resolved at Claude startup instead of
+# persisted in ~/.claude.json.
 claude() {
-  local context7_key greptile_key
+  local context7_key
   context7_key="$(op read op://APIKeys/context7/credential 2>/dev/null)"
   if [[ -z "$context7_key" ]]; then
     print -u2 "claude: context7 key nicht aus 1Password lesbar -> Start abgebrochen"
     return 1
   fi
-  greptile_key="$(op read op://APIKeys/greptile/credential 2>/dev/null)"
-  if [[ -z "$greptile_key" ]]; then
-    print -u2 "claude: greptile key nicht aus 1Password lesbar -> starte ohne Greptile"
-    # Unset rather than just omit: if the caller exported GREPTILE_API_KEY, the
-    # child would inherit it and we would silently start *with* Greptile after
-    # announcing the opposite.
-    CONTEXT7_API_KEY="$context7_key" GREPTILE_API_KEY= command claude "$@"
-    return
-  fi
-  CONTEXT7_API_KEY="$context7_key" GREPTILE_API_KEY="$greptile_key" command claude "$@"
+  CONTEXT7_API_KEY="$context7_key" command claude "$@"
 }

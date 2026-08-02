@@ -52,17 +52,47 @@ Additional checks:
   2026-07-31). The external Orca integration hooks under `~/.orca/agent-hooks/`
   are expected and are not a finding — Orca owns them. Any hook wired in settings
   whose script does not exist on disk is a FAIL.
-- The three default own skills are present exactly once:
-  `branch-cleanup`, `git-sync`, `stack-detection`.
+- `~/.agents/skills/` holds **exactly thirteen** entries and no others — seven
+  authored (`branch-cleanup`, `config-edit`, `convexcheck`, `deploy`, `git-sync`,
+  `notion-safe-writes`, `pin-auth`) and six remote (`agent-browser`,
+  `computer-use`, `orca-cli`, `orchestration`, `skill-development`,
+  `vercel-optimize`). An extra entry means something was installed globally that
+  belongs project-local; a missing one means a placement or `npx skills` install
+  did not run:
+  ```sh
+  ls -1 ~/.agents/skills | wc -l   # 13
+  ```
+- **Every harness links all thirteen.** A harness with fewer is drift — disable a
+  skill through that harness's own overrides, never by omitting the link. Codex
+  legitimately carries one extra, `chrome-ui-explorer` (real directory, Codex-only,
+  drives its in-app Chrome plugin — see PROVISION.md):
+  ```sh
+  for d in ~/.claude/skills ~/.codex/skills ~/.gemini/antigravity-cli/skills; do
+    printf '%s: %s\n' "$d" "$(ls -1 "$d" | wc -l)"
+  done   # 13 / 14 / 13
+  ```
+- The two rules that were skills until 2026-08 are present as rules, not skills:
+  `~/.claude/rules/stack-detection.md` and `~/.claude/rules/review-routing.md`
+  exist, and `~/.agents/skills/stack-detection` / `review-routing` do **not**.
 - `./sync-agents.py` (no argument) reports `zu schreiben: 0`, and every
   generated `~/.codex/agents/*.toml` parses as TOML with a non-empty
   `developer_instructions`.
 - `./sync.sh` (no argument) reports `zu schreiben: 0` — every installed harness
   already carries the current authored content. A non-zero count means drift,
   not a failure of this check.
-- No skill directory contains a dangling symlink:
-  `find ~/.claude/skills ~/.agents/skills ~/.codex/skills ~/.grok/skills ~/.gemini/antigravity-cli/skills -maxdepth 1 -type l ! -exec test -e {} \; -print`
-  prints nothing.
+- No skill directory contains a dangling symlink. Guard each path — on a machine
+  where a harness is not installed, `find` errors out and exits non-zero, which
+  reads as a failure of this check rather than an absent harness:
+  ```sh
+  for d in ~/.claude/skills ~/.agents/skills ~/.codex/skills ~/.grok/skills \
+           ~/.gemini/antigravity-cli/skills; do
+    [ -d "$d" ] && find "$d" -maxdepth 1 -type l ! -exec test -e {} \; -print
+  done
+  ```
+  prints nothing. A hit means the skill hub lost the target — usually because a
+  remote skill was retired while a per-harness link survived. Fix by re-running
+  `./sync.sh --apply` (for authored skills) or `npx skills update -g -y` (for
+  remote ones), then delete whatever still dangles.
 - `npx skills update -g -y` reports all tracked remote skills current, and its
   lock contains no retired repository source.
 
@@ -107,8 +137,18 @@ When the active harness is Grok:
   copy under `~/.grok/rules/` — that directory must be empty.
 - `~/.grok/config.toml` disables the Cursor compat cells (Cursor is out of scope,
   and its leftovers would otherwise still be loaded).
+- **`[compat.claude] mcps = false` is present, and `grok mcp list` is empty.**
+  Grok is meant to run with zero MCP servers; the cell is what stops it inheriting
+  the claude.ai account connectors from `~/.claude.json`. This has silently
+  disappeared once in an unrelated cleanup, so check the value, not just the
+  section:
+  ```sh
+  python3 -c "import tomllib,pathlib;d=tomllib.load(open(pathlib.Path.home()/'.grok'/'config.toml','rb'));print(d['compat']['claude']['mcps'])"   # False
+  ```
 - The skills intentionally switched off in Claude's `skillOverrides` are also
-  disabled in Grok's skills config; Grok does not inherit that state.
+  disabled in Grok's skills config; Grok does not inherit that state. The two
+  lists must match entry for entry — a stale name in Grok's `[skills] disabled`
+  outlives the skill it referred to.
 - Known and accepted gap: the four authored subagents are NOT available in Grok.
   Their absence is not a FAIL. A partial copy under `~/.grok/agents/` would be.
 

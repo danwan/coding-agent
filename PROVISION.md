@@ -43,7 +43,6 @@ both legs' tool schemas are charged to every session.
 - google-developer-knowledge  [optional] — https://developerknowledge.googleapis.com/mcp — why: Google-platform docs — verify: server lists tools
 - playwright  [optional, OpenCode only] — npx @playwright/mcp@latest — why: headless browser for the one harness with no browser plugin; Claude and Codex use their own browser surfaces plus the `agent-browser` CLI — verify: agent can screenshot a page
 - GitKraken  [optional, Codex] — why: git/PR operations beyond the `gh` CLI — verify: one read-only repo lookup succeeds
-- greptile  [optional, Codex] — why: the same server-side repo index the Claude plugin provides, for the harness that has no such plugin; needs GREPTILE_API_KEY — verify: server lists tools
 - computer-use  [optional, Codex] — why: desktop control, tied to the Orca toolchain — verify: server lists tools
 
 **App-owned, not provisioned by this repo** — do not add, remove, or "fix" these;
@@ -56,9 +55,14 @@ the app writes them and will rewrite them again:
   than in a file this repo can own. Their permissions do appear in the personal
   `settings.json` template.
 
-Grok configures MCP in `~/.grok/config.toml`, but also inherits Claude's servers
-from `~/.claude.json` through its compat scanning — so a raw leg added for Claude
-shows up there too. See `sources/harness-notes/grok.md`.
+**Grok runs with no MCP servers at all** — intended, set 2026-08-02. It declares
+none of its own, and `[compat.claude] mcps = false` in `~/.grok/config.toml` stops
+the merge from `~/.claude.json`. Without that cell Grok would also inherit the
+claude.ai account connectors and reach Gmail, Drive, Notion and Sentry with no
+separate approval — and the account level is out of scope for this repo, so it
+cannot gate what it does not own. Context7 is gone in Grok as a consequence; that
+is accepted. See `sources/harness-notes/grok.md` for the trade-off and how to
+reverse it.
 
 ## Plugins (Claude Code)
 marketplaces: anthropics/claude-plugins-official (the only one — do not register
@@ -78,10 +82,6 @@ justification here.
 - skill-creator  [default] — why: authoring plus evals/benchmarks for skills — verify: /plugin lists it
 - coderabbit  [default] — why: external review engine, own CLI quota and
   subscription; the default reviewer — verify: `coderabbit --version` and /plugin lists it
-- greptile  [optional, installed but disabled] — why: server-side repo index (a
-  capability no local model has); needs GREPTILE_API_KEY
-  (op://APIKeys/greptile/credential, resolved by the `claude()` shell wrapper —
-  see `sources/shell/aliases.zsh`) — verify: /plugin lists it
 - typescript-lsp / pyright-lsp  [optional, installed but disabled] — why: real
   language servers; zero context cost — verify: /plugin lists it
 
@@ -105,7 +105,7 @@ rule and against the stack this machine actually uses. Most are vendor
 integrations for services not in use; the overlapping ones (context7, notion,
 sentry, exa, github, gitkraken, playwright) are already configured as MCP
 servers, and the code-search and security ones (serena, lumen, sourcegraph,
-semgrep, sonarqube, claude-security) duplicate greptile, coderabbit and ggshield.
+semgrep, sonarqube, claude-security) duplicate coderabbit and ggshield.
 
 One genuine candidate survived that filter and was installed to measure:
 **`convex`** — official, and its MCP server offers live deployment introspection
@@ -122,10 +122,10 @@ the rest: exactly the maintenance ballast this audit set out to remove. So it
 was uninstalled. **If live Convex introspection is wanted, add the MCP server
 alone, project-local** — per the stack-skills rule below, not as a global plugin.
 
-The kept six all clear the bar for a different reason each: coderabbit and
-greptile are external services, the two LSPs are real language servers costing
-nothing, skill-creator provides evals no prompt replaces, commit-commands is
-three cheap slash commands. Nothing was installed to fill a gap, because the
+The kept ones all clear the bar for a different reason each: coderabbit is an
+external service, the two LSPs are real language servers costing nothing,
+skill-creator provides evals no prompt replaces, commit-commands is three cheap
+slash commands. Nothing was installed to fill a gap, because the
 audit found none: everything a candidate plugin would have added is either a
 built-in (`/code-review`, `/simplify`, plan mode, worktrees, auto-memory,
 Monitor, `/usage`) or a capability of the model.
@@ -155,20 +155,42 @@ Monitor, `/usage`) or a capability of the model.
   was installed-but-disabled and removed 2026-08-01 — Linear is not in use.)
   verify: `codex plugin list` shows exactly these five as installed/enabled.
 
-## Skills — own (stored in this repo; the prompt PLACES them)  [default]
-branch-cleanup · git-sync · stack-detection
-verify: `/` shows each; skills load
+## Skills — the global set is closed at thirteen
 
-## Skills — own, optional (stored, not default)  [optional]
+**Seven authored + six remote. Nothing else is installed globally.** Everything
+else goes project-local, in the repo that needs it, and is not this setup's
+business. Adding a global skill is the exception and needs a reason recorded here.
+
+The canonical copy of all thirteen lives in `~/.agents/skills/`; **every harness
+symlinks all thirteen out of that hub** (`~/.claude/skills`, `~/.codex/skills`,
+`~/.gemini/antigravity-cli/skills`). OpenCode reads the hub directly, Grok
+inherits `~/.claude/skills` via `[compat.claude]` and gets no copies. A harness
+carrying fewer than thirteen is drift, not a per-harness decision — enable or
+disable a skill through the harness's own overrides, never by omitting the link.
+
+**One documented exception:** `~/.codex/skills/chrome-ui-explorer` is a real
+directory, Codex-only, and deliberately not in the hub. It drives Codex's in-app
+Chrome plugin; no other harness can use it, so hub-placing it would put a dead
+skill in four directories. Keep it where it is.
+
+### Own — stored in this repo; the prompt PLACES all of them  [default]
+- branch-cleanup — why: converge a messy repo onto clean main; dry-run-able
 - config-edit — Claude Code only; why: path syntax reference for its settings/permissions/hooks
-- convexcheck — why: report-only audit of a project's Convex+Vercel+Modal deploy footguns (currently `off` in skillOverrides)
+- convexcheck — why: report-only audit of a project's Convex+Vercel+Modal deploy footguns (`off` in skillOverrides)
 - deploy — why: safe Modal/Convex deploy delegating to project deploy-script gates (project-local preferred)
+- git-sync — why: sync/inspect every repo in a directory across machines
 - notion-safe-writes — Claude/raw-Notion-MCP only; do not install for Codex's app connector
-- pin-auth — why: scaffold PIN-based auth (Convex or lightweight HMAC variant) into a Next.js app (currently `off` in skillOverrides)
-- review-routing — Claude Code only; why: routing lookup across its review/security plugins
-verify: `/` shows each once placed; skills load
+- pin-auth — why: scaffold PIN-based auth into a Next.js app (`off` in skillOverrides)
 
-## Skills — remote, globally installed (documented only — NOT stored in this repo)  [optional]
+verify: `~/.agents/skills/` holds exactly these seven; `/` shows each; skills load
+
+**Two former skills are now rules** (`sources/claude/rules/stack-detection.md`,
+`review-routing.md`). Both are reference policy rather than an invokable
+procedure, `challenger` and `codebase-audit` depend on the first, and rules reach
+every harness through `sync.sh` without occupying a global skill slot. Do not
+re-add them under `sources/skills/`.
+
+### Remote — globally installed (documented only — NOT stored in this repo)
 Remote skills live only as installs via `npx skills add -g` (canonical copy in
 `~/.agents/skills/`, symlinked into each harness). Re-install from their
 registries; this repo documents the intent, never their content.
@@ -184,16 +206,22 @@ that is not in any public doc. Currently:
   `agent-browser` CLI (see CLI tools above) — procedure, not vendor docs
 - skill-development — anthropics/claude-code; why: structure/progressive-disclosure
   guidance when authoring skills for this repo
-- vercel-cli-with-tokens — vercel-labs/agent-skills; why: token auth without
-  leaking values into shell history, team scoping, env-var handling
 - vercel-optimize — vercel-labs/agent-skills; why: metrics-first gating plus
   scripts; keep `off` until a real Vercel cost question exists
-- next-cache-components-adoption · next-cache-components-optimizer — vercel/next.js;
-  why: a test-driven migration loop; keep `off` until such a migration is due
 - computer-use · orca-cli · orchestration — stablyai/orca; why: stubs whose
   reference comes from the `orca` binary; keep `off` unless Orca is in use
-These named global skills are deliberate cross-project exceptions. Everything
-else under Module: webservice remains project-local.
+
+verify: `~/.agents/skills/` holds exactly these six alongside the seven authored
+ones — **thirteen entries, no more**
+
+**Removed 2026-08-02, do not re-add:** `vercel-cli-with-tokens`,
+`next-cache-components-adoption`, `next-cache-components-optimizer`. All three
+were documented as globally installed and were not present in `~/.agents/skills/`;
+the only trace was a dangling symlink in a harness directory. The Next cache
+skills are a migration loop that belongs in the repo doing the migration, and the
+Vercel token skill belongs wherever a Vercel deploy actually runs.
+
+Everything else under Module: webservice remains project-local.
 
 **Convex skills are NOT among them.** waynesutton/convexskills is installed
 per-project (see Module: webservice below), never with `-g`. This section
@@ -292,7 +320,7 @@ are the external Orca integration hooks under `~/.orca/agent-hooks/`; Orca owns
 and manages them.
 
 ## System & Shell Environment  [default]
-- **Shell Aliases & Functions:** The canonical alias/function block for `~/.zshrc` is `sources/shell/aliases.zsh` (agent aliases `c`/`cc`/`co`/`oc`, git helpers, 1Password keychain token, `codex()` Context7-key wrapper, and `claude()` Greptile-key wrapper). NOTE: `op` is the 1Password CLI, never an alias.
+- **Shell Aliases & Functions:** The canonical alias/function block for `~/.zshrc` is `sources/shell/aliases.zsh` (agent aliases `c`/`cc`/`co`/`oc`, git helpers, 1Password keychain token, `codex()` and `claude()` Context7-key wrappers). NOTE: `op` is the 1Password CLI, never an alias.
 
 ## Personal  [optional toggle]
 - shell/aliases.zsh, wezterm/wezterm.lua → dotfiles
@@ -320,7 +348,6 @@ wrapper fills from `op read` — never a literal. Vault is `APIKeys`; there is n
   ```
   filled by the `codex()` wrapper. No literal Context7 key belongs in
   `~/.claude.json`, `~/.codex/config.toml`, or any other config file.
-- GREPTILE_API_KEY — op://APIKeys/greptile/credential (resolved per-start by the `claude()` wrapper)
 - OP_SERVICE_ACCOUNT_TOKEN — macOS Keychain item `op-service-account` (basis for all `op run`/`op read`). It is **read-only** on the `APIKeys` vault: creating or updating an item fails with `(101) You do not have permission`. New secrets have to be added interactively by the user; an agent can read them but never write them.
 
 Audit: no *config* file of any supported harness may contain a literal key. Scan
@@ -329,7 +356,7 @@ the config files by name — not the whole home directories. Recursing over
 plugin fixtures, which match the pattern constantly and drown the real finding:
 
 ```sh
-grep -lE '(\b(sk|ctx7sk)-[A-Za-z0-9_-]{16,}|Bearer [A-Za-z0-9]{20})' \
+grep -lE '(\b(sk|ctx7sk)-[A-Za-z0-9_-]{16,}|Bearer [A-Za-z0-9._~+/=-]{20,})' \
   ~/.claude.json ~/.claude/settings.json ~/.codex/config.toml \
   ~/.config/opencode/opencode.json ~/.grok/config.toml \
   ~/.gemini/settings.json 2>/dev/null

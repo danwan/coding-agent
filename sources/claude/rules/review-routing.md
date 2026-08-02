@@ -1,29 +1,13 @@
----
-name: review-routing
-description: >
-  Routing lookup for review and security tools. Which tool/skill/agent to use
-  when — onboarding vs. iterative development vs. pre-PR vs. targeted reviews.
-  Clarifies which engine is the DEFAULT for a quick diff review, simplify, or
-  security scan, and resolves the name collisions (code-reviewer, security-review,
-  simplify) between built-in skills and the coderabbit plugin. Triggers:
-  "which review tool", "which reviewer", "review routing", "code review choice",
-  "which review skill", "default review tool", "built-in vs plugin review",
-  "code-reviewer namespace", "which simplify".
-allowed-tools: Read, Grep, Glob
-version: 2.0.0
----
-
 # Review & Security Routing
 
-> Three engines, clear defaults. Stack-scoping signatures: `~/.claude/skills/stack-detection/SKILL.md`.
+> Two engines, clear defaults. Stack-scoping signatures: `~/.claude/rules/stack-detection.md`.
 
-## The Three Engines (orient here first)
+## The Two Engines (orient here first)
 
 | Engine | What it is | Cost / setup | Use as |
 |---|---|---|---|
 | **built-in** (`/code-review`, `/simplify`, `/security-review`, `/review`, `/verify`) | Native Anthropic skills on the current diff; `/code-review ultra` = parallel cloud review | free, zero-setup | **DEFAULT** for everyday diff review, simplify, security scan |
-| **coderabbit** (`/coderabbit:coderabbit-review`, `coderabbit:autofix`) | External SaaS engine — 40+ static analyzers, AST/codegraph, SAST | needs CLI + `coderabbit auth login` | **escalation** for deeper bug/security/regression analysis |
-| **greptile** (`@greptileai`, MCP tools) | Server-side repo index — whole-repo context no local pass has | free tier, 50 credits/mo, manual-only | **fallback** when CodeRabbit is throttled, and for whole-repo context questions |
+| **coderabbit** (`/coderabbit:coderabbit-review`, `coderabbit:autofix`) | External SaaS engine — 40+ static analyzers, AST/codegraph, SAST, Multi-Repo Analysis | needs CLI + `coderabbit auth login` | **escalation** for deeper bug/security/regression analysis, and for cross-repo breaking changes |
 
 ## Default Lane (the common case)
 
@@ -76,7 +60,7 @@ Stack-specific tools apply **only** when the stack artifact exists in the projec
 | Concern | Tool |
 |---------|------|
 | Error handling, test gaps, type design, comment accuracy | name the dimension explicitly to `/code-review`, or `/coderabbit:coderabbit-review` |
-| Whole-repo context question ("where else does X happen") | greptile MCP tools |
+| Whole-repo context question ("where else does X happen") | `rg`/`ast-grep` locally; for cross-repo impact, CodeRabbit Multi-Repo Analysis |
 | Code simplification | built-in `/simplify` |
 | Deep Convex security | `/convex-security-audit` |
 | Deep on-demand vulnerability scan of a whole repo (large/critical codebase) | `deepsec` — agent-powered scanner, project-local via `npx deepsec init` then `pnpm deepsec scan/process/export` (vercel-labs/deepsec). ⚠️ Uses top models at max thinking — scans can cost thousands on large repos; run deliberately, not per-diff |
@@ -100,11 +84,17 @@ name is retired).
 
 ## Solo-Dev Development Process (budget order, since 2026-07-18)
 
-Quota facts: CodeRabbit PR reviews and CLI/IDE reviews have SEPARATE hourly
-quotas (Pro: 5/h each); the adaptive fair-usage throttle (~60 PR reviews/7 days
-→ 1/h) counts only PR reviews. Repo configs enforce `profile: chill` +
-`auto_pause_after_reviewed_commits: 2`. Greptile = free tier, 50 credits/mo,
-manual-only. Monitor with `@coderabbitai rate limit` on any PR (costs nothing).
+Quota facts: CodeRabbit PR reviews, IDE reviews and CLI reviews have SEPARATE
+hourly quotas (Pro: 5/h each, Pro+: 10/h each); the adaptive fair-usage throttle
+counts only PR reviews and drops to 1/h above ~60 reviews per 7 days on Pro,
+~90 on Pro+. Repo configs enforce `profile: chill` +
+`auto_pause_after_reviewed_commits: 2`. Monitor with `@coderabbitai rate limit`
+on any PR (costs nothing).
+
+**Burst discipline:** opening several PRs at once burns the hourly PR quota in
+minutes and the surplus gets throttled, not queued. Open them as **drafts** —
+CodeRabbit skips drafts (`drafts: false`) — and flip them to ready one at a time.
+Run `cr review` before pushing: it draws on the separate CLI quota.
 
 1. **Iterate (free):** built-in `/code-review` (low/med) + `/simplify` during
    development; format hooks + ggshield ai-hook run passively. `/verify` or
@@ -116,8 +106,9 @@ manual-only. Monitor with `@coderabbitai rate limit` on any PR (costs nothing).
    diff: `/code-review high` first.
 4. **PR open (PR quota, conserved):** CodeRabbit reviews once, auto-pauses
    after 2 commits — further pushes cost nothing. When truly done: one
-   `@coderabbitai review` as final gate. Throttled? → `@greptileai` fallback.
-   GitGuardian checks run automatically.
+   `@coderabbitai review` as final gate. Throttled? The review is deferred, not
+   lost — re-trigger with `@coderabbitai review` once capacity returns, and do
+   not merge unreviewed in the meantime. GitGuardian checks run automatically.
 5. **Merge;** Dependabot PRs land grouped weekly — review in one batch
    (`branch-cleanup` skill can automerge green ones).
 6. **Periodic / pre-launch (whole repo):** `@codebase-audit`. Heavy artillery

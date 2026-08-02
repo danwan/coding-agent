@@ -18,7 +18,7 @@ Default posture: **skeptical**. Assume the sub-agent may have hallucinated, gues
 
 ## Stack Verification Discipline
 
-In addition to existence-verification (check c), verify that every stack-specific recommendation the sub-agent makes corresponds to a stack component that **actually exists in this project**. Run the signatures from `~/.claude/skills/stack-detection/SKILL.md`:
+In addition to existence-verification (check c), verify that every stack-specific recommendation the sub-agent makes corresponds to a stack component that **actually exists in this project**. Run the signatures from `~/.claude/rules/stack-detection.md`:
 
 - Sub-agent demands rate limiting → does the project have server-side endpoints (`app/api/`, `pages/api/`, `convex/`, `middleware.ts`)? If not → `REJECTED` (fabricated stack dependency).
 - Sub-agent references Convex patterns (`withIndex`, `internalMutation`, `.collect()` bounds) → does `convex/` exist? If not → `REJECTED`.

@@ -27,12 +27,15 @@ mapping, not a schema you should copy verbatim.
   another harness but disabled in Codex.
 - **Browser tooling:** keep the three surfaces distinct: desktop Browser
   (app-only), Chrome plugin (existing user Chrome), and the standalone
-  `agent-browser` CLI (headless usability automation). The Vercel Codex plugin
-  supplies the relevant skills; no duplicate global skill is needed. Disable
-  unused bundled Vercel skills with `[[skills.config]]` while keeping the
-  connector enabled; this setup keeps only `agent-browser` and
-  `agent-browser-verify` globally active. Plugin updates can change the cached
-  skill paths, so re-check the overrides after a Vercel plugin update.
+  `agent-browser` CLI (headless usability automation). The capability comes from
+  the `agent-browser` CLI plus the separately installed remote skill — **not**
+  from a Vercel Codex plugin, which is not installed here (see PROVISION.md, MCP
+  section: none of the OpenAI-curated connectors is installed). This setup keeps
+  `agent-browser` and `agent-browser-verify` globally active.
+  *If* a Vercel connector is ever installed: check `codex plugin list` first,
+  then trim its bundled skills with `[[skills.config]]` while keeping the
+  connector enabled, and re-check those overrides after every plugin update —
+  updates move the cached skill paths.
 - **Hooks:** keep only the external Orca integration hooks from
   `~/.orca/agent-hooks/`. Do not restore the retired backend-deploy or
   pre-publish secret-scan hooks; their surviving policy belongs in rules and
