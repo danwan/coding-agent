@@ -137,8 +137,18 @@ When the active harness is Grok:
   copy under `~/.grok/rules/` — that directory must be empty.
 - `~/.grok/config.toml` disables the Cursor compat cells (Cursor is out of scope,
   and its leftovers would otherwise still be loaded).
+- **`[compat.claude] mcps = false` is present, and `grok mcp list` is empty.**
+  Grok is meant to run with zero MCP servers; the cell is what stops it inheriting
+  the claude.ai account connectors from `~/.claude.json`. This has silently
+  disappeared once in an unrelated cleanup, so check the value, not just the
+  section:
+  ```sh
+  python3 -c "import tomllib,pathlib;d=tomllib.load(open(pathlib.Path.home()/'.grok'/'config.toml','rb'));print(d['compat']['claude']['mcps'])"   # False
+  ```
 - The skills intentionally switched off in Claude's `skillOverrides` are also
-  disabled in Grok's skills config; Grok does not inherit that state.
+  disabled in Grok's skills config; Grok does not inherit that state. The two
+  lists must match entry for entry — a stale name in Grok's `[skills] disabled`
+  outlives the skill it referred to.
 - Known and accepted gap: the four authored subagents are NOT available in Grok.
   Their absence is not a FAIL. A partial copy under `~/.grok/agents/` would be.
 

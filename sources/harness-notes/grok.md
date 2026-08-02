@@ -27,6 +27,30 @@ Turn a compat source **off** rather than working around it, if a harness leaves
 this setup's scope — otherwise Grok keeps loading that tool's leftovers. This
 setup disables the Cursor compat cells for exactly that reason.
 
+## Grok runs with zero MCP servers — deliberately
+
+`[compat.claude] mcps = false`, set 2026-08-02 in `~/.grok/config.toml`.
+
+Grok declares no MCP servers of its own, so the compat merge from `~/.claude.json`
+was its only source. That file carries more than this repo's own legs: the
+claude.ai account connectors live there too (`claude.ai <name>`). Inheriting them
+lets a second harness reach Gmail, Drive, Notion and Sentry with **no separate
+approval step**, and the account level is explicitly out of scope for this repo —
+it cannot gate what it does not own.
+
+Off therefore means Grok starts with **no MCP servers at all**, Context7 included.
+That is the intended state, not a gap to fill: Grok is used for code work here,
+and anything it genuinely needs gets an explicit per-server table in its own
+config — an explicit list beats silent inheritance.
+
+**To reverse:** delete the cell; the default is on. Do not "work around" it by
+copying servers into Grok's config *and* leaving inheritance on — they then load
+twice.
+
+> Careful when editing near this section: it was once removed as collateral in an
+> unrelated cleanup commit, and nothing failed loudly. `verify.md` now checks the
+> cell explicitly.
+
 ## What Grok does NOT inherit
 
 - **Subagents.** The Claude compat cell for `agents` covers *instruction* files,

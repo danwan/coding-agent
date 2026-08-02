@@ -55,9 +55,14 @@ the app writes them and will rewrite them again:
   than in a file this repo can own. Their permissions do appear in the personal
   `settings.json` template.
 
-Grok configures MCP in `~/.grok/config.toml`, but also inherits Claude's servers
-from `~/.claude.json` through its compat scanning — so a raw leg added for Claude
-shows up there too. See `sources/harness-notes/grok.md`.
+**Grok runs with no MCP servers at all** — intended, set 2026-08-02. It declares
+none of its own, and `[compat.claude] mcps = false` in `~/.grok/config.toml` stops
+the merge from `~/.claude.json`. Without that cell Grok would also inherit the
+claude.ai account connectors and reach Gmail, Drive, Notion and Sentry with no
+separate approval — and the account level is out of scope for this repo, so it
+cannot gate what it does not own. Context7 is gone in Grok as a consequence; that
+is accepted. See `sources/harness-notes/grok.md` for the trade-off and how to
+reverse it.
 
 ## Plugins (Claude Code)
 marketplaces: anthropics/claude-plugins-official (the only one — do not register
