@@ -43,7 +43,6 @@ both legs' tool schemas are charged to every session.
 - google-developer-knowledge  [optional] — https://developerknowledge.googleapis.com/mcp — why: Google-platform docs — verify: server lists tools
 - playwright  [optional, OpenCode only] — npx @playwright/mcp@latest — why: headless browser for the one harness with no browser plugin; Claude and Codex use their own browser surfaces plus the `agent-browser` CLI — verify: agent can screenshot a page
 - GitKraken  [optional, Codex] — why: git/PR operations beyond the `gh` CLI — verify: one read-only repo lookup succeeds
-- greptile  [optional, Codex] — why: the same server-side repo index the Claude plugin provides, for the harness that has no such plugin; needs GREPTILE_API_KEY — verify: server lists tools
 - computer-use  [optional, Codex] — why: desktop control, tied to the Orca toolchain — verify: server lists tools
 
 **App-owned, not provisioned by this repo** — do not add, remove, or "fix" these;
@@ -56,9 +55,12 @@ the app writes them and will rewrite them again:
   than in a file this repo can own. Their permissions do appear in the personal
   `settings.json` template.
 
-Grok configures MCP in `~/.grok/config.toml`, but also inherits Claude's servers
-from `~/.claude.json` through its compat scanning — so a raw leg added for Claude
-shows up there too. See `sources/harness-notes/grok.md`.
+Grok configures MCP in `~/.grok/config.toml`. Its compat scanning would also pull
+in every server from `~/.claude.json` — including the claude.ai account connectors,
+which are out of scope for this repo and would reach a second harness without any
+separate approval. **That cell is therefore off: `[compat.claude] mcps = false`**
+(set 2026-08-02). Grok's MCP servers must be declared in its own config; nothing is
+inherited. See `sources/harness-notes/grok.md` for the trade-off and how to reverse it.
 
 ## Plugins (Claude Code)
 marketplaces: anthropics/claude-plugins-official (the only one — do not register
@@ -78,10 +80,13 @@ justification here.
 - skill-creator  [default] — why: authoring plus evals/benchmarks for skills — verify: /plugin lists it
 - coderabbit  [default] — why: external review engine, own CLI quota and
   subscription; the default reviewer — verify: `coderabbit --version` and /plugin lists it
-- greptile  [optional, installed but disabled] — why: server-side repo index (a
-  capability no local model has); needs GREPTILE_API_KEY
-  (op://APIKeys/greptile/credential, resolved by the `claude()` shell wrapper —
-  see `sources/shell/aliases.zsh`) — verify: /plugin lists it
+- greptile — **out of scope 2026-08-02.** Removed as a second AI reviewer running
+  on the same pull requests as CodeRabbit: the free tier's 50 monthly credits were
+  exhausted, auto-review was off anyway, and overlapping reviewers produce
+  contradictory comments that get ignored wholesale. The repo-wide context it
+  provided is covered by CodeRabbit's Multi-Repo Analysis. Uninstall the GitHub
+  App, drop the plugin, and delete `op://APIKeys/greptile/credential` once nothing
+  reads it — verify: /plugin does **not** list it, `GREPTILE_API_KEY` unset.
 - typescript-lsp / pyright-lsp  [optional, installed but disabled] — why: real
   language servers; zero context cost — verify: /plugin lists it
 
@@ -105,7 +110,7 @@ rule and against the stack this machine actually uses. Most are vendor
 integrations for services not in use; the overlapping ones (context7, notion,
 sentry, exa, github, gitkraken, playwright) are already configured as MCP
 servers, and the code-search and security ones (serena, lumen, sourcegraph,
-semgrep, sonarqube, claude-security) duplicate greptile, coderabbit and ggshield.
+semgrep, sonarqube, claude-security) duplicate coderabbit and ggshield.
 
 One genuine candidate survived that filter and was installed to measure:
 **`convex`** — official, and its MCP server offers live deployment introspection
@@ -122,10 +127,10 @@ the rest: exactly the maintenance ballast this audit set out to remove. So it
 was uninstalled. **If live Convex introspection is wanted, add the MCP server
 alone, project-local** — per the stack-skills rule below, not as a global plugin.
 
-The kept six all clear the bar for a different reason each: coderabbit and
-greptile are external services, the two LSPs are real language servers costing
-nothing, skill-creator provides evals no prompt replaces, commit-commands is
-three cheap slash commands. Nothing was installed to fill a gap, because the
+The kept ones all clear the bar for a different reason each: coderabbit is an
+external service, the two LSPs are real language servers costing nothing,
+skill-creator provides evals no prompt replaces, commit-commands is three cheap
+slash commands. Nothing was installed to fill a gap, because the
 audit found none: everything a candidate plugin would have added is either a
 built-in (`/code-review`, `/simplify`, plan mode, worktrees, auto-memory,
 Monitor, `/usage`) or a capability of the model.
@@ -292,7 +297,7 @@ are the external Orca integration hooks under `~/.orca/agent-hooks/`; Orca owns
 and manages them.
 
 ## System & Shell Environment  [default]
-- **Shell Aliases & Functions:** The canonical alias/function block for `~/.zshrc` is `sources/shell/aliases.zsh` (agent aliases `c`/`cc`/`co`/`oc`, git helpers, 1Password keychain token, `codex()` Context7-key wrapper, and `claude()` Greptile-key wrapper). NOTE: `op` is the 1Password CLI, never an alias.
+- **Shell Aliases & Functions:** The canonical alias/function block for `~/.zshrc` is `sources/shell/aliases.zsh` (agent aliases `c`/`cc`/`co`/`oc`, git helpers, 1Password keychain token, `codex()` and `claude()` Context7-key wrappers). NOTE: `op` is the 1Password CLI, never an alias.
 
 ## Personal  [optional toggle]
 - shell/aliases.zsh, wezterm/wezterm.lua → dotfiles
@@ -320,7 +325,6 @@ wrapper fills from `op read` — never a literal. Vault is `APIKeys`; there is n
   ```
   filled by the `codex()` wrapper. No literal Context7 key belongs in
   `~/.claude.json`, `~/.codex/config.toml`, or any other config file.
-- GREPTILE_API_KEY — op://APIKeys/greptile/credential (resolved per-start by the `claude()` wrapper)
 - OP_SERVICE_ACCOUNT_TOKEN — macOS Keychain item `op-service-account` (basis for all `op run`/`op read`). It is **read-only** on the `APIKeys` vault: creating or updating an item fails with `(101) You do not have permission`. New secrets have to be added interactively by the user; an agent can read them but never write them.
 
 Audit: no *config* file of any supported harness may contain a literal key. Scan
@@ -329,7 +333,7 @@ the config files by name — not the whole home directories. Recursing over
 plugin fixtures, which match the pattern constantly and drown the real finding:
 
 ```sh
-grep -lE '(\b(sk|ctx7sk)-[A-Za-z0-9_-]{16,}|Bearer [A-Za-z0-9]{20})' \
+grep -lE '(\b(sk|ctx7sk)-[A-Za-z0-9_-]{16,}|Bearer [A-Za-z0-9._~+/=-]{20,})' \
   ~/.claude.json ~/.claude/settings.json ~/.codex/config.toml \
   ~/.config/opencode/opencode.json ~/.grok/config.toml \
   ~/.gemini/settings.json 2>/dev/null

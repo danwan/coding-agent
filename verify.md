@@ -60,9 +60,19 @@ Additional checks:
 - `./sync.sh` (no argument) reports `zu schreiben: 0` — every installed harness
   already carries the current authored content. A non-zero count means drift,
   not a failure of this check.
-- No skill directory contains a dangling symlink:
-  `find ~/.claude/skills ~/.agents/skills ~/.codex/skills ~/.grok/skills ~/.gemini/antigravity-cli/skills -maxdepth 1 -type l ! -exec test -e {} \; -print`
-  prints nothing.
+- No skill directory contains a dangling symlink. Guard each path — on a machine
+  where a harness is not installed, `find` errors out and exits non-zero, which
+  reads as a failure of this check rather than an absent harness:
+  ```sh
+  for d in ~/.claude/skills ~/.agents/skills ~/.codex/skills ~/.grok/skills \
+           ~/.gemini/antigravity-cli/skills; do
+    [ -d "$d" ] && find "$d" -maxdepth 1 -type l ! -exec test -e {} \; -print
+  done
+  ```
+  prints nothing. A hit means the skill hub lost the target — usually because a
+  remote skill was retired while a per-harness link survived. Fix by re-running
+  `./sync.sh --apply` (for authored skills) or `npx skills update -g -y` (for
+  remote ones), then delete whatever still dangles.
 - `npx skills update -g -y` reports all tracked remote skills current, and its
   lock contains no retired repository source.
 
