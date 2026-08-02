@@ -6,8 +6,13 @@
 
 The four subagent definitions are authored once in Claude Code's format
 (markdown + YAML frontmatter). Every other harness wants a different container:
-Codex uses TOML with the prompt as one escaped string, OpenCode and Gemini and
-Droid use markdown with differently-named frontmatter keys.
+Codex uses TOML with the prompt as one escaped string, OpenCode and Gemini use
+markdown with differently-named frontmatter keys.
+
+Grok is deliberately absent: it inherits rules and skills from ~/.claude via
+[compat.claude], but its `agents` compat cell covers instruction files, not
+subagent definitions — so the four agents are simply not available there. See
+sources/harness-notes/grok.md.
 
 The body is copied verbatim everywhere — it is the actual instruction, and
 rewording it per harness is how copies start to drift. Only the frontmatter is
@@ -126,7 +131,6 @@ def main():
         ("Codex", HOME / ".codex/agents", "codex"),
         ("OpenCode", HOME / ".config/opencode/agents", "opencode"),
         ("Gemini / Antigravity", HOME / ".gemini/agents", "gemini"),
-        ("Factory Droid", HOME / ".factory/droids", "droid"),
         ("Claude Code", HOME / ".claude/agents", "claude"),
     ]
 
@@ -158,17 +162,6 @@ def main():
                     yaml_agent(meta, body, [
                         ("name", name),
                         ("description", meta.get("description")),
-                        ("tools", meta.get("tools")),
-                    ]),
-                )
-            elif kind == "droid":
-                write(
-                    outdir / f"{name}.md",
-                    yaml_agent(meta, body, [
-                        ("name", name),
-                        ("description", meta.get("description")),
-                        ("model", "inherit"),
-                        ("reasoningEffort", meta.get("effort")),
                         ("tools", meta.get("tools")),
                     ]),
                 )

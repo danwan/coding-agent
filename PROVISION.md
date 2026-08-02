@@ -31,12 +31,34 @@ verify (all): the binary's `--version` (or `--help`) succeeds.
 | `qmd` | npm **`@tobilu/qmd`** | install from npm ONLY — **never** a GitHub source of the same name |
 | `skills` | skills.sh — run via **`npx skills`** | no global binary needed |
 | `agent-browser` | Vercel Labs — github.com/vercel-labs/agent-browser | browser automation CLI used for usability and repeatable headless UI tests. Install the browser runtime after the CLI. This is separate from Codex's in-app Browser and Chrome plugins. verify: `agent-browser doctor --offline --quick` passes and opening `https://example.com` returns the title |
-| `ggshield` | GitGuardian CLI — github.com/GitGuardian/ggshield | brew/pipx `ggshield`. Post-install (per user, interactive): `ggshield auth login` (token → OS keyring), then verify `ggshield quota` is greater than zero before installing hooks. Install the global `pre-push` target and the detected agent target (`claude-code` for Claude Code, `codex` for Codex) only while scanning quota is available; otherwise the pre-push hook blocks normal pushes and the agent hook can only fail open noisily. Husky repos need their own `.husky/pre-push` with `ggshield secret scan pre-push "$@"` (local hooksPath shadows global). Do not dismiss a failed `ggshield api-status` as sandbox noise without verifying keyring auth. Why: blocks secret leaks in pushes and agent traffic. verify: `ggshield api-status` is healthy, `ggshield quota` is positive, and a benign scan succeeds |
+| `ggshield` | GitGuardian CLI — github.com/GitGuardian/ggshield | brew/pipx `ggshield`. **Currently installed but not active** (state as of 2026-08-01): no token is readable, so `api-status` and `quota` both fail, and no global `core.hooksPath` is set — the hooks were retired 2026-07-31 when quota hit zero. That is the intended state, not a defect: secret scanning currently runs server-side via GitGuardian and in review via CodeRabbit. To reactivate: `ggshield auth login` (interactive, token → OS keyring), confirm `ggshield quota` is greater than zero, and only then install the global `pre-push` target plus the detected agent target (`claude-code` / `codex`). Never install those hooks without positive quota — the pre-push hook then blocks normal pushes and the agent hook can only fail open noisily. Husky repos need their own `.husky/pre-push` with `ggshield secret scan pre-push "$@"` (local hooksPath shadows global). Note the keyring is not readable from inside the agent sandbox, so a failed `api-status` there is not by itself proof of missing auth. verify: the binary runs (`ggshield --version`). Auth, quota and hooks are verified **only** when reactivation was selected |
 
 ## MCP servers
-- context7  [default] — https://mcp.context7.com/mcp — why: current library docs — prefer the agent's OAuth/keychain flow; API-key fallback: CONTEXT7_API_KEY from op://APIKeys/context7/credential via the harness's shell wrapper, **never a literal in a config file** — verify: server lists tools and one library-resolution call succeeds
-- playwright  [optional] — npx @playwright/mcp@latest — why: headless browser — verify: agent can screenshot a page
+Configured per harness. **One leg per service**: where a harness already reaches
+a service through an authenticated account connector or a plugin, do not add a
+second raw MCP leg for it — the duplicate is unauthenticated or redundant, and
+both legs' tool schemas are charged to every session.
+
+- context7  [default, all harnesses] — https://mcp.context7.com/mcp — why: current library docs — key is CONTEXT7_API_KEY from op://APIKeys/context7/credential, injected by the harness's shell wrapper, **never a literal in a config file** — verify: server lists tools and one library-resolution call succeeds
 - google-developer-knowledge  [optional] — https://developerknowledge.googleapis.com/mcp — why: Google-platform docs — verify: server lists tools
+- playwright  [optional, OpenCode only] — npx @playwright/mcp@latest — why: headless browser for the one harness with no browser plugin; Claude and Codex use their own browser surfaces plus the `agent-browser` CLI — verify: agent can screenshot a page
+- GitKraken  [optional, Codex] — why: git/PR operations beyond the `gh` CLI — verify: one read-only repo lookup succeeds
+- greptile  [optional, Codex] — why: the same server-side repo index the Claude plugin provides, for the harness that has no such plugin; needs GREPTILE_API_KEY — verify: server lists tools
+- computer-use  [optional, Codex] — why: desktop control, tied to the Orca toolchain — verify: server lists tools
+
+**App-owned, not provisioned by this repo** — do not add, remove, or "fix" these;
+the app writes them and will rewrite them again:
+- `node_repl` — injected by the Codex desktop app into both its own and Claude's
+  MCP config; it backs the in-app Browser plugin.
+- The claude.ai account connectors (Notion, Gmail, Calendar, Drive, Exa, Sentry,
+  n8n, …) and the OpenAI-curated Codex app plugins. They are bound to the signed-in
+  account, have no portable standalone form, and are configured in the app rather
+  than in a file this repo can own. Their permissions do appear in the personal
+  `settings.json` template.
+
+Grok configures MCP in `~/.grok/config.toml`, but also inherits Claude's servers
+from `~/.claude.json` through its compat scanning — so a raw leg added for Claude
+shows up there too. See `sources/harness-notes/grok.md`.
 
 ## Plugins (Claude Code)
 marketplaces: anthropics/claude-plugins-official (the only one — do not register
@@ -74,7 +96,7 @@ the plugin is invoked or not.
 | ponytail | ~1k tok + a SessionStart injection repeated on **every** SubagentStart | A style preference, not a capability. The per-subagent re-injection makes it the most expensive plugin under fan-out. |
 | superpowers | ~0.7k tok + SessionStart injection | Fourteen process skills that duplicate built-ins (plan mode, `EnterWorktree`, the Agent tool) or restate what current models do unprompted. Its TDD and verification skills are the exact scaffolding the Opus 5 guide says to delete. |
 | aikido | 0 (was disabled) | Would be a third security layer beside ggshield (local) and GitGuardian (server) plus an `npx` MCP process per session. |
-| frontend-design | 0 (was disabled) | Covered by the built-in `dataviz` and `artifact-design` skills. |
+| frontend-design | 0 (was disabled) | Covered by the built-in `dataviz` and `artifact-design` skills. Uninstalled 2026-08-01 — it had been left installed-but-disabled, which made this table read as done when it was not. |
 | memsearch | 0 (not enabled) | Superseded by native auto-memory. Removed everywhere, not just disabled. |
 
 ### Considered and measured, not installed
@@ -112,17 +134,26 @@ Monitor, `/usage`) or a capability of the model.
 - Browser + Chrome  [default in the desktop app] — Browser controls the
   app-owned browser; Chrome controls the user's existing Chrome profile.
   Browser is app-only. verify: each selected surface can open `https://example.com`
-- GitHub · Gmail · Google Calendar · Google Drive · Notion · Vercel
-  [default on this setup] — use the OpenAI-curated app plugins and their
-  authenticated app connectors. Do not add a second raw MCP leg unless it
-  provides a capability the app connector lacks. verify: one read-only profile,
-  list, or lookup call succeeds for each configured service
-- The Vercel plugin already supplies the `agent-browser` and
-  `agent-browser-verify` skills. Do not install a second standalone copy of the
-  same skill; the `agent-browser` CLI above is still required. Keep only these
-  two Vercel plugin skills globally enabled on this setup; the connector tools
-  remain available and specialized guidance can come from current docs or
-  project-local skills without overflowing Codex's skill-description budget.
+- OpenAI-curated app connectors (GitHub, Gmail, Google Calendar, Google Drive,
+  Notion, Vercel) — **none of them is installed** (verified 2026-08-01). This
+  section previously described them as the default on this setup, including a
+  claim that the Vercel plugin supplies the `agent-browser` skills. It does not,
+  because it is not installed; the `agent-browser` CLI and the separately
+  installed remote skill are what actually provide that capability. Do not
+  re-add that claim without checking `codex plugin list` first.
+  If a connector IS installed later: prefer it over a raw MCP leg for the same
+  service, and keep its bundled skills trimmed with `[[skills.config]]` so they
+  do not overflow Codex's skill-description budget. verify: one read-only
+  profile, list, or lookup call succeeds per configured service.
+- Notion in Codex therefore runs over the **raw MCP leg**, not a connector — it
+  is the only access path there, and removing it would cut Notion off entirely.
+- Claude-marketplace plugins in Codex [default on this setup]: `coderabbit`,
+  `commit-commands`, `skill-creator`, `typescript-lsp`, `pyright-lsp` — installed
+  and enabled. Codex registers the `claude-plugins-official` marketplace and runs
+  these natively, so the same selection rule applies as for Claude Code. That is
+  the complete list; anything else found installed is a prune candidate. (`linear`
+  was installed-but-disabled and removed 2026-08-01 — Linear is not in use.)
+  verify: `codex plugin list` shows exactly these five as installed/enabled.
 
 ## Skills — own (stored in this repo; the prompt PLACES them)  [default]
 branch-cleanup · git-sync · stack-detection
@@ -148,10 +179,11 @@ Context7 fetches live, and several such skills tell the agent to "fetch the
 latest documentation" in their own body. Install a remote skill only when it
 carries a *procedure* (an ordered, failure-avoiding recipe) or setup knowledge
 that is not in any public doc. Currently:
-- agent-browser — vercel-labs/agent-skills; why: drives the `agent-browser` CLI
-  (see CLI tools above) — procedure, not vendor docs
-- skill-development — why: structure/progressive-disclosure guidance when
-  authoring skills for this repo
+- agent-browser — **vercel-labs/agent-browser** (its own repo, not
+  `agent-skills` — that was recorded wrongly until 2026-08-01); why: drives the
+  `agent-browser` CLI (see CLI tools above) — procedure, not vendor docs
+- skill-development — anthropics/claude-code; why: structure/progressive-disclosure
+  guidance when authoring skills for this repo
 - vercel-cli-with-tokens — vercel-labs/agent-skills; why: token auth without
   leaking values into shell history, team scoping, env-var handling
 - vercel-optimize — vercel-labs/agent-skills; why: metrics-first gating plus
@@ -173,6 +205,41 @@ out and that contradicted the project-local rule anyway. Do not re-add it: a
 list that asserts installed state without it being true reads as verified
 coverage when there is none.
 
+## The account level — NOT provisioned by this repo
+Anthropic keeps a second configuration layer bound to the signed-in account,
+stored server-side. This repo cannot create it, cannot verify it, and cannot
+restore it: a fresh machine provisioned from `SETUP-PROMPT.md` gets none of it,
+and wiping the machine loses none of it. It is recorded here only so the next
+audit does not go looking for these things on disk — they are not there.
+
+What lives there: the Skills under claude.ai → Customize → Skills, account-level
+plugins, and every Connector of type **Web**. This file deliberately does not
+enumerate them. The list is machine- and person-specific, it goes stale the moment
+someone toggles a connector, and this repository is public — an inventory of which
+third-party services an account talks to is reconnaissance, not provisioning intent.
+
+To see the current state, read it at the source: `claude mcp list` shows the Web
+Connectors as `claude.ai <name>`, and claude.ai → Settings shows Skills and plugins.
+
+Two consequences worth knowing:
+- **Web Connectors DO reach Claude Code.** They appear in `claude mcp list` as
+  `claude.ai <name>`. So the account level is not fully separate — it leaks into
+  the local tooling in exactly one direction, and that is why this repo's MCP
+  section stays silent about them: they are configured in the account, not here.
+- **The Claude desktop app is three surfaces, not one.** Its Chat and Cowork
+  tabs read the account level plus locally installed *Extensions*
+  (`~/Library/Application Support/Claude/Claude Extensions/`) and
+  `claude_desktop_config.json`. Its Code tab reads the same Claude Code
+  configuration as the CLI. None of the desktop Extensions or that config file
+  affect Claude Code — verified 2026-08-01: `claude_desktop_config.json` holds
+  only a GitKraken server, and the other three servers the app lists come from
+  Extensions. Do not "fix" a difference between the two; it is by design.
+
+Open question, unanswered by the official docs: whether plugins installed at the
+account level become visible to Claude Code. Six plugins currently appear in both
+lists, and the file evidence cannot say whether that is one source read twice or
+two installs that happen to match. Do not assume either.
+
 ## Module: webservice  [ask]  — mostly project-local
 - optional global plugins: typescript-lsp
 - stack SKILLS are PROJECT-LOCAL — inside each project: `npx skills add <source>` WITHOUT -g, commit .agents/ + skills-lock.json:
@@ -188,10 +255,22 @@ field is omitted so the agent inherits the session model. No argument
 = dry run, `--apply` = write, absent harnesses are skipped, and it is idempotent.
 Run it after any change under `sources/`. verify: a second `./sync.sh` reports
 `zu schreiben: 0`. Per-harness format limits are documented in
-`sources/harness-notes/README.md` — Cursor's `.mdc` frontmatter requirement and
-Codex's `project_doc_max_bytes` in particular mean "identical" is not achievable
-everywhere, and the script fails loud rather than truncating. Windsurf is
-deliberately out of scope; see the same file for why.
+`sources/harness-notes/README.md` — Codex's `project_doc_max_bytes` in particular
+means "identical" is not achievable everywhere, and the script fails loud rather
+than truncating.
+
+**Grok is deliberately not placed into.** It reads `~/.claude/` directly, so a
+copy under `~/.grok/rules/` would load every rule twice per session; `sync.sh`
+reports it as inherited and warns if that directory is not empty. The trade-off
+is that Grok does not get the four subagents — see `sources/harness-notes/grok.md`.
+
+Supported harnesses are Claude Code, Codex, Grok, OpenCode and Antigravity, and
+they are **not equal**: Claude Code is the main workhorse and carries the full
+set; the other four verify work independently and take over when Claude runs out
+of tokens. They need the same rules — so they judge by the same standards — plus
+the skills they can actually run. Feature parity is explicitly not the goal.
+Cursor and Factory Droid were removed from scope 2026-08-01 (both were trials);
+Windsurf never was. See `sources/harness-notes/README.md` for the reasoning.
 
 ## Authored config (placed from this repo)  [default]
 Stored ONCE, in Claude Code's format, under `sources/claude/` (single source of
@@ -200,14 +279,20 @@ truth). A non-Claude agent translates these into its own format at provision tim
 - `sources/claude/CLAUDE.md` → the agent's global instruction file
 - `sources/claude/rules/` → where this agent reads global rules (copy ALL)
 - `sources/claude/agents/` → subagent definitions
+- `sources/claude/templates/` → `~/.agents/templates/` — ADR and feature-spec
+  templates, harness-neutral, one shared path. Nothing generates project docs
+  automatically; `search-discipline.md` points at this path for when you write one.
 
-There are no lifecycle hooks and no runbooks anymore: the hooks were retired
-2026-07-31 (ggshield quota at zero made them fail-open noise; the
-backend-deploy check lives on as the `deploy-safety.md` rule), and the runbook
-content was either folded into the rules or retired with its feature.
+There are no repo-authored security or deploy lifecycle hooks and no runbooks
+anymore: those hooks were retired 2026-07-31 (ggshield quota at zero made them
+fail-open noise; the backend-deploy check lives on as the `deploy-safety.md`
+rule), and the runbook content was either folded into the rules or retired with
+its feature. The only global lifecycle hooks retained in Claude Code and Codex
+are the external Orca integration hooks under `~/.orca/agent-hooks/`; Orca owns
+and manages them.
 
 ## System & Shell Environment  [default]
-- **Shell Aliases & Functions:** The canonical alias/function block for `~/.zshrc` is `sources/shell/aliases.zsh` (agent aliases `c`/`cc`/`co`/`oc`, git helpers, 1Password keychain token + `claude()` Greptile-key wrapper). NOTE: `op` is the 1Password CLI, never an alias.
+- **Shell Aliases & Functions:** The canonical alias/function block for `~/.zshrc` is `sources/shell/aliases.zsh` (agent aliases `c`/`cc`/`co`/`oc`, git helpers, 1Password keychain token, `codex()` Context7-key wrapper, and `claude()` Greptile-key wrapper). NOTE: `op` is the 1Password CLI, never an alias.
 
 ## Personal  [optional toggle]
 - shell/aliases.zsh, wezterm/wezterm.lua → dotfiles
@@ -220,13 +305,12 @@ harness supports config-time substitution, it references an env var that a shell
 wrapper fills from `op read` — never a literal. Vault is `APIKeys`; there is no
 `Private` vault on this machine.
 
-- CONTEXT7_API_KEY — op://APIKeys/context7/credential, exported by the
-  `opencode()` wrapper in `sources/shell/aliases.zsh`; `opencode.json` references
-  it as `{env:CONTEXT7_API_KEY}`. ⚠️ opencode substitutes a **missing** variable
-  with the empty string instead of erroring, so the wrapper checks explicitly and
-  says so — otherwise an unauthenticated Context7 looks like a working one.
-  For Claude Code, Context7 uses its own OAuth/keychain flow and needs no key.
-  Codex holds the same key; its secure form is the HTTP transport with
+- CONTEXT7_API_KEY — op://APIKeys/context7/credential, exported at process
+  start by the `codex()`, `claude()`, and `opencode()` wrappers in
+  `sources/shell/aliases.zsh`; their configs reference only the environment
+  variable name. Each wrapper hard-fails when the item is missing so an
+  unauthenticated Context7 cannot look like a working one. Claude Code expands
+  `${CONTEXT7_API_KEY}` in its HTTP header. Codex uses HTTP transport with
   `env_http_headers` (header name → env var name) instead of a stdio server with
   a literal `[mcp_servers.context7.env]` block:
   ```toml
@@ -234,12 +318,26 @@ wrapper fills from `op read` — never a literal. Vault is `APIKeys`; there is n
   url = "https://mcp.context7.com/mcp"
   env_http_headers = { CONTEXT7_API_KEY = "CONTEXT7_API_KEY" }
   ```
-  filled by the `codex()` wrapper. Do not flip either config before the
-  1Password item exists — both harnesses fail *quietly* without the key.
+  filled by the `codex()` wrapper. No literal Context7 key belongs in
+  `~/.claude.json`, `~/.codex/config.toml`, or any other config file.
 - GREPTILE_API_KEY — op://APIKeys/greptile/credential (resolved per-start by the `claude()` wrapper)
 - OP_SERVICE_ACCOUNT_TOKEN — macOS Keychain item `op-service-account` (basis for all `op run`/`op read`). It is **read-only** on the `APIKeys` vault: creating or updating an item fails with `(101) You do not have permission`. New secrets have to be added interactively by the user; an agent can read them but never write them.
 
-Audit: no config file under any harness should contain a literal key.
-`grep -rEl '(sk-|ctx7sk-|Bearer [A-Za-z0-9]{20})' ~/.claude ~/.codex ~/.config/opencode ~/.cursor ~/.gemini ~/.factory --include='*.json' --include='*.toml' 2>/dev/null`
-should print nothing.
-- (REF_API_KEY, EXA_API_KEY are Cursor-only — not in the Claude default)
+Audit: no *config* file of any supported harness may contain a literal key. Scan
+the config files by name — not the whole home directories. Recursing over
+`~/.claude` or `~/.codex` sweeps in session transcripts, model caches and bundled
+plugin fixtures, which match the pattern constantly and drown the real finding:
+
+```sh
+grep -lE '(\b(sk|ctx7sk)-[A-Za-z0-9_-]{16,}|Bearer [A-Za-z0-9]{20})' \
+  ~/.claude.json ~/.claude/settings.json ~/.codex/config.toml \
+  ~/.config/opencode/opencode.json ~/.grok/config.toml \
+  ~/.gemini/settings.json 2>/dev/null
+```
+
+should print nothing. Two details the earlier version got wrong, both worth
+keeping: `~/.claude.json` is a *file* next to the directory, so a
+directory-recursive scan never looked at the place Claude's MCP servers actually
+live; and a bare `sk-` with no word boundary or length floor matches ordinary
+identifiers — `task-master-ai` contains it, and one permanent false positive is
+enough to make everyone stop reading the output.

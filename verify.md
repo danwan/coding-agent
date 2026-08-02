@@ -28,8 +28,10 @@ Additional checks:
 
 - `agent-browser doctor --offline --quick` passes and a short session can open
   `https://example.com`, read its title, and close cleanly.
-- `ggshield api-status` is healthy. Check `ggshield quota`; enabled Git and
-  agent hooks are a FAIL when quota is zero because they cannot scan reliably.
+- `ggshield`: only the binary is required. Auth, quota and hooks are intentionally
+  inactive (see `PROVISION.md`) — do not report that as a FAIL. Check them only if
+  reactivation was selected, and then a hook installed while `ggshield quota` is
+  zero IS a FAIL, because it cannot scan and blocks pushes.
 - Verify every selected optional CLI/module tool in the same way.
 
 ## 2. Authored configuration
@@ -37,9 +39,19 @@ Additional checks:
 - Global instructions exist in the path used by this harness.
 - Every canonical rule in `sources/claude/rules/` is represented in the active
   always-loaded instructions and the full adapted references are available.
-- All four custom agents load in the harness's native format.
-- No lifecycle hooks are configured (they were retired 2026-07-31); a hook
-  wired in settings whose script no longer exists is a FAIL.
+- **No harness carries a rule that is NOT canonical.** Count the files: each
+  rules directory holds exactly the four canonical rules (plus a harness's own
+  files, e.g. Antigravity's `default.rules`). An extra `*.md` is a leftover from
+  an older revision and a FAIL — three such files survived in Antigravity until
+  2026-08-01 and were still being loaded into every session, pointing at rules
+  and runbooks that no longer exist. `sync.sh` places files; it never deletes.
+- All four custom agents load in the harness's native format (except Grok — see
+  section 4b).
+- The ADR and feature-spec templates are present in `~/.agents/templates/`.
+- No **repo-authored** lifecycle hooks are configured (they were retired
+  2026-07-31). The external Orca integration hooks under `~/.orca/agent-hooks/`
+  are expected and are not a finding — Orca owns them. Any hook wired in settings
+  whose script does not exist on disk is a FAIL.
 - The three default own skills are present exactly once:
   `branch-cleanup`, `git-sync`, `stack-detection`.
 - `./sync-agents.py` (no argument) reports `zu schreiben: 0`, and every
@@ -49,7 +61,7 @@ Additional checks:
   already carries the current authored content. A non-zero count means drift,
   not a failure of this check.
 - No skill directory contains a dangling symlink:
-  `find ~/.claude/skills ~/.agents/skills ~/.codex/skills ~/.cursor/skills ~/.gemini/antigravity-cli/skills -maxdepth 1 -type l ! -exec test -e {} \; -print`
+  `find ~/.claude/skills ~/.agents/skills ~/.codex/skills ~/.grok/skills ~/.gemini/antigravity-cli/skills -maxdepth 1 -type l ! -exec test -e {} \; -print`
   prints nothing.
 - `npx skills update -g -y` reports all tracked remote skills current, and its
   lock contains no retired repository source.
@@ -70,14 +82,35 @@ When the active harness is Codex:
 
 - Confirm CLI and desktop app use the same `~/.codex/config.toml`; do not create
   a second app-only MCP config.
-- Run `codex --strict-config` validation and `codex doctor --summary`.
+- Run `codex doctor --summary`; `0 fail` is the bar. Warnings about rollout files
+  or the state DB are Codex-internal session bookkeeping, not a config finding.
+  (`codex --strict-config` needs a TTY and cannot be checked from a script.)
 - Parse every `~/.codex/agents/*.toml` and require `name`, `description`, and
   `developer_instructions`.
 - Confirm Browser works in the desktop app, Chrome works through the Chrome
   plugin, and the standalone `agent-browser` CLI works independently.
-- Confirm OpenAI-curated GitHub, Gmail, Google Calendar, Google Drive, Notion,
-  and Vercel app plugins are installed/enabled when this setup selected them.
-- Ensure Claude-only command/agent/hook plugins are not installed into Codex.
+- `codex plugin list`: the OpenAI-curated app connectors are currently NOT
+  installed — that is the recorded state, not a FAIL. Report any change in
+  either direction, and check whether a newly installed connector duplicates an
+  existing raw MCP leg (Notion in particular).
+- The Claude-marketplace plugins listed in `PROVISION.md` are installed and
+  enabled in Codex. This is intended: Codex runs them natively. A Claude plugin
+  that is installed but NOT listed there is a prune candidate — ask, never
+  auto-remove.
+
+## 4b. Grok-specific checks
+
+When the active harness is Grok:
+
+- `grok inspect` lists the authored global rules **exactly once each**, sourced
+  from the Claude compat scanner. A rule appearing twice means someone placed a
+  copy under `~/.grok/rules/` — that directory must be empty.
+- `~/.grok/config.toml` disables the Cursor compat cells (Cursor is out of scope,
+  and its leftovers would otherwise still be loaded).
+- The skills intentionally switched off in Claude's `skillOverrides` are also
+  disabled in Grok's skills config; Grok does not inherit that state.
+- Known and accepted gap: the four authored subagents are NOT available in Grok.
+  Their absence is not a FAIL. A partial copy under `~/.grok/agents/` would be.
 
 ## 5. Shell and personal toggle
 

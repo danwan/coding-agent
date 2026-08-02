@@ -173,8 +173,7 @@
     "pyright-lsp@claude-plugins-official": false,
     "skill-creator@claude-plugins-official": true,
     "coderabbit@claude-plugins-official": true,
-    "greptile@claude-plugins-official": false,
-    "frontend-design@claude-plugins-official": false
+    "greptile@claude-plugins-official": false
   },
   "extraKnownMarketplaces": {},
   "sandbox": {

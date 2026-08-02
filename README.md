@@ -3,8 +3,8 @@
 An intent-based coding-agent setup. Public. Provisioned by pasting a prompt into
 an agent — no install scripts. Authored content is stored **once**, in
 Claude Code's format; the prompt is **harness-agnostic**, so Claude Code, Codex,
-OpenCode, Antigravity or Cursor can each run it and translate the same source
-into its own format.
+Grok, OpenCode and Antigravity can each run it and translate the same source into
+its own format. Those five are the supported set; anything else is out of scope.
 
 `PROVISION.md` declares *what* should be on a machine, *from where*, and
 *why*, plus a one-line *verify* per item. It has no install commands on

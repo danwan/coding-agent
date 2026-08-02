@@ -11,7 +11,7 @@ Before any broad code search, check whichever of these exist:
 - `docs/runbooks/`
 - project `CLAUDE.md`
 
-These are produced by the `project-docs` skill family and usually answer "where does X live" without reading code.
+Where a project keeps them, they usually answer "where does X live" without reading code. Nothing generates them automatically — when you add one, the ADR and feature-spec templates are in `~/.agents/templates/`.
 
 ## 2. Pick the tool by domain
 

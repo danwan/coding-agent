@@ -1,8 +1,9 @@
-You are configuring THIS machine as my coding-agent setup. You may be Claude
-Code, Codex, OpenCode, Antigravity, Cursor, or another coding agent — figure out
-which you are and adapt. Work autonomously and completely. Only stop to ask me
-for: a login you can't complete, a secret value, or a sudo password. Print one
-line per item — PASS, FAIL, or SKIP.
+You are configuring THIS machine as my coding-agent setup. The supported
+harnesses are Claude Code, Codex, Grok, OpenCode and Antigravity — figure out
+which one you are and adapt. If you are none of them, say so and stop: this
+setup is deliberately scoped to those five. Work autonomously and completely.
+Only stop to ask me for: a login you can't complete, a secret value, or a sudo
+password. Print one line per item — PASS, FAIL, or SKIP.
 
 Source of truth (public — read the raw files directly, no clone needed):
 - Intent:  https://raw.githubusercontent.com/danwan/coding-agent/main/PROVISION.md
@@ -18,7 +19,7 @@ is the contract, not any specific command or path.
 
 ## Step 0 — Identify yourself and this machine
 Establish, and print, before doing anything else:
-- **Which agent am I** (Claude Code / Codex / OpenCode / Antigravity / Cursor / other) **and what version?** (`<tool> --version`, `--help`, or your about/info.)
+- **Which agent am I** (Claude Code / Codex / Grok / OpenCode / Antigravity / other) **and what version?** (`<tool> --version`, `--help`, or your about/info.)
 - **What OS, distro, version, and architecture** is this? Which **shell**? Which **package manager** is available (brew / apt / dnf / pacman / winget / scoop / …)?
 - **What language is the user using** (from this prompt / their locale)? Report and interact in it.
 
@@ -38,8 +39,8 @@ your version. If a mechanism changed since this doc was written, adapt.
 
 ## Step 3 — Ask which optional items and modules to add
 On top of the `[default]` set, ask me about: the `[optional]` entries (e.g.
-playwright), the "personal" toggle (dotfiles + settings), and the
-modules `google` and/or `webservice`.
+playwright), the "personal" toggle (dotfiles + settings), and the `webservice`
+module.
 
 Use the harness detected in Step 0. Do not ask the user to choose Codex or
 OpenCode when the current agent already identifies itself unambiguously.
@@ -55,6 +56,8 @@ loads it (the targets you found in Step 1):
   into your skills dir (Claude reads them natively). Place the `[default]`
   own-skills; add the `[optional]` ones only if selected in Step 3 — see
   `PROVISION.md`'s "Skills — own" sections for which is which.
+- `sources/claude/templates/` → `~/.agents/templates/` (ADR + feature-spec
+  templates; `search-discipline.md` points at that path).
 - If "personal" was chosen: `sources/claude/settings.json.template`,
   `sources/claude/statusline.sh`, and the dotfiles under `sources/shell/`,
   `sources/wezterm/`.
@@ -63,9 +66,10 @@ loads it (the targets you found in Step 1):
 per its mapping — it carries only what you can't derive (format mapping + which
 Claude features to skip):
 - Codex → `sources/harness-notes/codex.md`
+- Grok → `sources/harness-notes/grok.md` — read this **before placing anything**:
+  Grok reads `~/.claude/` directly, so placing copies double-loads every rule
 - OpenCode → `sources/harness-notes/opencode.md`
 - Antigravity → `sources/harness-notes/antigravity.md`
-- Cursor → `sources/harness-notes/cursor.md`
 
 Preserve instruction **intent**, not blindly literal bodies: translate
 frontmatter/format and adapt agent-specific paths, tool names, hook protocols,
