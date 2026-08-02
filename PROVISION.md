@@ -156,6 +156,18 @@ Monitor, `/usage`) or a capability of the model.
 else goes project-local, in the repo that needs it, and is not this setup's
 business. Adding a global skill is the exception and needs a reason recorded here.
 
+The canonical copy of all thirteen lives in `~/.agents/skills/`; **every harness
+symlinks all thirteen out of that hub** (`~/.claude/skills`, `~/.codex/skills`,
+`~/.gemini/antigravity-cli/skills`). OpenCode reads the hub directly, Grok
+inherits `~/.claude/skills` via `[compat.claude]` and gets no copies. A harness
+carrying fewer than thirteen is drift, not a per-harness decision — enable or
+disable a skill through the harness's own overrides, never by omitting the link.
+
+**One documented exception:** `~/.codex/skills/chrome-ui-explorer` is a real
+directory, Codex-only, and deliberately not in the hub. It drives Codex's in-app
+Chrome plugin; no other harness can use it, so hub-placing it would put a dead
+skill in four directories. Keep it where it is.
+
 ### Own — stored in this repo; the prompt PLACES all of them  [default]
 - branch-cleanup — why: converge a messy repo onto clean main; dry-run-able
 - config-edit — Claude Code only; why: path syntax reference for its settings/permissions/hooks

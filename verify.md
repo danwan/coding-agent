@@ -62,6 +62,15 @@ Additional checks:
   ```sh
   ls -1 ~/.agents/skills | wc -l   # 13
   ```
+- **Every harness links all thirteen.** A harness with fewer is drift — disable a
+  skill through that harness's own overrides, never by omitting the link. Codex
+  legitimately carries one extra, `chrome-ui-explorer` (real directory, Codex-only,
+  drives its in-app Chrome plugin — see PROVISION.md):
+  ```sh
+  for d in ~/.claude/skills ~/.codex/skills ~/.gemini/antigravity-cli/skills; do
+    printf '%s: %s\n' "$d" "$(ls -1 "$d" | wc -l)"
+  done   # 13 / 14 / 13
+  ```
 - The two rules that were skills until 2026-08 are present as rules, not skills:
   `~/.claude/rules/stack-detection.md` and `~/.claude/rules/review-routing.md`
   exist, and `~/.agents/skills/stack-detection` / `review-routing` do **not**.
