@@ -19,7 +19,7 @@ is the contract, not any specific command or path.
 
 ## Step 0 — Identify yourself and this machine
 Establish, and print, before doing anything else:
-- **Which agent am I** (Claude Code / Codex / OpenCode / Antigravity / Cursor / other) **and what version?** (`<tool> --version`, `--help`, or your about/info.)
+- **Which agent am I** (Claude Code / Codex / Grok / OpenCode / Antigravity / other) **and what version?** (`<tool> --version`, `--help`, or your about/info.)
 - **What OS, distro, version, and architecture** is this? Which **shell**? Which **package manager** is available (brew / apt / dnf / pacman / winget / scoop / …)?
 - **What language is the user using** (from this prompt / their locale)? Report and interact in it.
 

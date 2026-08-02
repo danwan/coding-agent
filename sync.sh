@@ -110,7 +110,14 @@ place_dir() {
   if [[ -L "$dd" ]]; then
     changed=$((changed+1))
     if (( APPLY )); then
-      rm -f "$dd" && mkdir -p "$dd" && say "  ~> ${dd/#$HOME/\~}/ (Symlink-Verzeichnis durch echtes ersetzt)"
+      # Fail loud instead of falling through: if the link survives, every place()
+      # below writes through it — straight back into this repo, which is exactly
+      # the situation this branch exists to fix.
+      if ! rm -f "$dd" || ! mkdir -p "$dd"; then
+        say "  !! Symlink-Verzeichnis ${dd/#$HOME/\~} nicht ersetzbar — übersprungen"
+        return 1
+      fi
+      say "  ~> ${dd/#$HOME/\~}/ (Symlink-Verzeichnis durch echtes ersetzt)"
     else
       say "  would replace symlinked dir ${dd/#$HOME/\~} -> $(readlink "$dd")"
       return 0

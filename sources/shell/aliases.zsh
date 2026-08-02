@@ -92,7 +92,10 @@ claude() {
   greptile_key="$(op read op://APIKeys/greptile/credential 2>/dev/null)"
   if [[ -z "$greptile_key" ]]; then
     print -u2 "claude: greptile key nicht aus 1Password lesbar -> starte ohne Greptile"
-    CONTEXT7_API_KEY="$context7_key" command claude "$@"
+    # Unset rather than just omit: if the caller exported GREPTILE_API_KEY, the
+    # child would inherit it and we would silently start *with* Greptile after
+    # announcing the opposite.
+    CONTEXT7_API_KEY="$context7_key" GREPTILE_API_KEY= command claude "$@"
     return
   fi
   CONTEXT7_API_KEY="$context7_key" GREPTILE_API_KEY="$greptile_key" command claude "$@"

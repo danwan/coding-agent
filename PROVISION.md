@@ -212,11 +212,14 @@ restore it: a fresh machine provisioned from `SETUP-PROMPT.md` gets none of it,
 and wiping the machine loses none of it. It is recorded here only so the next
 audit does not go looking for these things on disk — they are not there.
 
-What lives there (as of 2026-08-01): the Skills under claude.ai → Customize →
-Skills (`notion-workspace`, `humanizer`, `canvas-design`, `mcp-builder`,
-`morning`, `skill-creator`, `theme-factory`); the plugins `Operations` and
-`Human Resources`; and every Connector of type **Web** (Context7, Exa, GitHub,
-Gmail, Google Calendar, Google Drive, googledevapi, n8n, Notion, Sentry).
+What lives there: the Skills under claude.ai → Customize → Skills, account-level
+plugins, and every Connector of type **Web**. This file deliberately does not
+enumerate them. The list is machine- and person-specific, it goes stale the moment
+someone toggles a connector, and this repository is public — an inventory of which
+third-party services an account talks to is reconnaissance, not provisioning intent.
+
+To see the current state, read it at the source: `claude mcp list` shows the Web
+Connectors as `claude.ai <name>`, and claude.ai → Settings shows Skills and plugins.
 
 Two consequences worth knowing:
 - **Web Connectors DO reach Claude Code.** They appear in `claude mcp list` as
