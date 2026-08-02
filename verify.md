@@ -52,8 +52,19 @@ Additional checks:
   2026-07-31). The external Orca integration hooks under `~/.orca/agent-hooks/`
   are expected and are not a finding — Orca owns them. Any hook wired in settings
   whose script does not exist on disk is a FAIL.
-- The three default own skills are present exactly once:
-  `branch-cleanup`, `git-sync`, `stack-detection`.
+- `~/.agents/skills/` holds **exactly thirteen** entries and no others — seven
+  authored (`branch-cleanup`, `config-edit`, `convexcheck`, `deploy`, `git-sync`,
+  `notion-safe-writes`, `pin-auth`) and six remote (`agent-browser`,
+  `computer-use`, `orca-cli`, `orchestration`, `skill-development`,
+  `vercel-optimize`). An extra entry means something was installed globally that
+  belongs project-local; a missing one means a placement or `npx skills` install
+  did not run:
+  ```sh
+  ls -1 ~/.agents/skills | wc -l   # 13
+  ```
+- The two rules that were skills until 2026-08 are present as rules, not skills:
+  `~/.claude/rules/stack-detection.md` and `~/.claude/rules/review-routing.md`
+  exist, and `~/.agents/skills/stack-detection` / `review-routing` do **not**.
 - `./sync-agents.py` (no argument) reports `zu schreiben: 0`, and every
   generated `~/.codex/agents/*.toml` parses as TOML with a non-empty
   `developer_instructions`.

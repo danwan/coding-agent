@@ -4,13 +4,25 @@ Local-authored skills maintained in this repo. Each lives under
 `sources/skills/<name>/SKILL.md` and is placed into `~/.agents/skills/`
 (the canonical hub) by the setup prompt. From there it is linked into every
 installed tool's skill dir (`~/.claude/skills`, `~/.codex/skills`,
-`~/.cursor/skills`, `~/.gemini/antigravity-cli/skills`). OpenCode reads
-`~/.agents/skills/*/SKILL.md` directly — no per-tool dir needed.
+`~/.gemini/antigravity-cli/skills`). OpenCode reads `~/.agents/skills/*/SKILL.md`
+directly — no per-tool dir needed. Grok inherits `~/.claude/skills` and gets no
+copies.
 
-Remote skills (installed via `npx skills add`) are declared as intent in
+Remote skills (installed via `npx skills add -g`) are declared as intent in
 `PROVISION.md`, not here.
 
-## Inventory (9 skills)
+**Global skills are a closed set.** Seven authored (below) plus six remote —
+thirteen in total, listed in `PROVISION.md`. Everything else is installed
+**project-local**, in the repo that needs it, and is not this setup's business.
+Do not add a skill here to make it available everywhere; that decision is the
+exception, not the default.
+
+Two former skills became rules in 2026-08: `stack-detection` and
+`review-routing`. Both are reference policy rather than an invokable procedure,
+two subagents depend on the first, and rules reach every harness through
+`sync.sh` without occupying a global skill slot. See `sources/claude/rules/`.
+
+## Inventory (7 skills)
 
 | Skill | Purpose |
 | --- | --- |
@@ -21,8 +33,6 @@ Remote skills (installed via `npx skills add`) are declared as intent in
 | `git-sync` | Sync all git repos in the current directory across machines, or check their state. Triggers: "git sync", "Feierabend", "guten Morgen". |
 | `notion-safe-writes` | Safe-write guardrails for the Notion MCP. Prevents known Notion MCP write bugs (literal \u-escapes, silent search-replace skips, child-page deletion). |
 | `pin-auth` | Add PIN-based authentication to Next.js web apps. Two variants: Convex (DB sessions, fingerprinting, persistent rate limiting) and Lightweight (HMAC cookies, in-memory rate limiting). |
-| `review-routing` | Routing lookup for review and security tools. Resolves which engine is the DEFAULT for a quick diff review, simplify, or security scan. |
-| `stack-detection` | Verify which stack components (Convex, Vercel, Modal, Next.js, …) a project actually uses before applying stack-specific rules. |
 
 ## Lifecycle
 
@@ -35,3 +45,5 @@ Remote skills (installed via `npx skills add`) are declared as intent in
   from the machine into this repo.
 - **Retire a skill**: remove it from `~/.agents/skills/`, remove every harness
   symlink that pointed at it, then delete it here and from `PROVISION.md`.
+  Leaving the symlink behind is the common mistake — it dangles silently until
+  the `verify.md` check catches it.

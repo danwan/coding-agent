@@ -160,20 +160,30 @@ Monitor, `/usage`) or a capability of the model.
   was installed-but-disabled and removed 2026-08-01 — Linear is not in use.)
   verify: `codex plugin list` shows exactly these five as installed/enabled.
 
-## Skills — own (stored in this repo; the prompt PLACES them)  [default]
-branch-cleanup · git-sync · stack-detection
-verify: `/` shows each; skills load
+## Skills — the global set is closed at thirteen
 
-## Skills — own, optional (stored, not default)  [optional]
+**Seven authored + six remote. Nothing else is installed globally.** Everything
+else goes project-local, in the repo that needs it, and is not this setup's
+business. Adding a global skill is the exception and needs a reason recorded here.
+
+### Own — stored in this repo; the prompt PLACES all of them  [default]
+- branch-cleanup — why: converge a messy repo onto clean main; dry-run-able
 - config-edit — Claude Code only; why: path syntax reference for its settings/permissions/hooks
-- convexcheck — why: report-only audit of a project's Convex+Vercel+Modal deploy footguns (currently `off` in skillOverrides)
+- convexcheck — why: report-only audit of a project's Convex+Vercel+Modal deploy footguns (`off` in skillOverrides)
 - deploy — why: safe Modal/Convex deploy delegating to project deploy-script gates (project-local preferred)
+- git-sync — why: sync/inspect every repo in a directory across machines
 - notion-safe-writes — Claude/raw-Notion-MCP only; do not install for Codex's app connector
-- pin-auth — why: scaffold PIN-based auth (Convex or lightweight HMAC variant) into a Next.js app (currently `off` in skillOverrides)
-- review-routing — Claude Code only; why: routing lookup across its review/security plugins
-verify: `/` shows each once placed; skills load
+- pin-auth — why: scaffold PIN-based auth into a Next.js app (`off` in skillOverrides)
 
-## Skills — remote, globally installed (documented only — NOT stored in this repo)  [optional]
+verify: `~/.agents/skills/` holds exactly these seven; `/` shows each; skills load
+
+**Two former skills are now rules** (`sources/claude/rules/stack-detection.md`,
+`review-routing.md`). Both are reference policy rather than an invokable
+procedure, `challenger` and `codebase-audit` depend on the first, and rules reach
+every harness through `sync.sh` without occupying a global skill slot. Do not
+re-add them under `sources/skills/`.
+
+### Remote — globally installed (documented only — NOT stored in this repo)
 Remote skills live only as installs via `npx skills add -g` (canonical copy in
 `~/.agents/skills/`, symlinked into each harness). Re-install from their
 registries; this repo documents the intent, never their content.
@@ -189,16 +199,22 @@ that is not in any public doc. Currently:
   `agent-browser` CLI (see CLI tools above) — procedure, not vendor docs
 - skill-development — anthropics/claude-code; why: structure/progressive-disclosure
   guidance when authoring skills for this repo
-- vercel-cli-with-tokens — vercel-labs/agent-skills; why: token auth without
-  leaking values into shell history, team scoping, env-var handling
 - vercel-optimize — vercel-labs/agent-skills; why: metrics-first gating plus
   scripts; keep `off` until a real Vercel cost question exists
-- next-cache-components-adoption · next-cache-components-optimizer — vercel/next.js;
-  why: a test-driven migration loop; keep `off` until such a migration is due
 - computer-use · orca-cli · orchestration — stablyai/orca; why: stubs whose
   reference comes from the `orca` binary; keep `off` unless Orca is in use
-These named global skills are deliberate cross-project exceptions. Everything
-else under Module: webservice remains project-local.
+
+verify: `~/.agents/skills/` holds exactly these six alongside the seven authored
+ones — **thirteen entries, no more**
+
+**Removed 2026-08-02, do not re-add:** `vercel-cli-with-tokens`,
+`next-cache-components-adoption`, `next-cache-components-optimizer`. All three
+were documented as globally installed and were not present in `~/.agents/skills/`;
+the only trace was a dangling symlink in a harness directory. The Next cache
+skills are a migration loop that belongs in the repo doing the migration, and the
+Vercel token skill belongs wherever a Vercel deploy actually runs.
+
+Everything else under Module: webservice remains project-local.
 
 **Convex skills are NOT among them.** waynesutton/convexskills is installed
 per-project (see Module: webservice below), never with `-g`. This section

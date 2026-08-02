@@ -35,8 +35,6 @@
     "defaultMode": "auto"
   },
   "skillOverrides": {
-    "next-cache-components-adoption": "off",
-    "next-cache-components-optimizer": "off",
     "vercel-optimize": "off",
     "computer-use": "off",
     "orca-cli": "off",

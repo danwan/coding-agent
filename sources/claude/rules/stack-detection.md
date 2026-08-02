@@ -1,8 +1,3 @@
----
-name: stack-detection
-description: Verify which stack components (Next.js, server endpoints, Convex, Modal, Vercel, DB, Python tooling) actually exist in a project before applying stack-specific rules or flagging missing components. Use before reviews, audits, and any "missing X" finding. Detection signatures are shell one-liners; absence of a signature = "N/A — project does not use X".
----
-
 # Stack Detection (Verify Before Applying Stack-Specific Rules)
 
 > **Purpose:** Prevent reviewer/auditor agents from fabricating stack dependencies from global default assumptions. The default is not evidence — the project's actual files are. This is the canonical reference for all stack-scoping decisions.

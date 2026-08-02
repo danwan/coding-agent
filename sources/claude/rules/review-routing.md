@@ -1,21 +1,6 @@
----
-name: review-routing
-description: >
-  Routing lookup for review and security tools. Which tool/skill/agent to use
-  when — onboarding vs. iterative development vs. pre-PR vs. targeted reviews.
-  Clarifies which engine is the DEFAULT for a quick diff review, simplify, or
-  security scan, and resolves the name collisions (code-reviewer, security-review,
-  simplify) between built-in skills and the coderabbit plugin. Triggers:
-  "which review tool", "which reviewer", "review routing", "code review choice",
-  "which review skill", "default review tool", "built-in vs plugin review",
-  "code-reviewer namespace", "which simplify".
-allowed-tools: Read, Grep, Glob
-version: 2.0.0
----
-
 # Review & Security Routing
 
-> Three engines, clear defaults. Stack-scoping signatures: `~/.claude/skills/stack-detection/SKILL.md`.
+> Two engines, clear defaults. Stack-scoping signatures: `~/.claude/rules/stack-detection.md`.
 
 ## The Two Engines (orient here first)
 
