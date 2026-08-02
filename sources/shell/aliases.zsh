@@ -89,8 +89,5 @@ claude() {
     print -u2 "claude: context7 key nicht aus 1Password lesbar -> Start abgebrochen"
     return 1
   fi
-  # GREPTILE_API_KEY explicitly cleared, not just omitted: Greptile is out of
-  # scope (see PROVISION.md), and an exported value in the parent shell would
-  # otherwise silently re-enable it in the child.
-  CONTEXT7_API_KEY="$context7_key" GREPTILE_API_KEY= command claude "$@"
+  CONTEXT7_API_KEY="$context7_key" command claude "$@"
 }

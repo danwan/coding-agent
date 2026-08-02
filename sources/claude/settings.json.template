@@ -170,8 +170,7 @@
     "typescript-lsp@claude-plugins-official": false,
     "pyright-lsp@claude-plugins-official": false,
     "skill-creator@claude-plugins-official": true,
-    "coderabbit@claude-plugins-official": true,
-    "greptile@claude-plugins-official": false
+    "coderabbit@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {},
   "sandbox": {

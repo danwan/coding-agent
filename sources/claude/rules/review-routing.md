@@ -9,12 +9,6 @@
 | **built-in** (`/code-review`, `/simplify`, `/security-review`, `/review`, `/verify`) | Native Anthropic skills on the current diff; `/code-review ultra` = parallel cloud review | free, zero-setup | **DEFAULT** for everyday diff review, simplify, security scan |
 | **coderabbit** (`/coderabbit:coderabbit-review`, `coderabbit:autofix`) | External SaaS engine — 40+ static analyzers, AST/codegraph, SAST, Multi-Repo Analysis | needs CLI + `coderabbit auth login` | **escalation** for deeper bug/security/regression analysis, and for cross-repo breaking changes |
 
-> **Greptile is out of scope since 2026-08-02.** It was a second AI reviewer on the
-> same pull requests, and overlapping reviewers produce contradictory comments that
-> get ignored wholesale. Its one unique capability — whole-repo context beyond the
-> diff — is covered by CodeRabbit's Multi-Repo Analysis. Do not route to
-> `@greptileai` or its MCP tools.
-
 ## Default Lane (the common case)
 
 | Need | Default | Escalate to |

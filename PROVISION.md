@@ -55,12 +55,9 @@ the app writes them and will rewrite them again:
   than in a file this repo can own. Their permissions do appear in the personal
   `settings.json` template.
 
-Grok configures MCP in `~/.grok/config.toml`. Its compat scanning would also pull
-in every server from `~/.claude.json` — including the claude.ai account connectors,
-which are out of scope for this repo and would reach a second harness without any
-separate approval. **That cell is therefore off: `[compat.claude] mcps = false`**
-(set 2026-08-02). Grok's MCP servers must be declared in its own config; nothing is
-inherited. See `sources/harness-notes/grok.md` for the trade-off and how to reverse it.
+Grok configures MCP in `~/.grok/config.toml`, but also inherits Claude's servers
+from `~/.claude.json` through its compat scanning — so a raw leg added for Claude
+shows up there too. See `sources/harness-notes/grok.md`.
 
 ## Plugins (Claude Code)
 marketplaces: anthropics/claude-plugins-official (the only one — do not register
@@ -80,13 +77,6 @@ justification here.
 - skill-creator  [default] — why: authoring plus evals/benchmarks for skills — verify: /plugin lists it
 - coderabbit  [default] — why: external review engine, own CLI quota and
   subscription; the default reviewer — verify: `coderabbit --version` and /plugin lists it
-- greptile — **out of scope 2026-08-02.** Removed as a second AI reviewer running
-  on the same pull requests as CodeRabbit: the free tier's 50 monthly credits were
-  exhausted, auto-review was off anyway, and overlapping reviewers produce
-  contradictory comments that get ignored wholesale. The repo-wide context it
-  provided is covered by CodeRabbit's Multi-Repo Analysis. Uninstall the GitHub
-  App, drop the plugin, and delete `op://APIKeys/greptile/credential` once nothing
-  reads it — verify: /plugin does **not** list it, `GREPTILE_API_KEY` unset.
 - typescript-lsp / pyright-lsp  [optional, installed but disabled] — why: real
   language servers; zero context cost — verify: /plugin lists it
 
