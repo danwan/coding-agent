@@ -16,6 +16,14 @@ below do not load themselves — open them before acting.
   `echo` for env values — a trailing newline corrupts secrets.
 - **E6** Convex and Modal do not auto-deploy. Deploy the backend before testing a
   frontend against it. If you use it local for testing ensure the latest database is running, with latest updates.
+- **E7** Secrets never enter the agent's context. Resolve a secret only inside a
+  subprocess that consumes it directly — `op run --env-file=… -- <cmd>`, or
+  `op read '<op://…>' | <cmd>` piped straight into the tool. Never `op read` a value
+  to stdout, `cat`/`grep` a real secret out of an `.env`, or `echo` a key, so that the
+  value lands in tool output the model reads. To liveness-test a key, surface only the
+  HTTP status, a character count, or a one-way hash — never the value itself. Any secret
+  value that does reach the context is considered compromised and must be rotated. This
+  is why `op run`/piping exists: the shell sees the key, the model never does.
 
 ## W — Working
 
