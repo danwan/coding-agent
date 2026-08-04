@@ -227,6 +227,8 @@ Erkenne diese Muster explizit — sie sind häufiger als fehlende Tests:
 
 ## 7. Berichtsvorlage
 
+**Ausfüllreihenfolge ≠ Leseordnung:** Der Reifegrad wird als Letztes vergeben, nachdem alle Phasen abgeschlossen sind — er steht nur im Bericht vorn, weil der Leser das Fazit zuerst sehen will. Wer ihn zu Beginn festlegt, ankert seine eigene Analyse.
+
 ```markdown
 # Test- & CI-Audit — <Repo>
 
