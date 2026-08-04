@@ -75,7 +75,7 @@ Jedes Prinzip ist als Regel formuliert, gefolgt von der Begründung — du brauc
 
 **P2 — Gate-Kriterium: deterministisch und schnell.** Nur was reproduzierbar und in wenigen Minuten fertig ist, darf Merges blockieren.
 
-**P3 — Bugfix beginnt mit dem Test.** Ein Fix startet mit einem Test, der den Fehler reproduziert und fehlschlägt. Ein Feature benennt vorab die *eine* beobachtbare Prüfung, die es beweist. Prüfbar an der Commit-Historie: enthalten Fix-Commits Teständerungen?
+**P3 — Bugfix beginnt mit dem Test.** Ein Fix startet mit einem Test, der den Fehler reproduziert und fehlschlägt. Ein Feature benennt vorab die *eine* beobachtbare Prüfung, die es beweist. Prüfbar an der Commit-Historie — aber als **Stichprobe**, nicht als Vollerhebung: nimm die letzten ~10 Commits mit Fix-Charakter (`fix:`-Präfix oder erkennbar korrigierende Message) und prüfe, ob sie Teständerungen enthalten. Mehr Historie zu klassifizieren kostet unverhältnismäßig viel Kontext für wenig zusätzliche Aussagekraft.
 
 **P4 — „N/A" ist ein legitimes Prüfergebnis.** Eine statische Site ohne Server hat kein Rate-Limiting, keine Sessions, keine DB-Schicht. Fordere nichts für Schichten ein, die nicht existieren, und markiere sie explizit als nicht zutreffend — sonst erzeugst du genau das Rauschen, das Reviews unglaubwürdig macht.
 
@@ -129,6 +129,8 @@ Jedes Prinzip ist als Regel formuliert, gefolgt von der Begründung — du brauc
 
 ## 4. Audit-Verfahren
 
+**Zugriffsvoraussetzungen — vor Phase 1 klären.** Der Dateibaum allein reicht für dieses Audit nicht: Branch-Schutz/Rulesets, Required-Check-Namen, Bypass-Rollen und die Lauf-Historie liegen hinter der Hosting-API (bei GitHub z. B. `gh api repos/<owner>/<repo>/rulesets`, `gh api repos/<owner>/<repo>/branches/<main>/protection`, `gh run list`, `gh pr checks`). Stelle vorab fest, welche dieser Quellen dir zur Verfügung stehen. Fehlt der Zugriff, weise jede betroffene Prüfung im Bericht ausdrücklich als **„nicht prüfbar"** aus — niemals stillschweigend auslassen und niemals als „nicht vorhanden" werten. Ein Audit, das Gates nicht sehen konnte, sagt das; sonst verstößt es selbst gegen „kein Befund ohne Beleg".
+
 ### Phase 1 — Inventar (nur lesen, nichts behaupten)
 
 Erhebe, was tatsächlich da ist:
@@ -162,6 +164,8 @@ Für jede Prüfung, die laut Zielbild blockieren soll: Läuft sie im PR? Ist sie
 
 Laufzeit je Job, Flakiness-Rate, Timeout-Einstellungen, Worker-Zahl mit oder ohne Messgrundlage, Cache-Nutzung, doppelte Läufe nach Merge.
 
+**Flakiness wird gemessen, nicht geschätzt:** die letzten ~20 Läufe je Workflow ziehen (`gh run list`) und den Anteil der Läufe zählen, die erst im Retry grün wurden bzw. vom Runner als *flaky* markiert sind. Eine Retry-Zahl > 2 in der Runner-Konfiguration ohne dokumentierte Begründung ist dabei selbst ein Befund — sie ist die Retry-Variante des aufgeweichten Timeouts (P21).
+
 ### Phase 6 — Bericht
 
 Nach der Vorlage in Abschnitt 7. Priorisiert, belegt, mit Aufwand.
@@ -181,22 +185,23 @@ Nach der Vorlage in Abschnitt 7. Priorisiert, belegt, mit Aufwand.
 | 6   | Fehlertoleranz-Flags auf Prüfschritten             | keine            | **Hoch**            |
 | 7   | Tests lesen die Entwicklungs-ENV-Datei             | nein             | **Hoch**            |
 | 8   | Nicht-deterministische Tests als Gate              | nein             | **Hoch**            |
-| 9   | Full-Suite blockiert den Merge                     | nein             | **Mittel**          |
-| 10  | Nightly existiert und ist manuell triggerbar       | ja               | **Mittel**          |
-| 11  | Dependency-Audit blockierend (bei Deploy-Ziel)     | ja               | **Mittel**          |
-| 12  | Artefakt-Upload bei Fehlschlag                     | ja               | **Mittel**          |
-| 13  | Nebenläufigkeitsgruppe mit Abbruch                 | ja               | **Mittel**          |
-| 14  | Teure Jobs laufen nach Merge erneut                | nein             | **Mittel**          |
-| 15  | Worker-Zahl ohne Messgrundlage erhöht              | nein             | **Mittel**          |
-| 16  | Feste Wartezeiten statt Health-Poll                | keine            | **Mittel**          |
-| 17  | Timeout über Default ohne Begründung               | nein             | **Mittel**          |
-| 18  | Coverage-Schwelle in der Historie gesenkt          | nein             | **Mittel**          |
-| 19  | Testverteilung folgt der Pyramide                  | ja               | **Mittel**          |
-| 20  | Tests liegen neben dem Code                        | ja               | **Niedrig**         |
-| 21  | Environment je Testzweck getrennt                  | ja               | **Niedrig**         |
-| 22  | Cron auf ungerader Minute                          | ja               | **Niedrig**         |
-| 23  | Dependency-Bot gruppiert, Automerge nur mit Gate   | ja               | **Niedrig**         |
-| 24  | Ein Verify-Entrypoint bei Mehr-Stack-Repos         | ja               | **Niedrig**         |
+| 9   | Serverseitiges Secret-Scanning + SCA/Dependency-Inventar aktiv | ja   | **Hoch**            |
+| 10  | Full-Suite blockiert den Merge                     | nein             | **Mittel**          |
+| 11  | Nightly existiert und ist manuell triggerbar       | ja               | **Mittel**          |
+| 12  | Dependency-Audit blockierend (bei Deploy-Ziel)     | ja               | **Mittel**          |
+| 13  | Artefakt-Upload bei Fehlschlag                     | ja               | **Mittel**          |
+| 14  | Nebenläufigkeitsgruppe mit Abbruch                 | ja               | **Mittel**          |
+| 15  | Teure Jobs laufen nach Merge erneut                | nein             | **Mittel**          |
+| 16  | Worker-Zahl ohne Messgrundlage erhöht              | nein             | **Mittel**          |
+| 17  | Feste Wartezeiten statt Health-Poll                | keine            | **Mittel**          |
+| 18  | Timeout über Default ohne Begründung               | nein             | **Mittel**          |
+| 19  | Coverage-Schwelle in der Historie gesenkt          | nein             | **Mittel**          |
+| 20  | Testverteilung folgt der Pyramide                  | ja               | **Mittel**          |
+| 21  | Tests liegen neben dem Code                        | ja               | **Niedrig**         |
+| 22  | Environment je Testzweck getrennt                  | ja               | **Niedrig**         |
+| 23  | Cron auf ungerader Minute                          | ja               | **Niedrig**         |
+| 24  | Dependency-Bot gruppiert, Automerge nur mit Gate   | ja               | **Niedrig**         |
+| 25  | Ein Verify-Entrypoint bei Mehr-Stack-Repos         | ja               | **Niedrig**         |
 
 
 ---
