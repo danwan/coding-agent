@@ -155,17 +155,17 @@ Monitor, `/usage`) or a capability of the model.
   was installed-but-disabled and removed 2026-08-01 — Linear is not in use.)
   verify: `codex plugin list` shows exactly these five as installed/enabled.
 
-## Skills — the global set is closed at thirteen
+## Skills — the global set is closed at fourteen
 
-**Seven authored + six remote. Nothing else is installed globally.** Everything
+**Eight authored + six remote. Nothing else is installed globally.** Everything
 else goes project-local, in the repo that needs it, and is not this setup's
 business. Adding a global skill is the exception and needs a reason recorded here.
 
-The canonical copy of all thirteen lives in `~/.agents/skills/`; **every harness
-symlinks all thirteen out of that hub** (`~/.claude/skills`, `~/.codex/skills`,
+The canonical copy of all fourteen lives in `~/.agents/skills/`; **every harness
+symlinks all fourteen out of that hub** (`~/.claude/skills`, `~/.codex/skills`,
 `~/.gemini/antigravity-cli/skills`). OpenCode reads the hub directly, Grok
 inherits `~/.claude/skills` via `[compat.claude]` and gets no copies. A harness
-carrying fewer than thirteen is drift, not a per-harness decision — enable or
+carrying fewer than fourteen is drift, not a per-harness decision — enable or
 disable a skill through the harness's own overrides, never by omitting the link.
 
 **One documented exception:** `~/.codex/skills/chrome-ui-explorer` is a real
@@ -181,8 +181,12 @@ skill in four directories. Keep it where it is.
 - git-sync — why: sync/inspect every repo in a directory across machines
 - notion-safe-writes — Claude/raw-Notion-MCP only; do not install for Codex's app connector
 - pin-auth — why: scaffold PIN-based auth into a Next.js app (`off` in skillOverrides)
+- test-ci-audit — why: audit + fix any repo's tests/CI/GitHub gates against the
+  house standard (P1–P24, rulesets, required checks); inherently cross-project —
+  its whole point is running in arbitrary repos, so project-local placement
+  would defeat it. Added 2026-08-04.
 
-verify: `~/.agents/skills/` holds exactly these seven; `/` shows each; skills load
+verify: `~/.agents/skills/` holds exactly these eight; `/` shows each; skills load
 
 **Two former skills are now rules** (`sources/claude/rules/stack-detection.md`,
 `review-routing.md`). Both are reference policy rather than an invokable
@@ -211,7 +215,7 @@ that is not in any public doc. Currently:
 - computer-use · orca-cli · orchestration — stablyai/orca; why: stubs whose
   reference comes from the `orca` binary; keep `off` unless Orca is in use
 
-verify: `~/.agents/skills/` holds exactly these six alongside the seven authored
+verify: `~/.agents/skills/` holds exactly these six alongside the eight authored
 ones — **thirteen entries, no more**
 
 **Removed 2026-08-02, do not re-add:** `vercel-cli-with-tokens`,
