@@ -42,7 +42,6 @@ both legs' tool schemas are charged to every session.
 - context7  [default, all harnesses] — https://mcp.context7.com/mcp — why: current library docs — key is CONTEXT7_API_KEY from op://APIKeys/context7/credential, injected by the harness's shell wrapper, **never a literal in a config file** — verify: server lists tools and one library-resolution call succeeds
 - google-developer-knowledge  [optional] — https://developerknowledge.googleapis.com/mcp — why: Google-platform docs — verify: server lists tools
 - playwright  [optional, OpenCode only] — npx @playwright/mcp@latest — why: headless browser for the one harness with no browser plugin; Claude and Codex use their own browser surfaces plus the `agent-browser` CLI — verify: agent can screenshot a page
-- GitKraken  [optional, Codex] — why: git/PR operations beyond the `gh` CLI — verify: one read-only repo lookup succeeds
 - computer-use  [optional, Codex] — why: desktop control, tied to the Orca toolchain — verify: server lists tools
 
 **App-owned, not provisioned by this repo** — do not add, remove, or "fix" these;
@@ -103,7 +102,7 @@ the plugin is invoked or not.
 All 276 plugins in the official marketplace were filtered against the selection
 rule and against the stack this machine actually uses. Most are vendor
 integrations for services not in use; the overlapping ones (context7, notion,
-sentry, exa, github, gitkraken, playwright) are already configured as MCP
+sentry, exa, github, playwright) are already configured as MCP
 servers, and the code-search and security ones (serena, lumen, sourcegraph,
 semgrep, sonarqube, claude-security) duplicate coderabbit and ggshield.
 
@@ -135,7 +134,7 @@ Monitor, `/usage`) or a capability of the model.
   app-owned browser; Chrome controls the user's existing Chrome profile.
   Browser is app-only. verify: each selected surface can open `https://example.com`
 - OpenAI-curated app connectors (GitHub, Gmail, Google Calendar, Google Drive,
-  Notion, Vercel) — **none of them is installed** (verified 2026-08-01). This
+  Vercel) — **none of them is installed** (verified 2026-08-01). This
   section previously described them as the default on this setup, including a
   claim that the Vercel plugin supplies the `agent-browser` skills. It does not,
   because it is not installed; the `agent-browser` CLI and the separately
@@ -145,8 +144,6 @@ Monitor, `/usage`) or a capability of the model.
   service, and keep its bundled skills trimmed with `[[skills.config]]` so they
   do not overflow Codex's skill-description budget. verify: one read-only
   profile, list, or lookup call succeeds per configured service.
-- Notion in Codex therefore runs over the **raw MCP leg**, not a connector — it
-  is the only access path there, and removing it would cut Notion off entirely.
 - Claude-marketplace plugins in Codex [default on this setup]: `coderabbit`,
   `commit-commands`, `skill-creator`, `typescript-lsp`, `pyright-lsp` — installed
   and enabled. Codex registers the `claude-plugins-official` marketplace and runs
@@ -179,7 +176,9 @@ skill in four directories. Keep it where it is.
 - convexcheck — why: report-only audit of a project's Convex+Vercel+Modal deploy footguns (`off` in skillOverrides)
 - deploy — why: safe Modal/Convex deploy delegating to project deploy-script gates (project-local preferred)
 - git-sync — why: sync/inspect every repo in a directory across machines
-- notion-safe-writes — Claude/raw-Notion-MCP only; do not install for Codex's app connector
+- notion-safe-writes — why: safe-write guardrails for the Notion MCP (Claude
+  only; Notion access is the claude.ai connector). Disabled in Codex via
+  `[[skills.config]]` override — Notion removed from Codex 2026-08.
 - pin-auth — why: scaffold PIN-based auth into a Next.js app (`off` in skillOverrides)
 - test-ci-audit — why: audit + fix any repo's tests/CI/GitHub gates against the
   house standard (P1–P24, rulesets, required checks); inherently cross-project —
@@ -263,9 +262,9 @@ Two consequences worth knowing:
   (`~/Library/Application Support/Claude/Claude Extensions/`) and
   `claude_desktop_config.json`. Its Code tab reads the same Claude Code
   configuration as the CLI. None of the desktop Extensions or that config file
-  affect Claude Code — verified 2026-08-01: `claude_desktop_config.json` holds
-  only a GitKraken server, and the other three servers the app lists come from
-  Extensions. Do not "fix" a difference between the two; it is by design.
+  affect Claude Code. As of 2026-08-05, `claude_desktop_config.json` declares no
+  MCP servers; servers shown by the app can still come from Extensions. Do not
+  "fix" a difference between the two; it is by design.
 
 Open question, unanswered by the official docs: whether plugins installed at the
 account level become visible to Claude Code. Six plugins currently appear in both
