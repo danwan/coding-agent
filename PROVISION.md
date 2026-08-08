@@ -40,14 +40,28 @@ second raw MCP leg for it — the duplicate is unauthenticated or redundant, and
 both legs' tool schemas are charged to every session.
 
 - context7  [default, all harnesses] — https://mcp.context7.com/mcp — why: current library docs — key is CONTEXT7_API_KEY from op://APIKeys/context7/credential, injected by the harness's shell wrapper, **never a literal in a config file** — verify: server lists tools and one library-resolution call succeeds
-- google-developer-knowledge  [optional] — https://developerknowledge.googleapis.com/mcp — why: Google-platform docs — verify: server lists tools
 - playwright  [optional, OpenCode only] — npx @playwright/mcp@latest — why: headless browser for the one harness with no browser plugin; Claude and Codex use their own browser surfaces plus the `agent-browser` CLI — verify: agent can screenshot a page
 - computer-use  [optional, Codex] — why: desktop control, tied to the Orca toolchain — verify: server lists tools
 
+**Removed 2026-08-08, do not re-add:**
+- **GitKraken** — the GitKraken CLI (`gk-alpha`) had written itself as a raw MCP
+  server into all four harness configs (`~/.claude.json`, `~/.codex/config.toml`,
+  OpenCode, Gemini) without ever being documented here. We do not use GitKraken;
+  all four entries were deleted. If it reappears, the GitKraken CLI/GitLens
+  re-registered itself — remove the entries again rather than adopting them.
+- **google-developer-knowledge** as a raw MCP leg — it duplicated the claude.ai
+  `googledevapi` connector (same service, second leg, unauthenticated and broken
+  on the Claude side), violating the one-leg-per-service rule above. Removed from
+  `~/.claude.json`, `~/.codex/config.toml`, and OpenCode. Google-platform docs
+  reach Claude through the account connector; the other harnesses do without.
+
 **App-owned, not provisioned by this repo** — do not add, remove, or "fix" these;
 the app writes them and will rewrite them again:
-- `node_repl` — injected by the Codex desktop app into both its own and Claude's
-  MCP config; it backs the in-app Browser plugin.
+- `node_repl` — injected by the Codex desktop app into its own MCP config; it
+  backs the in-app Browser plugin. A stale copy in Claude's `~/.claude.json`
+  (pointing at the renamed-away `Codex.app` path, dead since the app became
+  ChatGPT.app) was removed 2026-08-08 — if the app re-injects a working one
+  there, leave it; a broken one can go again.
 - The claude.ai account connectors (Notion, Gmail, Calendar, Drive, Exa, Sentry,
   n8n, …) and the OpenAI-curated Codex app plugins. They are bound to the signed-in
   account, have no portable standalone form, and are configured in the app rather
