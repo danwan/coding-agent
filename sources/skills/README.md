@@ -11,8 +11,8 @@ copies.
 Remote skills (installed via `npx skills add -g`) are declared as intent in
 `PROVISION.md`, not here.
 
-**Global skills are a closed set.** Seven authored (below) plus six remote —
-thirteen in total, listed in `PROVISION.md`. Everything else is installed
+**Global skills are a closed set.** Nine authored (below) plus six remote —
+fifteen in total, listed in `PROVISION.md`. Everything else is installed
 **project-local**, in the repo that needs it, and is not this setup's business.
 Do not add a skill here to make it available everywhere; that decision is the
 exception, not the default.
@@ -22,7 +22,7 @@ Two former skills became rules in 2026-08: `stack-detection` and
 two subagents depend on the first, and rules reach every harness through
 `sync.sh` without occupying a global skill slot. See `sources/claude/rules/`.
 
-## Inventory (7 skills)
+## Inventory (9 skills)
 
 | Skill | Purpose |
 | --- | --- |
@@ -30,9 +30,11 @@ two subagents depend on the first, and rules reach every harness through
 | `config-edit` | Reference for path syntax in Claude Code `settings.json` and hooks (permissions, sandbox, hook paths, directory patterns). |
 | `convexcheck` | Audit the current project's deploy setup (Convex + Vercel + Modal + shell) for footguns from `deploy-safety.md`. Report-only. |
 | `deploy` | Safe Modal/Convex backend deployment. Delegates to project deploy scripts that own the 10-gate safety contract. |
+| `findings-to-prs` | Convert existing review findings into GitHub issues and isolated, challenged draft PRs without merging. |
 | `git-sync` | Sync all git repos in the current directory across machines, or check their state. Triggers: "git sync", "Feierabend", "guten Morgen". |
 | `notion-safe-writes` | Safe-write guardrails for the Notion MCP. Prevents known Notion MCP write bugs (literal \u-escapes, silent search-replace skips, child-page deletion). |
 | `pin-auth` | Add PIN-based authentication to Next.js web apps. Two variants: Convex (DB sessions, fingerprinting, persistent rate limiting) and Lightweight (HMAC cookies, in-memory rate limiting). |
+| `test-ci-audit` | Audit and fix test strategy, CI workflows, and GitHub merge enforcement against the house standard. |
 
 ## Lifecycle
 

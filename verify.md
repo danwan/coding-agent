@@ -52,24 +52,25 @@ Additional checks:
   2026-07-31). The external Orca integration hooks under `~/.orca/agent-hooks/`
   are expected and are not a finding — Orca owns them. Any hook wired in settings
   whose script does not exist on disk is a FAIL.
-- `~/.agents/skills/` holds **exactly fourteen** entries and no others — eight
-  authored (`branch-cleanup`, `config-edit`, `convexcheck`, `deploy`, `git-sync`,
-  `notion-safe-writes`, `pin-auth`, `test-ci-audit`) and six remote (`agent-browser`,
+- `~/.agents/skills/` holds **exactly fifteen** entries and no others — nine
+  authored (`branch-cleanup`, `config-edit`, `convexcheck`, `deploy`,
+  `findings-to-prs`, `git-sync`, `notion-safe-writes`, `pin-auth`,
+  `test-ci-audit`) and six remote (`agent-browser`,
   `computer-use`, `orca-cli`, `orchestration`, `skill-development`,
   `vercel-optimize`). An extra entry means something was installed globally that
   belongs project-local; a missing one means a placement or `npx skills` install
   did not run:
   ```sh
-  ls -1 ~/.agents/skills | wc -l   # 14
+  ls -1 ~/.agents/skills | wc -l   # 15
   ```
-- **Every harness links all fourteen.** A harness with fewer is drift — disable a
+- **Every harness links all fifteen.** A harness with fewer is drift — disable a
   skill through that harness's own overrides, never by omitting the link. Codex
   legitimately carries one extra, `chrome-ui-explorer` (real directory, Codex-only,
   drives its in-app Chrome plugin — see PROVISION.md):
   ```sh
   for d in ~/.claude/skills ~/.codex/skills ~/.gemini/antigravity-cli/skills; do
     printf '%s: %s\n' "$d" "$(ls -1 "$d" | wc -l)"
-  done   # 13 / 14 / 13
+  done   # 15 / 16 / 15 (`ls` hides Codex's `.system`; `chrome-ui-explorer` is the visible extra)
   ```
 - The two rules that were skills until 2026-08 are present as rules, not skills:
   `~/.claude/rules/stack-detection.md` and `~/.claude/rules/review-routing.md`

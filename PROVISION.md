@@ -152,17 +152,17 @@ Monitor, `/usage`) or a capability of the model.
   was installed-but-disabled and removed 2026-08-01 — Linear is not in use.)
   verify: `codex plugin list` shows exactly these five as installed/enabled.
 
-## Skills — the global set is closed at fourteen
+## Skills — the global set is closed at fifteen
 
-**Eight authored + six remote. Nothing else is installed globally.** Everything
+**Nine authored + six remote. Nothing else is installed globally.** Everything
 else goes project-local, in the repo that needs it, and is not this setup's
 business. Adding a global skill is the exception and needs a reason recorded here.
 
-The canonical copy of all fourteen lives in `~/.agents/skills/`; **every harness
-symlinks all fourteen out of that hub** (`~/.claude/skills`, `~/.codex/skills`,
+The canonical copy of all fifteen lives in `~/.agents/skills/`; **every harness
+symlinks all fifteen out of that hub** (`~/.claude/skills`, `~/.codex/skills`,
 `~/.gemini/antigravity-cli/skills`). OpenCode reads the hub directly, Grok
 inherits `~/.claude/skills` via `[compat.claude]` and gets no copies. A harness
-carrying fewer than fourteen is drift, not a per-harness decision — enable or
+carrying fewer than fifteen is drift, not a per-harness decision — enable or
 disable a skill through the harness's own overrides, never by omitting the link.
 
 **One documented exception:** `~/.codex/skills/chrome-ui-explorer` is a real
@@ -175,6 +175,9 @@ skill in four directories. Keep it where it is.
 - config-edit — Claude Code only; why: path syntax reference for its settings/permissions/hooks
 - convexcheck — why: report-only audit of a project's Convex+Vercel+Modal deploy footguns (`off` in skillOverrides)
 - deploy — why: safe Modal/Convex deploy delegating to project deploy-script gates (project-local preferred)
+- findings-to-prs — why: turn existing review findings into tracked GitHub
+  issues and isolated, challenged draft PRs without merging; cross-project by
+  design and harness-neutral for Claude and Codex
 - git-sync — why: sync/inspect every repo in a directory across machines
 - notion-safe-writes — why: safe-write guardrails for the Notion MCP (Claude
   only; Notion access is the claude.ai connector). Disabled in Codex via
@@ -185,7 +188,7 @@ skill in four directories. Keep it where it is.
   its whole point is running in arbitrary repos, so project-local placement
   would defeat it. Added 2026-08-04.
 
-verify: `~/.agents/skills/` holds exactly these eight; `/` shows each; skills load
+verify: `~/.agents/skills/` holds exactly these nine; `/` shows each; skills load
 
 **Two former skills are now rules** (`sources/claude/rules/stack-detection.md`,
 `review-routing.md`). Both are reference policy rather than an invokable
@@ -214,8 +217,8 @@ that is not in any public doc. Currently:
 - computer-use · orca-cli · orchestration — stablyai/orca; why: stubs whose
   reference comes from the `orca` binary; keep `off` unless Orca is in use
 
-verify: `~/.agents/skills/` holds exactly these six alongside the eight authored
-ones — **thirteen entries, no more**
+verify: `~/.agents/skills/` holds exactly these six alongside the nine authored
+ones — **fifteen entries, no more**
 
 **Removed 2026-08-02, do not re-add:** `vercel-cli-with-tokens`,
 `next-cache-components-adoption`, `next-cache-components-optimizer`. All three

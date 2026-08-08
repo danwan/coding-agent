@@ -130,6 +130,32 @@ place_dir() {
   done
 }
 
+# link_skill <hub-skill-dir> <harness-skill-dir>
+# Harnesses load the shared hub through links. Missing or stale links are fixed;
+# real directories are left untouched so an untracked local skill is never
+# deleted or overwritten silently.
+link_skill() {
+  local s="$1" d="$2" rel
+  [[ -d "$s" ]] || { say "  !! Skill-Quelle fehlt: ${s/#$HOME/\~}"; return 1; }
+  if [[ -L "$d" ]] && [[ "$d" -ef "$s" ]]; then
+    same=$((same+1)); return 0
+  fi
+  if [[ -e "$d" ]] && [[ ! -L "$d" ]]; then
+    changed=$((changed+1))
+    say "  !! ${d/#$HOME/\~} ist ein echtes Verzeichnis — nicht automatisch ersetzt"
+    return 1
+  fi
+  changed=$((changed+1))
+  rel="$(python3 -c 'import os,sys; print(os.path.relpath(sys.argv[1], os.path.dirname(sys.argv[2])))' "$s" "$d")" || return 1
+  if (( APPLY )); then
+    mkdir -p "$(dirname "$d")"
+    [[ -L "$d" ]] && rm -f "$d"
+    ln -s "$rel" "$d" && say "  ~> ${d/#$HOME/\~} -> $rel"
+  else
+    say "  would link ${d/#$HOME/\~} -> $rel"
+  fi
+}
+
 need() { [[ -d "$1" ]] || { skipped=$((skipped+1)); say "  (nicht installiert — übersprungen)"; return 1; }; }
 
 # ── Claude Code — the reference implementation ───────────────────────────────
@@ -156,6 +182,20 @@ if need "$HOME/.agents"; then
   # hub under one path every agent can reference; search-discipline.md points here.
   place_dir "$SRC/templates" "$HOME/.agents/templates"
 fi
+
+# Claude, Codex, and Antigravity all load the same canonical user skills. Grok
+# inherits Claude's directory and OpenCode reads ~/.agents/skills directly.
+for harness_skills in \
+  "$HOME/.claude/skills" \
+  "$HOME/.codex/skills" \
+  "$HOME/.gemini/antigravity-cli/skills"; do
+  [[ -d "$harness_skills" ]] || continue
+  for hub_skill in "$HOME/.agents/skills"/*/; do
+    [[ -d "$hub_skill" ]] || continue
+    name="$(basename "$hub_skill")"
+    link_skill "${hub_skill%/}" "$harness_skills/$name"
+  done
+done
 
 # ── Codex — same content, its own filenames ─────────────────────────────────
 # Codex reads ~/.codex/AGENTS.md. It has no rules-glob, so the rules are

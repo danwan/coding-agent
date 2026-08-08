@@ -10,7 +10,6 @@ description: >
   prüfen", "CI einrichten", "Repo auf Standard bringen", "test audit",
   "check github config" — even if they only mention one aspect (just tests,
   just CI, or just branch protection), since the three are audited together.
-effort: medium
 ---
 
 # Test- und CI-Audit
